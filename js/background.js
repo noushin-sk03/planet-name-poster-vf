@@ -245,13 +245,14 @@ const SolarBackground = (() => {
     // Center point of the Solar System
     // On desktop, offset slightly to account for the 250px left sidebar
     if (width >= 820) {
-      sunCenterX = 250 + (width - 250) * 0.50;
-      sunCenterY = height * 0.46;
-      baseRadius = Math.min((width - 250) * 0.48, height * 0.60);
+      // Space between left sidebar (250px) and right panel
+      sunCenterX = 250 + (width - 250) * 0.46;
+      sunCenterY = height * 0.52;
+      baseRadius = Math.min((width - 250) * 0.45, height * 0.56);
     } else {
       sunCenterX = width * 0.50;
-      sunCenterY = height * 0.43;
-      baseRadius = Math.min(width * 0.52, height * 0.46);
+      sunCenterY = height * 0.40;
+      baseRadius = Math.min(width * 0.50, height * 0.42);
     }
 
     sunBody.projX = sunCenterX;

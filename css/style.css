@@ -333,21 +333,34 @@ body {
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
 }
 
-/* --- Selected Planet Placeholder Panel --- */
+/* --- Selected Planet Placeholder Panel (Docked on Right) --- */
 .selection-panel {
   width: 100%;
-  max-width: 480px;
+  max-width: 440px;
   pointer-events: auto; /* Clickable */
   margin-top: auto;
 }
 
+@media (min-width: 820px) {
+  .selection-panel {
+    position: fixed;
+    right: 2rem;
+    bottom: 2rem;
+    width: 360px;
+    max-width: calc(100vw - 300px);
+    margin: 0;
+    z-index: 30;
+  }
+}
+
 .selection-card {
   background: var(--color-bg-card);
-  backdrop-filter: blur(16px);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 1.25rem 1.4rem;
-  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.7), 0 0 0 1px var(--color-border);
+  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.75), 0 0 0 1px var(--color-border);
   transition: transform var(--transition-fast), border-color var(--transition-fast);
 }
 
