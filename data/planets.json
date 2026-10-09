@@ -1,0 +1,336 @@
+[
+  {
+    "id": "mercury",
+    "name": "Mercury",
+    "type": "planet",
+    "texture": "textures/mercury.jpg",
+    "dayTemp": "430 °C",
+    "nightTemp": "-180 °C",
+    "lengthOfDay": "4,222.6 hours (175.9 Earth days)",
+    "gravity": "3.7 m/s²",
+    "orbitalPeriodYears": 0.241,
+    "textureSource": "NASA / JHUAPL / Carnegie Inst. (MESSENGER)",
+    "dataSource": "NASA Planetary Fact Sheet",
+    "notes": "Extreme diurnal range due to negligible atmosphere and 3:2 spin-orbit resonance.",
+    "palette": {
+      "primary": "#8f8b82",
+      "secondary": "#57534d",
+      "accent": "#c4beb2",
+      "glow": "rgba(196, 190, 178, 0.45)"
+    }
+  },
+  {
+    "id": "venus",
+    "name": "Venus",
+    "type": "planet",
+    "texture": "textures/venus.jpg",
+    "dayTemp": "464 °C",
+    "nightTemp": "464 °C",
+    "lengthOfDay": "2,802.0 hours (116.75 Earth days)",
+    "gravity": "8.9 m/s²",
+    "orbitalPeriodYears": 0.615,
+    "textureSource": "NASA / JPL-Caltech / USGS (Magellan Radar)",
+    "dataSource": "NASA Planetary Fact Sheet",
+    "notes": "93-bar CO2 greenhouse atmosphere equalizes day and night surface heat.",
+    "palette": {
+      "primary": "#d99748",
+      "secondary": "#8c4f1c",
+      "accent": "#f5c378",
+      "glow": "rgba(245, 195, 120, 0.5)"
+    }
+  },
+  {
+    "id": "earth",
+    "name": "Earth",
+    "type": "planet",
+    "texture": "textures/earth.jpg",
+    "dayTemp": "20 °C",
+    "nightTemp": "10 °C",
+    "lengthOfDay": "24.0 hours",
+    "gravity": "9.8 m/s²",
+    "orbitalPeriodYears": 1.0,
+    "textureSource": "NASA Visible Earth / Blue Marble (MODIS)",
+    "dataSource": "NASA Planetary Fact Sheet",
+    "notes": "Global average surface temperature is 15 °C. Diurnal averages reflect populated temperate zones.",
+    "palette": {
+      "primary": "#2b6cb0",
+      "secondary": "#2f855a",
+      "accent": "#63b3ed",
+      "glow": "rgba(99, 179, 237, 0.55)"
+    }
+  },
+  {
+    "id": "mars",
+    "name": "Mars",
+    "type": "planet",
+    "texture": "textures/mars.jpg",
+    "dayTemp": "20 °C",
+    "nightTemp": "-73 °C",
+    "lengthOfDay": "24.7 hours",
+    "gravity": "3.7 m/s²",
+    "orbitalPeriodYears": 1.881,
+    "textureSource": "NASA / USGS Astrogeology (Viking Orbiter)",
+    "dataSource": "NASA Planetary Fact Sheet",
+    "notes": "Thin atmosphere allows equatorial noon surface to reach ~20 °C, falling to -73 °C at night.",
+    "palette": {
+      "primary": "#c05621",
+      "secondary": "#7b2713",
+      "accent": "#dd6b20",
+      "glow": "rgba(221, 107, 32, 0.55)"
+    }
+  },
+  {
+    "id": "jupiter",
+    "name": "Jupiter",
+    "type": "planet",
+    "texture": "textures/jupiter.jpg",
+    "dayTemp": "-110 °C",
+    "nightTemp": "-110 °C",
+    "lengthOfDay": "9.9 hours",
+    "gravity": "24.8 m/s²",
+    "orbitalPeriodYears": 11.86,
+    "textureSource": "NASA / JPL-Caltech / SSI (Cassini)",
+    "dataSource": "NASA Planetary Fact Sheet",
+    "notes": "Gas giant: temperature measured at 1-bar cloud level. Rapid rotation and internal heat equalize day/night.",
+    "palette": {
+      "primary": "#c28d54",
+      "secondary": "#7a482b",
+      "accent": "#e3b584",
+      "glow": "rgba(227, 181, 132, 0.5)"
+    }
+  },
+  {
+    "id": "saturn",
+    "name": "Saturn",
+    "type": "planet",
+    "texture": "textures/saturn.jpg",
+    "dayTemp": "-140 °C",
+    "nightTemp": "-140 °C",
+    "lengthOfDay": "10.7 hours",
+    "gravity": "10.4 m/s²",
+    "orbitalPeriodYears": 29.46,
+    "textureSource": "NASA / JPL-Caltech / SSI (Cassini)",
+    "dataSource": "NASA Planetary Fact Sheet",
+    "notes": "Gas giant: temperature measured at 1-bar cloud level.",
+    "palette": {
+      "primary": "#d1b47c",
+      "secondary": "#8c7349",
+      "accent": "#fae3b2",
+      "glow": "rgba(250, 227, 178, 0.45)"
+    }
+  },
+  {
+    "id": "uranus",
+    "name": "Uranus",
+    "type": "planet",
+    "texture": "textures/uranus.jpg",
+    "dayTemp": "-195 °C",
+    "nightTemp": "-195 °C",
+    "lengthOfDay": "17.2 hours",
+    "gravity": "8.9 m/s²",
+    "orbitalPeriodYears": 84.01,
+    "textureSource": "NASA / JPL-Caltech (Voyager 2)",
+    "dataSource": "NASA Planetary Fact Sheet",
+    "notes": "Ice giant: temperature measured at 1-bar cloud level. 97.8 degree axial tilt produces extreme 42-year polar seasons.",
+    "palette": {
+      "primary": "#4fd1c5",
+      "secondary": "#234e52",
+      "accent": "#b2f5ea",
+      "glow": "rgba(79, 209, 197, 0.55)"
+    }
+  },
+  {
+    "id": "neptune",
+    "name": "Neptune",
+    "type": "planet",
+    "texture": "textures/neptune.jpg",
+    "dayTemp": "-200 °C",
+    "nightTemp": "-200 °C",
+    "lengthOfDay": "16.1 hours",
+    "gravity": "11.2 m/s²",
+    "orbitalPeriodYears": 164.8,
+    "textureSource": "NASA / JPL-Caltech (Voyager 2)",
+    "dataSource": "NASA Planetary Fact Sheet",
+    "notes": "Ice giant: temperature measured at 1-bar level. Fastest winds in the solar system up to 2,100 km/h.",
+    "palette": {
+      "primary": "#3182ce",
+      "secondary": "#1a365d",
+      "accent": "#63b3ed",
+      "glow": "rgba(49, 130, 206, 0.6)"
+    }
+  },
+  {
+    "id": "sun",
+    "name": "The Sun",
+    "type": "star",
+    "texture": "textures/sun.jpg",
+    "dayTemp": "5,500 °C",
+    "nightTemp": "5,500 °C",
+    "lengthOfDay": "600.0 hours (~25 Earth days)",
+    "gravity": "274.0 m/s²",
+    "orbitalPeriodYears": 0.0,
+    "textureSource": "NASA / SDO (Solar Dynamics Observatory)",
+    "dataSource": "NASA Sun Fact Sheet",
+    "notes": "Luminous G2V star. Temperature represents the visible photosphere. Rotation is differential.",
+    "palette": {
+      "primary": "#ed8936",
+      "secondary": "#9c4221",
+      "accent": "#fbd38d",
+      "glow": "rgba(237, 137, 54, 0.65)"
+    }
+  },
+  {
+    "id": "moon",
+    "name": "The Moon",
+    "type": "moon",
+    "parent": "Earth",
+    "isTidallyLocked": true,
+    "texture": "textures/moon.jpg",
+    "dayTemp": "120 °C",
+    "nightTemp": "-130 °C",
+    "lengthOfDay": "708.7 hours (29.5 Earth days)",
+    "gravity": "1.6 m/s²",
+    "orbitalPeriodYears": 1.0,
+    "textureSource": "NASA / GSFC / ASU (LRO / WAC)",
+    "dataSource": "NASA Moon Fact Sheet",
+    "notes": "Tidally locked to Earth. 1 lunar day equals 29.5 Earth days. Airless surface swings between 120 °C and -130 °C.",
+    "palette": {
+      "primary": "#cbd5e0",
+      "secondary": "#4a5568",
+      "accent": "#edf2f7",
+      "glow": "rgba(226, 232, 240, 0.5)"
+    }
+  },
+  {
+    "id": "io",
+    "name": "Io",
+    "type": "moon",
+    "parent": "Jupiter",
+    "isTidallyLocked": true,
+    "texture": "textures/io.jpg",
+    "dayTemp": "-130 °C",
+    "nightTemp": "-180 °C",
+    "lengthOfDay": "42.5 hours (1.77 Earth days)",
+    "gravity": "1.8 m/s²",
+    "orbitalPeriodYears": 11.86,
+    "textureSource": "NASA / JPL-Caltech / USGS (Galileo / Voyager)",
+    "dataSource": "NASA Planetary Satellite Fact Sheet",
+    "notes": "Tidally locked to Jupiter. Most volcanically active body in solar system; calderas exceed 1,200 °C.",
+    "palette": {
+      "primary": "#eab308",
+      "secondary": "#b91c1c",
+      "accent": "#fef08a",
+      "glow": "rgba(234, 179, 8, 0.55)"
+    }
+  },
+  {
+    "id": "europa",
+    "name": "Europa",
+    "type": "moon",
+    "parent": "Jupiter",
+    "isTidallyLocked": true,
+    "texture": "textures/europa.jpg",
+    "dayTemp": "-140 °C",
+    "nightTemp": "-220 °C",
+    "lengthOfDay": "85.2 hours (3.55 Earth days)",
+    "gravity": "1.3 m/s²",
+    "orbitalPeriodYears": 11.86,
+    "textureSource": "NASA / JPL-Caltech / USGS (Galileo)",
+    "dataSource": "NASA Planetary Satellite Fact Sheet",
+    "notes": "Tidally locked to Jupiter. Global subsurface saltwater ocean beneath a cracked water-ice lithosphere.",
+    "palette": {
+      "primary": "#bfdbfe",
+      "secondary": "#9a3412",
+      "accent": "#ffffff",
+      "glow": "rgba(191, 219, 254, 0.6)"
+    }
+  },
+  {
+    "id": "ganymede",
+    "name": "Ganymede",
+    "type": "moon",
+    "parent": "Jupiter",
+    "isTidallyLocked": true,
+    "texture": "textures/ganymede.jpg",
+    "dayTemp": "-110 °C",
+    "nightTemp": "-180 °C",
+    "lengthOfDay": "171.7 hours (7.15 Earth days)",
+    "gravity": "1.4 m/s²",
+    "orbitalPeriodYears": 11.86,
+    "textureSource": "NASA / JPL-Caltech / USGS (Galileo / Voyager)",
+    "dataSource": "NASA Planetary Satellite Fact Sheet",
+    "notes": "Tidally locked to Jupiter. Largest moon in solar system (larger than Mercury); only moon with an intrinsic magnetic dynamo.",
+    "palette": {
+      "primary": "#94a3b8",
+      "secondary": "#334155",
+      "accent": "#f1f5f9",
+      "glow": "rgba(148, 163, 184, 0.5)"
+    }
+  },
+  {
+    "id": "callisto",
+    "name": "Callisto",
+    "type": "moon",
+    "parent": "Jupiter",
+    "isTidallyLocked": true,
+    "texture": "textures/callisto.jpg",
+    "dayTemp": "-110 °C",
+    "nightTemp": "-180 °C",
+    "lengthOfDay": "400.5 hours (16.69 Earth days)",
+    "gravity": "1.2 m/s²",
+    "orbitalPeriodYears": 11.86,
+    "textureSource": "NASA / JPL-Caltech / USGS (Galileo / Voyager)",
+    "dataSource": "NASA Planetary Satellite Fact Sheet",
+    "notes": "Tidally locked to Jupiter. Ancient, heavily cratered ice-rock surface with multi-ring impact basins (Valhalla).",
+    "palette": {
+      "primary": "#64748b",
+      "secondary": "#1e293b",
+      "accent": "#cbd5e1",
+      "glow": "rgba(100, 116, 139, 0.45)"
+    }
+  },
+  {
+    "id": "enceladus",
+    "name": "Enceladus",
+    "type": "moon",
+    "parent": "Saturn",
+    "isTidallyLocked": true,
+    "texture": "textures/enceladus.jpg",
+    "dayTemp": "-198 °C",
+    "nightTemp": "-210 °C",
+    "lengthOfDay": "32.9 hours (1.37 Earth days)",
+    "gravity": "0.11 m/s²",
+    "orbitalPeriodYears": 29.46,
+    "textureSource": "NASA / JPL-Caltech / SSI (Cassini)",
+    "dataSource": "NASA Planetary Satellite Fact Sheet",
+    "notes": "Tidally locked to Saturn. Hyper-reflective ice crust with cryovolcanic geysers erupting water vapor from a subsurface ocean.",
+    "palette": {
+      "primary": "#e0f2fe",
+      "secondary": "#0284c7",
+      "accent": "#ffffff",
+      "glow": "rgba(224, 242, 254, 0.65)"
+    }
+  },
+  {
+    "id": "titan",
+    "name": "Titan",
+    "type": "moon",
+    "parent": "Saturn",
+    "isTidallyLocked": true,
+    "texture": "textures/titan.jpg",
+    "dayTemp": "-179 °C",
+    "nightTemp": "-179 °C",
+    "lengthOfDay": "382.7 hours (15.95 Earth days)",
+    "gravity": "1.4 m/s²",
+    "orbitalPeriodYears": 29.46,
+    "textureSource": "NASA / JPL-Caltech / SSI (Cassini Radar & VIMS Surface Mosaic)",
+    "dataSource": "NASA Planetary Satellite Fact Sheet",
+    "notes": "Tidally locked to Saturn. Optical surface is concealed by dense nitrogen-methane haze; surface hosts liquid methane seas and dunes.",
+    "palette": {
+      "primary": "#d97706",
+      "secondary": "#78350f",
+      "accent": "#fde68a",
+      "glow": "rgba(217, 119, 6, 0.55)"
+    }
+  }
+]

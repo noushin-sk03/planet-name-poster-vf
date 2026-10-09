@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planet Name Poster</title>
+  <meta name="description" content="Generate an authentic solar system typography poster with your name filled by real planetary textures and NASA scientific data.">
+  <meta name="theme-color" content="#08090e">
+
+  <!-- Open Graph / Facebook / LinkedIn Social Previews -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Planet Name Poster — Solar System Typographic Posters">
+  <meta property="og:description" content="Render your name in the geological textures of the solar system with real NASA physical facts. Free PNG downloads.">
+  <meta property="og:image" content="preview.png">
+
+  <!-- Twitter Card Previews -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Planet Name Poster — Solar System Typographic Posters">
+  <meta name="twitter:description" content="Render your name in the geological textures of the solar system with real NASA physical facts. Free PNG downloads.">
+  <meta name="twitter:image" content="preview.png">
+
+  <!-- Google Fonts: Cinzel for celestial serif typography, Inter for clean UI -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Header with celestial branding -->
+  <header class="site-header">
+    <div class="header-content">
+      <span class="header-badge">Stage 04 &bull; Sharing &amp; Export</span>
+      <h1 class="site-title">Planet Name Poster</h1>
+      <p class="site-tagline">Create an authentic solar system poster card with your name and real NASA planetary facts.</p>
+    </div>
+  </header>
+
+  <!-- Main interactive workspace (mobile-first layout) -->
+  <main class="app-layout">
+    <!-- Controls section -->
+    <section class="controls-card" aria-label="Poster Customization Controls">
+      <form id="poster-form" onsubmit="event.preventDefault();">
+        
+        <!-- Name input field -->
+        <div class="form-group">
+          <label for="name-input" class="form-label">
+            <span>Your Name</span>
+            <span class="char-count" id="char-count">6 / 20</span>
+          </label>
+          <input 
+            type="text" 
+            id="name-input" 
+            name="name" 
+            class="text-input" 
+            value="COSMOS" 
+            maxlength="20" 
+            placeholder="e.g. ARIA" 
+            autocomplete="off" 
+            spellcheck="false"
+            required
+          >
+          <p class="field-hint">Uppercase bold serif letters look best for planetary textures.</p>
+        </div>
+
+        <!-- Planet selector -->
+        <div class="form-group">
+          <label for="planet-select" class="form-label">Choose a World</label>
+          <div class="select-wrapper">
+            <select id="planet-select" name="planet" class="select-input">
+              <option value="" disabled>Loading solar system data...</option>
+            </select>
+            <div class="select-arrow" aria-hidden="true">&#9662;</div>
+          </div>
+          <p class="field-hint" id="planet-hint">Surface texture and atmospheric profile.</p>
+        </div>
+
+        <!-- Day / Night toggle -->
+        <div class="form-group">
+          <span class="form-label">Illumination Mode</span>
+          <div class="toggle-group" role="radiogroup" aria-label="Illumination Mode">
+            <button 
+              type="button" 
+              class="toggle-btn active" 
+              id="mode-day-btn" 
+              role="radio" 
+              aria-checked="true"
+              data-mode="day"
+            >
+              <span class="toggle-icon">&#9728;&#65039;</span>
+              <span class="toggle-text">Day</span>
+            </button>
+            <button 
+              type="button" 
+              class="toggle-btn" 
+              id="mode-night-btn" 
+              role="radio" 
+              aria-checked="false"
+              data-mode="night"
+            >
+              <span class="toggle-icon">&#127769;</span>
+              <span class="toggle-text">Night</span>
+            </button>
+          </div>
+          <p class="field-hint" id="mode-hint">Day reveals bright surface features with a subtle rim light.</p>
+        </div>
+
+        <!-- Export Size selector (Stage 04) -->
+        <div class="form-group">
+          <label for="size-select" class="form-label">Export Size &amp; Format</label>
+          <div class="select-wrapper">
+            <select id="size-select" name="size" class="select-input">
+              <option value="portrait" selected>Portrait (1080 &times; 1350) &bull; Poster</option>
+              <option value="square">Square (1080 &times; 1080) &bull; Social Post</option>
+              <option value="story">Phone Story (1080 &times; 1920) &bull; Vertical Story</option>
+            </select>
+            <div class="select-arrow" aria-hidden="true">&#9662;</div>
+          </div>
+          <p class="field-hint" id="size-hint">Layout adapts automatically for print, social, or mobile wallpapers.</p>
+        </div>
+
+        <!-- Actions: Download, Surprise Me, Copy Link -->
+        <div class="form-actions">
+          <button type="button" id="download-btn" class="btn btn-primary mb-xs">
+            <span class="btn-icon">&#128392;</span>
+            <span>Download PNG Poster</span>
+          </button>
+          
+          <div class="action-btn-row">
+            <button type="button" id="surprise-btn" class="btn btn-secondary" title="Pick a random world and lighting mode">
+              <span class="btn-icon">&#127922;</span>
+              <span>Surprise Me</span>
+            </button>
+            <button type="button" id="copy-link-btn" class="btn btn-secondary" title="Copy shareable link with current configuration">
+              <span class="btn-icon">&#128279;</span>
+              <span>Copy Link</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Screen reader live announcement & Visual Toast -->
+        <div id="copy-status" role="status" aria-live="polite" class="sr-only"></div>
+        <div id="copy-toast" class="toast-popup" aria-hidden="true">Shareable link copied to clipboard!</div>
+
+      </form>
+
+      <!-- Stage 03: Your Life on Another World Card -->
+      <div class="life-card" id="life-card">
+        <div class="life-card-header">
+          <h2 class="life-card-title">Life on <span id="life-planet-name">Jupiter</span></h2>
+          <span class="life-badge">Biophysics</span>
+        </div>
+        <p class="life-disclaimer">
+          Note: “Weight” here represents the gravitational force exerted by this world on your mass.
+        </p>
+
+        <!-- Optional User Inputs -->
+        <div class="life-inputs-grid">
+          <div class="form-group mb-sm">
+            <label for="weight-input" class="form-label-sm">Weight (kg) <span class="optional-tag">optional</span></label>
+            <input 
+              type="number" 
+              id="weight-input" 
+              class="text-input text-input-sm" 
+              min="1" 
+              max="500" 
+              step="0.5" 
+              placeholder="e.g. 70"
+            >
+          </div>
+          <div class="form-group mb-sm">
+            <label for="dob-input" class="form-label-sm">Birth Date <span class="optional-tag">optional</span></label>
+            <input 
+              type="date" 
+              id="dob-input" 
+              class="text-input text-input-sm"
+            >
+          </div>
+        </div>
+
+        <!-- Calculated Metric Cards -->
+        <div class="life-metrics-grid">
+          <!-- Metric 1: Weight -->
+          <div class="metric-card">
+            <span class="metric-label">YOUR WEIGHT</span>
+            <span class="metric-value" id="calc-weight-val">—</span>
+            <span class="metric-sub" id="calc-weight-sub">Enter weight above</span>
+          </div>
+
+          <!-- Metric 2: Age -->
+          <div class="metric-card">
+            <span class="metric-label">PLANETARY AGE</span>
+            <span class="metric-value" id="calc-age-val">—</span>
+            <span class="metric-sub" id="calc-age-sub">Enter birth date above</span>
+          </div>
+
+          <!-- Metric 3: Diurnal Day Ratio -->
+          <div class="metric-card metric-card-wide">
+            <span class="metric-label">DIURNAL RATIO (1 EARTH DAY)</span>
+            <span class="metric-value" id="calc-day-val">—</span>
+            <span class="metric-sub" id="calc-day-sub">Rotation period comparison</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Canvas Preview Section -->
+    <section class="preview-section" aria-label="Live Poster Preview">
+      <div class="preview-header">
+        <h2 class="preview-title">Live Preview</h2>
+      <!-- Stage 08: 2D Poster vs 3D Lit Globe Tabs -->
+      <div class="view-mode-tabs" role="tablist" aria-label="Poster and 3D View Modes">
+        <button type="button" class="view-tab active" id="tab-2d-btn" role="tab" aria-selected="true" aria-controls="canvas-container">
+          <span>🖼️ 2D Poster Card</span>
+        </button>
+        <button type="button" class="view-tab" id="tab-3d-btn" role="tab" aria-selected="false" aria-controls="sphere-container">
+          <span>🌐 3D Lit Globe (WebGL)</span>
+        </button>
+      </div>
+
+      <!-- 2D Canvas Container (Default) -->
+      <div class="canvas-container" id="canvas-container">
+        <!-- Loading spinner overlay -->
+        <div class="loading-overlay" id="loading-overlay" aria-live="polite">
+          <div class="spinner"></div>
+          <p id="loading-status">Synthesizing celestial textures...</p>
+        </div>
+
+        <!-- The main HTML5 drawing canvas with live accessibility description -->
+        <canvas 
+          id="poster-canvas" 
+          width="1080" 
+          height="1350" 
+          role="img"
+          aria-label="Celestial poster artwork" 
+          aria-describedby="canvas-accessible-desc"
+        ></canvas>
+        <div id="canvas-accessible-desc" class="sr-only" aria-live="polite">
+          Poster artwork displaying COSMOS textured with Jupiter surface in Day illumination mode.
+        </div>
+      </div>
+
+      <!-- Stage 08: 3D Lit Sphere Container -->
+      <div class="sphere-container" id="sphere-container" style="display: none;">
+        <canvas id="sphere-canvas" width="600" height="600" aria-label="3D illuminated planetary sphere"></canvas>
+        <div class="sphere-controls">
+          <label for="terminator-slider" class="form-label-sm">
+            <span>Solar Terminator Angle</span>
+            <span id="terminator-angle-val">45&deg;</span>
+          </label>
+          <input type="range" id="terminator-slider" min="0" max="360" value="45" class="slider-input">
+          <div class="sphere-actions">
+            <button type="button" id="autorotate-btn" class="btn btn-secondary btn-sm">Pause Rotation</button>
+            <button type="button" id="capture-sphere-btn" class="btn btn-primary btn-sm">Capture 3D View</button>
+          </div>
+          <p class="field-hint text-center">Drag slider to move the solar illumination line between day and night.</p>
+        </div>
+      </div>
+      
+      <p class="preview-footer-note">
+        Drawn natively via HTML Canvas &amp; WebGL APIs. Resolution matches downloaded print asset.
+      </p>
+    </section>
+  </main>
+
+  <!-- Visible Credits & License Section (Stage 05) -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <details class="credits-details">
+        <summary class="credits-summary">
+          <span>Data Sources &amp; Image Attributions</span>
+          <span class="summary-arrow" aria-hidden="true">&#9662;</span>
+        </summary>
+        <div class="credits-body">
+          <p>
+            <strong>Scientific Data:</strong> Physical metrics (gravity, day length, temperatures, orbital periods) checked against the 
+            <a href="https://nssdc.gsfc.nasa.gov/planetary/factsheet/" target="_blank" rel="noopener noreferrer">NASA Planetary Fact Sheet</a>.
+          </p>
+          <p>
+            <strong>Surface Textures:</strong> Imagery compiled from NASA missions including MESSENGER, Magellan, Viking, Cassini, and Voyager 2, and the 
+            <a href="https://visibleearth.nasa.gov/" target="_blank" rel="noopener noreferrer">NASA Visible Earth Blue Marble</a>.
+          </p>
+          <p>
+            <strong>Licensing:</strong> NASA media is public domain. Typography by Natanael Gama (Cinzel) and Rasmus Andersson (Inter) under the SIL Open Font License.
+            Detailed breakdown available in <a href="CREDITS.md" target="_blank">CREDITS.md</a>.
+          </p>
+        </div>
+      </details>
+      <p class="footer-copy">Built with plain HTML, CSS &amp; JavaScript. No frameworks. No backend.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts: loaded in dependency order -->
+  <!-- 1. calculator.js: Pure mathematical calculations for weight, orbital age, and diurnal ratio -->
+  <script src="js/calculator.js"></script>
+  <!-- 2. textures.js: Manages font readiness, image loading, caching, and fallback gradient synthesis -->
+  <script src="js/textures.js"></script>
+  <!-- 3. canvas.js: The core 2D canvas drawing engine with text masking and lighting passes -->
+  <script src="js/canvas.js"></script>
+  <!-- 4. share.js: URL query parsing, serialization, and clipboard sharing -->
+  <script src="js/share.js"></script>
+  <!-- 5. sphere3d.js: WebGL 3D lit planetary sphere with moving terminator -->
+  <script src="js/sphere3d.js"></script>
+  <!-- 6. app.js: Controller linking the UI events, data fetch, and canvas rendering -->
+  <script src="js/app.js"></script>
+</body>
+</html>
