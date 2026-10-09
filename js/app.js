@@ -3,38 +3,47 @@
  * -------------------------------------------------------------
  * Educational Pair-Programming Project: "Planet Name Poster"
  * 
- * Stage 1 Goals:
- * 1. Initialize the animated interactive solar system canvas (background.js).
- * 2. Populate the left planet navigation menu with the 8 solar system worlds.
- * 3. Handle seamless two-way synchronized selection:
- *    - Clicking/touching a planet in the left drawer highlights it on the canvas
- *      and updates the detail panel.
- *    - Clicking/touching a moving planet on the canvas updates the active drawer item
- *      and the detail panel.
- * 4. Responsive mobile drawer navigation (toggle button, backdrop dismiss, Esc key).
- * 5. Keyboard accessibility (Tab navigation, Enter/Space selection, Arrow Up/Down).
+ * Features:
+ * 1. Coordinates full Solar System navigation (The Sun, The Moon, and 8 Planets).
+ * 2. Two-way synchronized selection:
+ *    - Selecting a world in the left drawer highlights it on the canvas and detail panel.
+ *    - Clicking any world (Sun, Moon, or planet) on the canvas updates the drawer and detail panel.
+ * 3. Responsive drawer toggle for mobile devices.
+ * 4. Keyboard accessible menu navigation (Tab, Enter/Space, Arrow Up/Down).
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
   // ---------------------------------------------------------------------------
-  // 1. Planetary Data Definition
+  // 1. Celestial Worlds Definition (Sun, Moon, and 8 Planets)
   // ---------------------------------------------------------------------------
-  // Default data for the 8 solar system planets.
-  // Each entry includes visual color, order, and educational summary.
-  const DEFAULT_PLANETS = [
+  const DEFAULT_WORLDS = [
+    {
+      id: 'sun',
+      name: 'The Sun',
+      order: 'Central Star',
+      color: '#fbbf24',
+      desc: 'Luminous G-type main-sequence star at the center of the solar system. Contains 99.86% of the system\'s mass and powers planetary climates.'
+    },
     {
       id: 'mercury',
       name: 'Mercury',
       order: '1st planet from Sun',
-      color: '#a3a3a3',
-      desc: 'Smallest planet and closest to the Sun. Cratered rocky surface with extreme temperature swings from day to night.'
+      color: '#cbd5e1',
+      desc: 'Smallest planet and closest to the Sun. Cratered rocky surface with extreme temperature swings from 430 °C by day to -180 °C by night.'
     },
     {
       id: 'venus',
       name: 'Venus',
       order: '2nd planet from Sun',
-      color: '#eab308',
-      desc: 'Second world from the Sun. Enveloped in a dense, runaway greenhouse atmosphere hotter than an oven.'
+      color: '#fde047',
+      desc: 'Second world from the Sun. Enveloped in a dense, runaway greenhouse atmosphere with crushing pressure, hotter than an oven.'
+    },
+    {
+      id: 'moon',
+      name: 'The Moon',
+      order: 'Earth\'s Natural Satellite',
+      color: '#e2e8f0',
+      desc: 'Earth\'s companion. Airless, heavily cratered world tidally locked in synchronous rotation, swinging between 120 °C and -130 °C.'
     },
     {
       id: 'earth',
@@ -47,43 +56,43 @@ document.addEventListener('DOMContentLoaded', async () => {
       id: 'mars',
       name: 'Mars',
       order: '4th planet from Sun',
-      color: '#ef4444',
-      desc: 'Fourth planet from the Sun. Dusty, iron-rich desert world with ancient dry river valleys and polar ice caps.'
+      color: '#f87171',
+      desc: 'Fourth planet from the Sun. Dusty, iron-rich desert world with ancient dry river valleys, giant volcanoes, and polar ice caps.'
     },
     {
       id: 'jupiter',
       name: 'Jupiter',
       order: '5th planet from Sun',
-      color: '#f97316',
-      desc: 'Fifth planet and the largest world in our solar system. Swirling gas giant with centuries-old storms like the Great Red Spot.'
+      color: '#fb923c',
+      desc: 'Fifth planet and largest world in our solar system. Swirling gas giant with centuries-old storms like the Great Red Spot.'
     },
     {
       id: 'saturn',
       name: 'Saturn',
       order: '6th planet from Sun',
-      color: '#fde047',
-      desc: 'Sixth planet from the Sun. Magnificent ring system composed of billions of water-ice particles and dust.'
+      color: '#fef08a',
+      desc: 'Sixth planet from the Sun. Magnificent ring system composed of billions of sparkling water-ice particles and rocky dust.'
     },
     {
       id: 'uranus',
       name: 'Uranus',
       order: '7th planet from Sun',
-      color: '#2dd4bf',
+      color: '#5eead4',
       desc: 'Seventh planet from the Sun. Tilted on its side by 98 degrees, an ice giant with pale cyan methane haze.'
     },
     {
       id: 'neptune',
       name: 'Neptune',
       order: '8th planet from Sun',
-      color: '#3b82f6',
-      desc: 'Eighth and most distant planet. Deep azure ice giant swept by supersonic supersonic winds exceeding 2,000 km/h.'
+      color: '#60a5fa',
+      desc: 'Eighth and most distant major planet. Deep azure ice giant swept by supersonic winds exceeding 2,000 km/h.'
     }
   ];
 
   // Application State
   const state = {
-    selectedPlanetId: 'earth',
-    planets: DEFAULT_PLANETS
+    selectedBodyId: 'earth',
+    worlds: DEFAULT_WORLDS
   };
 
   // ---------------------------------------------------------------------------
@@ -96,7 +105,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const drawerBackdrop = document.getElementById('drawer-backdrop');
   const planetMenuList = document.getElementById('planet-menu');
 
-  // Detail / Placeholder panel elements
+  // Detail panel elements
   const panelPlanetDot = document.getElementById('panel-planet-dot');
   const panelPlanetName = document.getElementById('panel-planet-name');
   const panelPlanetDesc = document.getElementById('panel-planet-desc');
@@ -108,57 +117,55 @@ document.addEventListener('DOMContentLoaded', async () => {
     const res = await fetch('data/planets.json');
     if (res.ok) {
       const data = await res.json();
-      // Merge extra details (notes, facts) if available
-      state.planets = state.planets.map((p) => {
-        const match = data.find((item) => item.id === p.id);
+      state.worlds = state.worlds.map((w) => {
+        const match = data.find((item) => item.id === w.id);
         if (match && match.notes) {
-          return { ...p, desc: match.notes };
+          return { ...w, desc: match.notes };
         }
-        return p;
+        return w;
       });
     }
   } catch (err) {
-    // If running from local file:// or network offline, gracefully proceed with DEFAULT_PLANETS
-    console.info('Using local planet defaults:', err);
+    console.info('Using local world definitions:', err);
   }
 
   // ---------------------------------------------------------------------------
-  // 4. Render Left Planet Menu
+  // 4. Render Navigation Menu
   // ---------------------------------------------------------------------------
   function renderPlanetMenu() {
     planetMenuList.innerHTML = '';
 
-    state.planets.forEach((planet, index) => {
+    state.worlds.forEach((world) => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'planet-btn';
       btn.setAttribute('role', 'menuitem');
-      btn.setAttribute('data-planet-id', planet.id);
-      btn.setAttribute('aria-label', `Select ${planet.name}, ${planet.order}`);
+      btn.setAttribute('data-body-id', world.id);
+      btn.setAttribute('aria-label', `Select ${world.name}, ${world.order}`);
 
-      if (planet.id === state.selectedPlanetId) {
+      if (world.id === state.selectedBodyId) {
         btn.classList.add('active');
         btn.setAttribute('aria-current', 'true');
       }
 
-      // Planet color swatch dot
+      // Visual color swatch
       const swatch = document.createElement('span');
       swatch.className = 'planet-swatch';
-      swatch.style.backgroundColor = planet.color;
-      swatch.style.color = planet.color;
+      swatch.style.backgroundColor = world.color;
+      swatch.style.color = world.color;
       swatch.setAttribute('aria-hidden', 'true');
 
-      // Planet label & subtitle
+      // Title & Subtitle metadata
       const meta = document.createElement('div');
       meta.className = 'planet-meta';
 
       const nameSpan = document.createElement('span');
       nameSpan.className = 'planet-btn-name';
-      nameSpan.textContent = planet.name;
+      nameSpan.textContent = world.name;
 
       const subSpan = document.createElement('span');
       subSpan.className = 'planet-btn-sub';
-      subSpan.textContent = planet.order;
+      subSpan.textContent = world.order;
 
       meta.appendChild(nameSpan);
       meta.appendChild(subSpan);
@@ -166,17 +173,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       btn.appendChild(swatch);
       btn.appendChild(meta);
 
-      // Menu button click handler
+      // Click handler
       btn.addEventListener('click', () => {
-        selectPlanet(planet.id, { source: 'drawer' });
+        selectWorld(world.id, { source: 'drawer' });
 
-        // If on small screen / mobile drawer is open, auto-close so the user can see the canvas
+        // Auto-close on mobile so the user sees the world on the canvas
         if (window.innerWidth < 820 && planetDrawer.classList.contains('open')) {
           closeDrawer();
         }
       });
 
-      // Keyboard navigation within the menu (Arrow Up / Down)
+      // Keyboard arrow navigation
       btn.addEventListener('keydown', (e) => {
         const buttons = Array.from(planetMenuList.querySelectorAll('.planet-btn'));
         const currentIndex = buttons.indexOf(btn);
@@ -199,31 +206,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ---------------------------------------------------------------------------
   // 5. Two-Way Selection Synchronization
   // ---------------------------------------------------------------------------
-  /**
-   * Selects a planet, updates visual states across menu, canvas, and info panel.
-   *
-   * @param {string} planetId - Unique identifier (e.g. 'earth', 'mars')
-   * @param {Object} options - { source: 'drawer' | 'canvas' }
-   */
-  function selectPlanet(planetId, options = {}) {
-    const planet = state.planets.find((p) => p.id === planetId);
-    if (!planet) return;
+  function selectWorld(bodyId, options = {}) {
+    const world = state.worlds.find((w) => w.id === bodyId);
+    if (!world) return;
 
-    state.selectedPlanetId = planetId;
+    state.selectedBodyId = bodyId;
 
-    // 1. Notify SolarBackground canvas engine
+    // 1. Notify canvas background engine
     if (typeof SolarBackground !== 'undefined' && SolarBackground.setSelectedPlanet) {
-      SolarBackground.setSelectedPlanet(planetId);
+      SolarBackground.setSelectedPlanet(bodyId);
     }
 
     // 2. Synchronize Drawer Menu Buttons
     const buttons = planetMenuList.querySelectorAll('.planet-btn');
     buttons.forEach((btn) => {
-      const isTarget = btn.getAttribute('data-planet-id') === planetId;
+      const isTarget = btn.getAttribute('data-body-id') === bodyId;
       btn.classList.toggle('active', isTarget);
       if (isTarget) {
         btn.setAttribute('aria-current', 'true');
-        // If selection was triggered from canvas click, scroll menu button into view
         if (options.source === 'canvas') {
           btn.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
         }
@@ -234,29 +234,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 3. Update Selected World Detail Card
     if (panelPlanetDot) {
-      panelPlanetDot.style.backgroundColor = planet.color;
-      panelPlanetDot.style.color = planet.color;
-      panelPlanetDot.style.boxShadow = `0 0 16px ${planet.color}`;
+      panelPlanetDot.style.backgroundColor = world.color;
+      panelPlanetDot.style.color = world.color;
+      panelPlanetDot.style.boxShadow = `0 0 18px ${world.color}`;
     }
 
     if (panelPlanetName) {
-      panelPlanetName.textContent = planet.name;
+      panelPlanetName.textContent = world.name;
     }
 
     if (panelPlanetDesc) {
-      panelPlanetDesc.textContent = planet.desc;
+      panelPlanetDesc.textContent = world.desc;
     }
   }
 
   // ---------------------------------------------------------------------------
-  // 6. Mobile Drawer Open / Close Handlers
+  // 6. Mobile Drawer Open / Close Controls
   // ---------------------------------------------------------------------------
   function openDrawer() {
     planetDrawer.classList.add('open');
     drawerBackdrop.classList.add('open');
     drawerToggleBtn.setAttribute('aria-expanded', 'true');
 
-    // Focus active or first button for screen readers and keyboard users
     const activeBtn = planetMenuList.querySelector('.planet-btn.active') || planetMenuList.querySelector('.planet-btn');
     if (activeBtn) activeBtn.focus();
   }
@@ -275,12 +274,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Bind drawer controls
   if (drawerToggleBtn) drawerToggleBtn.addEventListener('click', toggleDrawer);
   if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', closeDrawer);
   if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
 
-  // Close drawer when pressing Escape key
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && planetDrawer.classList.contains('open')) {
       closeDrawer();
@@ -292,9 +289,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 7. Initialize Canvas Background & Wire Selection Callback
   // ---------------------------------------------------------------------------
   if (canvasElement && typeof SolarBackground !== 'undefined') {
-    // When a planet is clicked directly on the canvas, this callback is fired
-    SolarBackground.init(canvasElement, (clickedPlanetId) => {
-      selectPlanet(clickedPlanetId, { source: 'canvas' });
+    SolarBackground.init(canvasElement, (clickedBodyId) => {
+      selectWorld(clickedBodyId, { source: 'canvas' });
     });
   }
 
@@ -302,5 +298,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 8. Initial Render & Default Selection
   // ---------------------------------------------------------------------------
   renderPlanetMenu();
-  selectPlanet('earth', { source: 'init' });
+  selectWorld('earth', { source: 'init' });
 });
