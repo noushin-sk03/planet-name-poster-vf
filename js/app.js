@@ -621,7 +621,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const skyStatusPill = document.getElementById('sky-status-pill');
   const skyFontIndicator = document.getElementById('sky-font-indicator');
-  const perfPill = document.getElementById('perf-pill');
 
   // Stage 04 & 05 Export & Actions Elements
   const exportSizeSelect = document.getElementById('export-size-select');
@@ -1833,11 +1832,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       selectWorld(clickedBodyId, { source: 'canvas' });
     });
 
-    if (perfPill && SolarBackground.onPerformanceUpdate) {
-      SolarBackground.onPerformanceUpdate((metrics) => {
-        perfPill.textContent = `${metrics.fps} FPS • DPR ${metrics.dpr}`;
-      });
-    }
+
 
     // Forward any touches/pointer events on the stage section background to SolarBackground
     const solarStageSection = document.getElementById('solar-stage-section');
