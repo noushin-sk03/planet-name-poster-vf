@@ -1,21 +1,24 @@
-# Planet Name Poster 🪐
+# Planet Name Poster & Solar Studio 🪐
 
-> Transform your name into a bold typographic celestial poster filled with real planetary textures, NASA scientific facts, moons, exoplanets, and an interactive 3D WebGL globe.
+> Transform your name into a bold typographic celestial poster with verified NASA textures, explore the interactive Solar System with full orbit selection, and export high-resolution wallpapers and print designs.
+>
+> **-Made by NSK with AI**
 
 ---
 
 ## 🌌 Overview
 
-**Planet Name Poster** is an educational, zero-framework web application built using standard modern HTML5, CSS3, and JavaScript (Canvas 2D & WebGL APIs).
+**Planet Name Poster & Solar Studio** is an educational, zero-framework web application built using standard modern HTML5, CSS3, and JavaScript (Canvas 2D APIs).
 
-* **Texture-in-Text Compositing**: Letters are rasterized into an alpha mask and composited using Canvas 2D Porter-Duff blend modes (`source-in` and `source-atop`).
-* **Day & Night Illumination**: Day mode renders bright surface topography with an edge rim light; Night mode darkens the texture and adds a luminous atmospheric halo.
-* **Solar System Planets & Moons**: Features all 8 planets, the Moon, Io, Europa, Ganymede, Callisto, Enceladus, Titan, and the Sun with verified data from the **NASA Planetary Fact Sheet** and **Planetary Satellite Fact Sheet**.
-* **Confirmed Exoplanets**: 12 famous exoplanets (TRAPPIST-1e/f, Proxima Centauri b, Kepler-186f, WASP-76b, etc.) queried directly from the **NASA Exoplanet Archive (IPAC/Caltech)** with procedural thermal artist's impressions.
-* **Life on Another World**: Biophysical calculations computing your weight on that world ($F = m \cdot \frac{g_{\text{world}}}{g_{\text{earth}}}$), your age in planetary orbital years, and rotational day length ratios.
-* **Interactive 3D Lit Globe (Stage 08)**: A pure WebGL analytical raytraced sphere with a real-time moving day/night solar terminator line.
-* **Multi-Size Export**: Instant PNG downloads formatted for **Portrait (1080×1350)**, **Square (1080×1080)**, and **Phone Story (1080×1920)**.
-* **Stateful Sharing**: Shareable URLs that sync the exact configuration with zero backend using HTML5 `history.replaceState`.
+* **Interactive Solar System Simulation**: Real-time orbital mechanics simulating celestial bodies orbiting the Sun, an Asteroid Belt, deep space nebulae, and galactic parallax drift traveling through the Milky Way at ~230 km/s.
+* **Direct Planet & Orbit Selection**: Click any planet, the Moon, or click directly on any elliptical orbit track in the starry simulation to inspect full NASA telemetry.
+* **Always-Visible Telemetry & Studio Actions**: Instant access to verified metrics (Gravity, Day Length, Mean Temp, Distance from Sun, Distance from Earth, Orbital Period, and Planetary Synopsis) with a one-click transition to the creative studio.
+* **Typographic Texture Compositing**: Names up to 30 characters rasterized into an alpha mask and composited with high-resolution celestial surface imagery using Canvas 2D Porter-Duff blend modes (`source-in` and `source-atop`).
+* **Day & Night Illumination**: Day mode renders authentic daytime surface illumination; Night mode darkens the surface and renders Rayleigh atmospheric backlighting and starry night skies.
+* **Multi-Format Export & Wallpapers**: High-resolution downloads categorized under Social (Portrait, Square, Story, X Post, Link Preview, Pinterest), Wallpapers (PC Wallpaper 1920×1080, 4K Desktop 3840×2160, Ultrawide 2560×1080, Tablet 2048×1536, Phone Wallpaper 1170×2532), Print (A4 300 DPI), and Custom Dimensions.
+* **Export Formats & Quality**: PNG (lossless), JPG, and WebP with configurable quality levels and automatic canvas fallback protections.
+* **Living on Another World Biophysics**: Calculates weight on each world ($F = m \cdot \frac{g_{\text{world}}}{g_{\text{earth}}}$) and age in planetary orbital years based on birthdate.
+* **Stateful Sharing & Data Export**: Shareable URLs that sync the exact configuration with zero backend using HTML5 `history.replaceState`, plus single-click JSON export of verified NASA Fact Sheets.
 
 ---
 

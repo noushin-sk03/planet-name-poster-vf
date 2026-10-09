@@ -42,10 +42,17 @@ const SolarBackground = (() => {
   let isPaused = false;
   let prefersReducedMotion = false;
 
-  // Center point & base radius for solar system projection
+  // Center point & base radius for solar system projection with smooth camera interpolation
   let sunCenterX = 0;
   let sunCenterY = 0;
   let baseRadius = 0;
+  let currentSunCenterX = 0;
+  let currentSunCenterY = 0;
+  let currentBaseRadius = 0;
+  let targetSunCenterX = 0;
+  let targetSunCenterY = 0;
+  let targetBaseRadius = 0;
+  let isPreviewOpen = true;
 
   // Selection callback & state
   // Can be 'overview' or a body id ('sun', 'earth', 'mars', etc.)
@@ -136,7 +143,7 @@ const SolarBackground = (() => {
     name: 'The Sun',
     color: '#fbbf24',
     secondaryColor: '#ea580c',
-    radius: 23,
+    radius: 36,
     projX: 0,
     projY: 0
   };
@@ -146,7 +153,7 @@ const SolarBackground = (() => {
     name: 'The Moon',
     color: '#e2e8f0',
     secondaryColor: '#64748b',
-    radius: 4.5,
+    radius: 6,
     projX: 0,
     projY: 0
   };
@@ -157,7 +164,7 @@ const SolarBackground = (() => {
       name: 'Mercury',
       color: '#cbd5e1',
       secondaryColor: '#64748b',
-      radius: 5.5,
+      radius: 7,
       orbitScale: 0.18,
       speed: 0.0016,
       angle: 0.8,
@@ -169,7 +176,7 @@ const SolarBackground = (() => {
       name: 'Venus',
       color: '#fde047',
       secondaryColor: '#d97706',
-      radius: 8.5,
+      radius: 11,
       orbitScale: 0.28,
       speed: 0.0012,
       angle: 2.1,
@@ -181,7 +188,7 @@ const SolarBackground = (() => {
       name: 'Earth',
       color: '#38bdf8',
       secondaryColor: '#15803d',
-      radius: 9.5,
+      radius: 13,
       orbitScale: 0.39,
       speed: 0.0009,
       angle: 3.7,
@@ -193,7 +200,7 @@ const SolarBackground = (() => {
       name: 'Mars',
       color: '#f87171',
       secondaryColor: '#991b1b',
-      radius: 7.5,
+      radius: 10,
       orbitScale: 0.50,
       speed: 0.0007,
       angle: 5.2,
@@ -205,7 +212,7 @@ const SolarBackground = (() => {
       name: 'Jupiter',
       color: '#fb923c',
       secondaryColor: '#9a3412',
-      radius: 19,
+      radius: 26,
       orbitScale: 0.63,
       speed: 0.00045,
       angle: 1.4,
@@ -218,12 +225,12 @@ const SolarBackground = (() => {
       name: 'Saturn',
       color: '#fef08a',
       secondaryColor: '#ca8a04',
-      radius: 16,
+      radius: 22,
       orbitScale: 0.75,
       speed: 0.00032,
       angle: 4.4,
       hasRings: true,
-      ringRadius: 28,
+      ringRadius: 38,
       projX: 0,
       projY: 0
     },
@@ -232,12 +239,12 @@ const SolarBackground = (() => {
       name: 'Uranus',
       color: '#5eead4',
       secondaryColor: '#0f766e',
-      radius: 13,
+      radius: 17,
       orbitScale: 0.87,
       speed: 0.00022,
       angle: 0.3,
       hasRings: true,
-      ringRadius: 21,
+      ringRadius: 27,
       projX: 0,
       projY: 0
     },
@@ -246,7 +253,7 @@ const SolarBackground = (() => {
       name: 'Neptune',
       color: '#60a5fa',
       secondaryColor: '#1e40af',
-      radius: 12.5,
+      radius: 16,
       orbitScale: 0.98,
       speed: 0.00015,
       angle: 2.8,
@@ -258,7 +265,7 @@ const SolarBackground = (() => {
       name: 'Pluto ✨',
       color: '#f3e8d2',
       secondaryColor: '#9a6042',
-      radius: 4.8,
+      radius: 7,
       orbitScale: 1.09,
       speed: 0.00010,
       angle: 1.1,
@@ -298,7 +305,9 @@ const SolarBackground = (() => {
   function updateLayout() {
     if (!canvas) return;
 
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // Explicit DPR cap: 1.5 on mobile (< 768px), 2.0 on desktop.
+    // Prevents fill-rate bottlenecks and preserves 60 FPS on high-density mobile screens.
+    dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.5 : 2);
     width = window.innerWidth;
     height = window.innerHeight;
 
@@ -306,18 +315,32 @@ const SolarBackground = (() => {
     canvas.height = Math.floor(height * dpr);
     ctx.scale(dpr, dpr);
 
+    const leftNavW = width >= 820 ? 240 : 0;
+    const availableW = width - leftNavW;
+
     if (width >= 820) {
-      sunCenterX = 250 + (width - 250) * 0.46;
-      sunCenterY = height * 0.52;
-      baseRadius = Math.min((width - 250) * 0.44, height * 0.54);
+      // Grand, expansive desktop solar system simulation
+      targetSunCenterX = leftNavW + availableW * 0.50;
+      targetSunCenterY = height * 0.52;
+      // Majestic baseRadius filling the viewport comfortably
+      targetBaseRadius = Math.min(availableW * 0.44, height * 0.70);
     } else {
-      sunCenterX = width * 0.50;
-      sunCenterY = height * 0.40;
-      baseRadius = Math.min(width * 0.48, height * 0.40);
+      // Mobile full view
+      targetSunCenterX = width * 0.50;
+      targetSunCenterY = height * 0.52;
+      targetBaseRadius = Math.min(width * 0.46, height * 0.55);
     }
 
-    sunBody.projX = sunCenterX;
-    sunBody.projY = sunCenterY;
+    if (currentBaseRadius === 0) {
+      currentBaseRadius = targetBaseRadius;
+      currentSunCenterX = targetSunCenterX;
+      currentSunCenterY = targetSunCenterY;
+      sunCenterX = currentSunCenterX;
+      sunCenterY = currentSunCenterY;
+      baseRadius = currentBaseRadius;
+      sunBody.projX = sunCenterX;
+      sunBody.projY = sunCenterY;
+    }
   }
 
   /**
@@ -343,13 +366,13 @@ const SolarBackground = (() => {
   function hitTest(mx, my) {
     // 1. Direct hit on Moon
     const dMoon = Math.hypot(mx - moonBody.projX, my - moonBody.projY);
-    if (dMoon <= moonBody.radius + 14) {
+    if (dMoon <= moonBody.radius + 18) {
       return moonBody;
     }
 
     // 2. Direct hit on Sun
     const dSun = Math.hypot(mx - sunBody.projX, my - sunBody.projY);
-    if (dSun <= sunBody.radius + 12) {
+    if (dSun <= sunBody.radius + 20) {
       return sunBody;
     }
 
@@ -357,7 +380,7 @@ const SolarBackground = (() => {
     for (let i = planets.length - 1; i >= 0; i--) {
       const p = planets[i];
       const dist = Math.hypot(mx - p.projX, my - p.projY);
-      if (dist <= p.radius + 18) {
+      if (dist <= p.radius + 22) {
         return p;
       }
     }
@@ -367,27 +390,31 @@ const SolarBackground = (() => {
     const dx = mx - sunCenterX;
     const dy = my - sunCenterY;
     const tilt = -0.32;
-    const cosT = Math.cos(-tilt);
-    const sinT = Math.sin(-tilt);
-    const rx = dx * cosT - dy * sinT;
-    const ry = dx * sinT + dy * cosT;
+    const cosT = Math.cos(tilt);
+    const sinT = Math.sin(tilt);
+    const rx = dx * cosT + dy * sinT;
+    const ry = -dx * sinT + dy * cosT;
 
-    // Calculate effective elliptical radius
-    const rEff = Math.hypot(rx, ry / 0.43);
-    const clickScale = rEff / baseRadius;
-
+    // Angle on the ellipse in unrotated space
+    const theta = Math.atan2(ry / 0.43, rx);
     let closestPlanet = null;
-    let minDiff = Infinity;
+    let minDistPx = Infinity;
+
+    // Measure true screen pixel distance to each planetary orbit track
     planets.forEach((p) => {
-      const diff = Math.abs(p.orbitScale - clickScale);
-      if (diff < minDiff) {
-        minDiff = diff;
+      const a = baseRadius * p.orbitScale;
+      const b = a * 0.43;
+      const ex0 = a * Math.cos(theta);
+      const ey0 = b * Math.sin(theta);
+      const distPx = Math.hypot(rx - ex0, ry - ey0);
+      if (distPx < minDistPx) {
+        minDistPx = distPx;
         closestPlanet = p;
       }
     });
 
-    // If within 15px of an orbit line, select that planet!
-    if (closestPlanet && minDiff * baseRadius <= 15) {
+    // If within 28px of the elliptical orbit path, select that planet!
+    if (closestPlanet && minDistPx <= 28) {
       return closestPlanet;
     }
 
@@ -641,7 +668,7 @@ const SolarBackground = (() => {
       moonAngle += 0.007;
     }
 
-    const moonOrbitR = 25;
+    const moonOrbitR = 30;
     moonBody.projX = earth.projX + Math.cos(moonAngle) * moonOrbitR;
     moonBody.projY = earth.projY + Math.sin(moonAngle) * (moonOrbitR * 0.44);
 
@@ -764,6 +791,102 @@ const SolarBackground = (() => {
     ctx.arc(p.projX, p.projY, p.radius, 0, Math.PI * 2);
     ctx.fill();
 
+    // Internal Planet Features: Axial Rotation, Drift & Cloud Bands
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(p.projX, p.projY, p.radius, 0, Math.PI * 2);
+    ctx.clip();
+
+    if (p.id === 'jupiter') {
+      // Alternating differential cloud bands drifting across Jupiter
+      const t = prefersReducedMotion ? 0 : time * 0.0006;
+      const numBands = 5;
+      for (let b = -numBands; b <= numBands; b++) {
+        const by = p.projY + (b / numBands) * p.radius * 0.88;
+        ctx.fillStyle = (b % 2 === 0) ? 'rgba(154, 52, 18, 0.45)' : 'rgba(254, 215, 170, 0.35)';
+        ctx.fillRect(p.projX - p.radius, by - 1.5, p.radius * 2, 3);
+      }
+      // Great Red Spot storm vortex drifting horizontally
+      const grsAngle = prefersReducedMotion ? 0.3 : (time * 0.00035) % (Math.PI * 2);
+      const grsX = p.projX + Math.sin(grsAngle) * (p.radius * 0.62);
+      const grsY = p.projY + p.radius * 0.35;
+      ctx.fillStyle = 'rgba(185, 28, 28, 0.85)';
+      ctx.beginPath();
+      ctx.ellipse(grsX, grsY, 3.2, 2.0, 0, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (p.id === 'earth') {
+      // Swirling white cloud decks drifting eastward over oceans & continents
+      const t = prefersReducedMotion ? 0 : time * 0.0008;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      const cX = p.projX + Math.sin(t) * (p.radius * 0.45);
+      ctx.arc(cX, p.projY - p.radius * 0.2, p.radius * 0.45, 0.3, Math.PI * 0.9);
+      ctx.stroke();
+
+      ctx.beginPath();
+      const cX2 = p.projX + Math.sin(t + 2.5) * (p.radius * 0.45);
+      ctx.arc(cX2, p.projY + p.radius * 0.25, p.radius * 0.5, 0.1, Math.PI * 0.8);
+      ctx.stroke();
+    } else if (p.id === 'venus') {
+      // Dense sulfuric acid cloud bands drifting across atmosphere
+      ctx.fillStyle = 'rgba(254, 240, 138, 0.28)';
+      for (let i = -2; i <= 2; i++) {
+        const vy = p.projY + (i / 3) * p.radius * 0.7;
+        ctx.fillRect(p.projX - p.radius, vy - 1, p.radius * 2, 2.2);
+      }
+    } else if (p.id === 'mars') {
+      // Bright polar ice cap
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+      ctx.beginPath();
+      ctx.arc(p.projX, p.projY - p.radius * 0.75, p.radius * 0.28, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Dark albedo marking (Syrtis Major) rotating across the disk
+      const t = prefersReducedMotion ? 0 : time * 0.0005;
+      const smX = p.projX + Math.sin(t) * (p.radius * 0.4);
+      ctx.fillStyle = 'rgba(67, 20, 7, 0.45)';
+      ctx.beginPath();
+      ctx.ellipse(smX, p.projY + 1, p.radius * 0.35, p.radius * 0.22, 0.2, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (p.id === 'saturn') {
+      // Subtle cloud bands on Saturn
+      const numBands = 4;
+      for (let b = -numBands; b <= numBands; b++) {
+        const by = p.projY + (b / numBands) * p.radius * 0.8;
+        ctx.fillStyle = (b % 2 === 0) ? 'rgba(202, 138, 4, 0.25)' : 'rgba(254, 240, 138, 0.18)';
+        ctx.fillRect(p.projX - p.radius, by - 1, p.radius * 2, 2);
+      }
+    } else if (p.id === 'neptune') {
+      // Supersonic methane cloud streak (Scooter cloud) and Great Dark Spot
+      const t = prefersReducedMotion ? 0 : time * 0.0012;
+      const sX = p.projX + Math.sin(t) * (p.radius * 0.6);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+      ctx.beginPath();
+      ctx.ellipse(sX, p.projY + p.radius * 0.2, 2.8, 1.2, -0.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Great Dark Spot
+      const gdsX = p.projX + Math.sin(t + 2.8) * (p.radius * 0.5);
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.6)';
+      ctx.beginPath();
+      ctx.ellipse(gdsX, p.projY - p.radius * 0.2, 3.2, 1.8, 0.1, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (p.id === 'uranus') {
+      // Faint high-altitude haze band
+      ctx.fillStyle = 'rgba(204, 251, 241, 0.25)';
+      ctx.fillRect(p.projX - p.radius, p.projY - 2, p.radius * 2, 4);
+    } else if (p.id === 'pluto') {
+      // Tombaugh Regio bright nitrogen ice heart
+      const t = prefersReducedMotion ? 0 : time * 0.0003;
+      const hX = p.projX + Math.sin(t) * (p.radius * 0.35);
+      ctx.fillStyle = 'rgba(255, 247, 237, 0.65)';
+      ctx.beginPath();
+      ctx.ellipse(hX, p.projY + 1, p.radius * 0.38, p.radius * 0.3, 0.3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+
     // Planetary Rings
     if (p.hasRings) {
       ctx.save();
@@ -803,7 +926,8 @@ const SolarBackground = (() => {
   function drawShootingStars() {
     if (Date.now() > nextShootingStarTime && !prefersReducedMotion) {
       spawnShootingStar();
-      nextShootingStarTime = Date.now() + Math.random() * 4000 + 2500;
+      // Keep shooting stars occasional (7 to 16 seconds apart)
+      nextShootingStarTime = Date.now() + Math.random() * 9000 + 7000;
     }
 
     for (let i = shootingStars.length - 1; i >= 0; i--) {
@@ -838,10 +962,46 @@ const SolarBackground = (() => {
   }
 
   // ---------------------------------------------------------------------------
-  // 14. Main Animation Frame Loop
+  // 14. Main Animation Frame Loop & Real-Time Performance Monitor
   // ---------------------------------------------------------------------------
+  let frameCount = 0;
+  let lastFpsUpdateTime = performance.now();
+  let measuredFps = '60.0';
+  let avgFrameTime = '16.6';
+  let onFpsUpdateCallback = null;
+
   function render(time) {
     if (isPaused) return;
+
+    // Track rolling 60 FPS performance metrics
+    frameCount++;
+    const now = performance.now();
+    if (now - lastFpsUpdateTime >= 1000) {
+      measuredFps = ((frameCount * 1000) / (now - lastFpsUpdateTime)).toFixed(1);
+      avgFrameTime = ((now - lastFpsUpdateTime) / frameCount).toFixed(1);
+      frameCount = 0;
+      lastFpsUpdateTime = now;
+      if (onFpsUpdateCallback) {
+        onFpsUpdateCallback({ fps: measuredFps, frameTimeMs: avgFrameTime, dpr });
+      }
+    }
+
+    // Smooth camera shrink & repositioning animation
+    if (!prefersReducedMotion) {
+      currentSunCenterX += (targetSunCenterX - currentSunCenterX) * 0.08;
+      currentSunCenterY += (targetSunCenterY - currentSunCenterY) * 0.08;
+      currentBaseRadius += (targetBaseRadius - currentBaseRadius) * 0.08;
+    } else {
+      currentSunCenterX = targetSunCenterX;
+      currentSunCenterY = targetSunCenterY;
+      currentBaseRadius = targetBaseRadius;
+    }
+
+    sunCenterX = currentSunCenterX;
+    sunCenterY = currentSunCenterY;
+    baseRadius = currentBaseRadius;
+    sunBody.projX = sunCenterX;
+    sunBody.projY = sunCenterY;
 
     ctx.clearRect(0, 0, width + 10, height + 10);
 
@@ -883,7 +1043,10 @@ const SolarBackground = (() => {
       drawMoonSystem(earthRef, time);
     }
 
-    animationId = requestAnimationFrame(render);
+    // Stop continuous loop if reduced motion is preferred to save 100% of GPU
+    if (!prefersReducedMotion) {
+      animationId = requestAnimationFrame(render);
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -901,6 +1064,9 @@ const SolarBackground = (() => {
       initStarfield();
       initAsteroidBelt();
       updateLayout();
+      if (prefersReducedMotion) {
+        render(0);
+      }
     });
 
     // Reduced motion preference
@@ -908,16 +1074,30 @@ const SolarBackground = (() => {
     prefersReducedMotion = motionQuery.matches;
     motionQuery.addEventListener('change', (e) => {
       prefersReducedMotion = e.matches;
+      if (prefersReducedMotion) {
+        cancelAnimationFrame(animationId);
+        render(0);
+      } else {
+        if (!isPaused) {
+          animationId = requestAnimationFrame(render);
+        }
+      }
     });
 
-    // Tab visibility change
+    // Tab visibility change (Page Visibility API)
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         isPaused = true;
         cancelAnimationFrame(animationId);
       } else {
         isPaused = false;
-        animationId = requestAnimationFrame(render);
+        lastFpsUpdateTime = performance.now();
+        frameCount = 0;
+        if (!prefersReducedMotion) {
+          animationId = requestAnimationFrame(render);
+        } else {
+          render(0);
+        }
       }
     });
 
@@ -963,16 +1143,31 @@ const SolarBackground = (() => {
     }, { passive: true });
 
     // Start render loop
-    animationId = requestAnimationFrame(render);
+    if (prefersReducedMotion) {
+      render(0);
+    } else {
+      animationId = requestAnimationFrame(render);
+    }
   }
 
   function setSelectedPlanet(bodyId) {
     selectedBodyId = bodyId;
+    if (prefersReducedMotion) {
+      render(0);
+    }
+  }
+
+  function setPreviewOpen(isOpen) {
+    isPreviewOpen = Boolean(isOpen);
+    updateLayout();
   }
 
   return {
     init,
     setSelectedPlanet,
-    getPlanets: () => planets
+    setPreviewOpen,
+    getPlanets: () => planets,
+    getPerformanceMetrics: () => ({ fps: measuredFps, frameTimeMs: avgFrameTime, dpr }),
+    onPerformanceUpdate: (cb) => { onFpsUpdateCallback = cb; }
   };
 })();

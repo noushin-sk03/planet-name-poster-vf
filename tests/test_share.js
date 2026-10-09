@@ -63,16 +63,22 @@ it('Sanitizes XSS payloads from name parameter', () => {
   assert.strictEqual(state.name.includes('<script>'), false);
 });
 
-it('Clamps name length to 20 characters', () => {
+it('Clamps name length to 30 characters', () => {
   const longName = '?name=Supercalifragilisticexpialidocious';
   const state = ShareManager.parseUrlParams(longName, mockPlanets);
-  assert.strictEqual(state.name.length, 20);
+  assert.strictEqual(state.name.length, 30);
 });
 
 it('Rejects invalid export size and falls back to portrait', () => {
   const query = '?size=billboard';
   const state = ShareManager.parseUrlParams(query, mockPlanets);
   assert.strictEqual(state.size, 'portrait');
+});
+
+it('Accepts landscape export size for PC wallpapers', () => {
+  const query = '?size=landscape';
+  const state = ShareManager.parseUrlParams(query, mockPlanets);
+  assert.strictEqual(state.size, 'landscape');
 });
 
 it('Rejects future birth date', () => {
