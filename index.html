@@ -12,7 +12,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="css/style.css">
+  <!-- Cache-busting query parameter ensures fresh CSS -->
+  <link rel="stylesheet" href="css/style.css?v=3.0">
 </head>
 <body>
   <!-- Full-Screen Interactive Solar System Canvas -->
@@ -55,10 +56,8 @@
   <!-- Mobile Drawer Backdrop Overlay -->
   <div id="drawer-backdrop" class="drawer-backdrop" aria-hidden="true"></div>
 
-  <!-- Main Foreground Content Layer -->
+  <!-- Main Foreground Content Layer (Header only, keeps center transparent) -->
   <main class="main-content" id="main-content">
-    
-    <!-- Hero Header -->
     <header class="hero-header">
       <span class="hero-pill">Stage 01 &bull; Landing &amp; Interactive Selection</span>
       <h1 class="hero-title">Choose your planet</h1>
@@ -66,39 +65,48 @@
         Click a planet in the starry solar system or select one from the left menu.
       </p>
     </header>
-
-    <!-- Selected Planet Placeholder Panel (Stage 1 State) -->
-    <section class="selection-panel" id="selection-panel" aria-live="polite">
-      <div class="selection-card">
-        <div class="selection-card-header">
-          <div class="planet-preview-dot" id="panel-planet-dot" aria-hidden="true"></div>
-          <div>
-            <span class="panel-eyebrow">Selected World</span>
-            <h2 class="panel-planet-name" id="panel-planet-name">Earth</h2>
-          </div>
-        </div>
-
-        <p class="panel-desc" id="panel-planet-desc">
-          Third rock from the Sun. Dense atmosphere, liquid oceans, and thriving biosphere.
-        </p>
-
-        <!-- Status notice for Stage 1 -->
-        <div class="stage-placeholder-notice">
-          <div class="notice-icon">&#128301;</div>
-          <div class="notice-content">
-            <strong>Stage 1 Selection Confirmed</strong>
-            <p>
-              Two-way synchronization active. Next stage: Skies, Day/Night views, and live Name Poster Preview.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
   </main>
 
+  <!-- Selected Planet Telemetry Card (Pinned to Right Side) -->
+  <aside class="selection-panel" id="selection-panel" aria-live="polite">
+    <div class="selection-card">
+      <div class="selection-card-header">
+        <div class="planet-preview-dot" id="panel-planet-dot" aria-hidden="true"></div>
+        <div class="selection-card-title-wrap">
+          <span class="panel-eyebrow">Selected World</span>
+          <h2 class="panel-planet-name" id="panel-planet-name">Earth</h2>
+        </div>
+      </div>
+
+      <div class="panel-meta-badges">
+        <span class="panel-badge" id="panel-planet-order">3rd from Sun</span>
+        <span class="panel-badge" id="panel-planet-type">Terrestrial</span>
+      </div>
+
+      <!-- Verified NASA Fact Sheet telemetry -->
+      <div class="panel-facts-grid">
+        <div class="fact-box">
+          <span class="fact-label">Gravity</span>
+          <strong class="fact-value" id="panel-gravity">9.8 m/s²</strong>
+        </div>
+        <div class="fact-box">
+          <span class="fact-label">Day Length</span>
+          <strong class="fact-value" id="panel-day-length">24.0 hrs</strong>
+        </div>
+        <div class="fact-box">
+          <span class="fact-label">Mean Temp</span>
+          <strong class="fact-value" id="panel-temp">15 °C</strong>
+        </div>
+      </div>
+
+      <div class="panel-credit-line">
+        Data verified from <span class="credit-source">NASA Planetary Fact Sheet</span>
+      </div>
+    </div>
+  </aside>
+
   <!-- Scripts: Background animation, then app controller -->
-  <script src="js/background.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/background.js?v=3.0"></script>
+  <script src="js/app.js?v=3.0"></script>
 </body>
 </html>
