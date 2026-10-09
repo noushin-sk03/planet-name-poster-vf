@@ -201,6 +201,19 @@ const SolarBackground = (() => {
       angle: 2.8,
       projX: 0,
       projY: 0
+    },
+    {
+      id: 'pluto',
+      name: 'Pluto ✨',
+      color: '#f3e8d2',
+      secondaryColor: '#9a6042',
+      radius: 4.8,
+      orbitScale: 1.09,
+      speed: 0.00010,
+      angle: 1.1,
+      isDwarf: true,
+      projX: 0,
+      projY: 0
     }
   ];
 
@@ -465,16 +478,24 @@ const SolarBackground = (() => {
       ctx.closePath();
 
       if (isSelected) {
+        ctx.setLineDash([]);
         ctx.strokeStyle = 'rgba(56, 189, 248, 0.65)';
         ctx.lineWidth = 1.6;
         ctx.shadowColor = '#38bdf8';
         ctx.shadowBlur = 9;
+      } else if (p.isDwarf) {
+        ctx.setLineDash([4, 6]);
+        ctx.strokeStyle = 'rgba(254, 215, 170, 0.16)';
+        ctx.lineWidth = 1.0;
+        ctx.shadowBlur = 0;
       } else {
+        ctx.setLineDash([]);
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
         ctx.lineWidth = 1.0;
         ctx.shadowBlur = 0;
       }
       ctx.stroke();
+      ctx.setLineDash([]);
     });
     ctx.restore();
   }

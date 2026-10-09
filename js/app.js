@@ -112,6 +112,16 @@ document.addEventListener('DOMContentLoaded', () => {
       gravity: '11.2 m/s²',
       dayLength: '16.1 hrs',
       temp: '-200 °C'
+    },
+    {
+      id: 'pluto',
+      name: 'Pluto',
+      order: 'Kuiper Belt World',
+      type: 'Special Dwarf Planet ✨',
+      color: '#f3e8d2',
+      gravity: '0.6 m/s²',
+      dayLength: '153.3 hrs',
+      temp: '-225 °C'
     }
   ];
 

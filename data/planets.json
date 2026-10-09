@@ -160,6 +160,27 @@
     }
   },
   {
+    "id": "pluto",
+    "name": "Pluto",
+    "type": "dwarf-planet",
+    "isSpecial": true,
+    "texture": "textures/pluto.jpg",
+    "dayTemp": "-225 °C",
+    "nightTemp": "-225 °C",
+    "lengthOfDay": "153.3 hours (6.39 Earth days)",
+    "gravity": "0.6 m/s²",
+    "orbitalPeriodYears": 248.0,
+    "textureSource": "NASA / JHUAPL / SwRI (New Horizons)",
+    "dataSource": "NASA Pluto Fact Sheet",
+    "notes": "Beloved special dwarf planet in the Kuiper Belt featuring heart-shaped nitrogen glacier Tombaugh Regio.",
+    "palette": {
+      "primary": "#f3e8d2",
+      "secondary": "#9a6042",
+      "accent": "#ffedd5",
+      "glow": "rgba(243, 232, 210, 0.55)"
+    }
+  },
+  {
     "id": "sun",
     "name": "The Sun",
     "type": "star",
