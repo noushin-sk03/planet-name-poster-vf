@@ -616,6 +616,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const nameInput = document.getElementById('name-input');
   const charCount = document.getElementById('char-count');
+  const modeDayBtn = document.getElementById('mode-day-btn');
+  const modeNightBtn = document.getElementById('mode-night-btn');
 
   const skyStatusPill = document.getElementById('sky-status-pill');
   const skyFontIndicator = document.getElementById('sky-font-indicator');
@@ -1212,6 +1214,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         PosterRenderer.render(state);
       }, 40);
     });
+
+    // 2. Day / Night mode toggle (controls 2D poster only)
+    if (modeDayBtn) {
+      modeDayBtn.addEventListener('click', () => {
+        if (state.mode === 'day') return;
+        state.mode = 'day';
+        modeDayBtn.classList.add('active');
+        modeDayBtn.setAttribute('aria-pressed', 'true');
+        modeNightBtn.classList.remove('active');
+        modeNightBtn.setAttribute('aria-pressed', 'false');
+        updateStudioBadges();
+        syncUrlState();
+        PosterRenderer.render(state);
+      });
+    }
+
+    if (modeNightBtn) {
+      modeNightBtn.addEventListener('click', () => {
+        if (state.mode === 'night') return;
+        state.mode = 'night';
+        modeNightBtn.classList.add('active');
+        modeNightBtn.setAttribute('aria-pressed', 'true');
+        modeDayBtn.classList.remove('active');
+        modeDayBtn.setAttribute('aria-pressed', 'false');
+        updateStudioBadges();
+        syncUrlState();
+        PosterRenderer.render(state);
+      });
+    }
 
     // 3. Two-Stage Vertical Navigation Buttons
     if (scrollToStudioBtn) {
@@ -1867,6 +1898,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       if (userWeightInput && state.weight) userWeightInput.value = state.weight;
       if (userDobInput && state.dob) userDobInput.value = state.dob;
+
+      if (modeDayBtn) {
+        modeDayBtn.classList.toggle('active', state.mode === 'day');
+        modeDayBtn.setAttribute('aria-pressed', state.mode === 'day' ? 'true' : 'false');
+      }
+      if (modeNightBtn) {
+        modeNightBtn.classList.toggle('active', state.mode === 'night');
+        modeNightBtn.setAttribute('aria-pressed', state.mode === 'night' ? 'true' : 'false');
+      }
     }
   }
 
