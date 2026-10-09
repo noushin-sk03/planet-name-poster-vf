@@ -1040,10 +1040,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ---------------------------------------------------------------------------
   // 4.1 Stage 08 WebGL 3D Lit Globe Controls
   // ---------------------------------------------------------------------------
-  function updateGlobeTexture(world) {
+  function updateGlobeTexture(world, forceRefresh = false) {
     if (typeof Sphere3DViewer === 'undefined' || !Sphere3DViewer.isSupported()) return;
     if (typeof TextureManager !== 'undefined' && TextureManager.generateProceduralTexture) {
-      const texCanvas = TextureManager.generateProceduralTexture(world, state.mode);
+      const texCanvas = TextureManager.generateProceduralTexture(world, state.mode, forceRefresh);
       Sphere3DViewer.setTexture(texCanvas, world);
     }
   }
@@ -1225,6 +1225,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       updateStudioBadges();
       syncUrlState();
       PosterRenderer.render(state);
+
+      // Refresh globe texture with new mode (bypass cache so night→day is immediate)
+      const allWorlds = getAllWorlds();
+      const currentWorld = allWorlds.find(w => w.id === state.worldId);
+      if (currentWorld) updateGlobeTexture(currentWorld, true);
     });
 
     modeNightBtn.addEventListener('click', () => {
@@ -1237,6 +1242,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       updateStudioBadges();
       syncUrlState();
       PosterRenderer.render(state);
+
+      // Refresh globe texture with new mode (bypass cache so day→night is immediate)
+      const allWorlds = getAllWorlds();
+      const currentWorld = allWorlds.find(w => w.id === state.worldId);
+      if (currentWorld) updateGlobeTexture(currentWorld, true);
     });
 
     function dayBtnActive(active) {

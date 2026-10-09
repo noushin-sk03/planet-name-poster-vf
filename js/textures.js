@@ -83,9 +83,9 @@ const TextureManager = (() => {
    * @param {string} mode - 'day' or 'night'
    * @returns {HTMLCanvasElement} - Offscreen canvas ready to be used as a texture
    */
-  function generateProceduralTexture(planet, mode = 'day') {
+  function generateProceduralTexture(planet, mode = 'day', forceRefresh = false) {
     const cacheKey = `${planet.id}_${mode}`;
-    if (proceduralCache.has(cacheKey)) {
+    if (!forceRefresh && proceduralCache.has(cacheKey)) {
       return proceduralCache.get(cacheKey);
     }
 
