@@ -1,562 +1,306 @@
 /**
- * app.js - Main Application Controller (All Stages Integrated: Core to 3D Sphere)
- * -------------------------------------------------------------------------------
- * Coordinates data loading (Planets, Moons, Exoplanets), canvas rendering,
- * URL state synchronization, multi-size exports, biophysical calculations,
- * and the WebGL interactive 3D lit sphere with moving terminator.
+ * app.js - Stage 01 Controller: Landing & Interactive Selection
+ * -------------------------------------------------------------
+ * Educational Pair-Programming Project: "Planet Name Poster"
+ * 
+ * Stage 1 Goals:
+ * 1. Initialize the animated interactive solar system canvas (background.js).
+ * 2. Populate the left planet navigation menu with the 8 solar system worlds.
+ * 3. Handle seamless two-way synchronized selection:
+ *    - Clicking/touching a planet in the left drawer highlights it on the canvas
+ *      and updates the detail panel.
+ *    - Clicking/touching a moving planet on the canvas updates the active drawer item
+ *      and the detail panel.
+ * 4. Responsive mobile drawer navigation (toggle button, backdrop dismiss, Esc key).
+ * 5. Keyboard accessibility (Tab navigation, Enter/Space selection, Arrow Up/Down).
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // ---------------------------------------------------------------------------
+  // 1. Planetary Data Definition
+  // ---------------------------------------------------------------------------
+  // Default data for the 8 solar system planets.
+  // Each entry includes visual color, order, and educational summary.
+  const DEFAULT_PLANETS = [
+    {
+      id: 'mercury',
+      name: 'Mercury',
+      order: '1st planet from Sun',
+      color: '#a3a3a3',
+      desc: 'Smallest planet and closest to the Sun. Cratered rocky surface with extreme temperature swings from day to night.'
+    },
+    {
+      id: 'venus',
+      name: 'Venus',
+      order: '2nd planet from Sun',
+      color: '#eab308',
+      desc: 'Second world from the Sun. Enveloped in a dense, runaway greenhouse atmosphere hotter than an oven.'
+    },
+    {
+      id: 'earth',
+      name: 'Earth',
+      order: '3rd planet from Sun',
+      color: '#38bdf8',
+      desc: 'Third rock from the Sun. Dense nitrogen-oxygen atmosphere, liquid oceans, and a thriving biosphere.'
+    },
+    {
+      id: 'mars',
+      name: 'Mars',
+      order: '4th planet from Sun',
+      color: '#ef4444',
+      desc: 'Fourth planet from the Sun. Dusty, iron-rich desert world with ancient dry river valleys and polar ice caps.'
+    },
+    {
+      id: 'jupiter',
+      name: 'Jupiter',
+      order: '5th planet from Sun',
+      color: '#f97316',
+      desc: 'Fifth planet and the largest world in our solar system. Swirling gas giant with centuries-old storms like the Great Red Spot.'
+    },
+    {
+      id: 'saturn',
+      name: 'Saturn',
+      order: '6th planet from Sun',
+      color: '#fde047',
+      desc: 'Sixth planet from the Sun. Magnificent ring system composed of billions of water-ice particles and dust.'
+    },
+    {
+      id: 'uranus',
+      name: 'Uranus',
+      order: '7th planet from Sun',
+      color: '#2dd4bf',
+      desc: 'Seventh planet from the Sun. Tilted on its side by 98 degrees, an ice giant with pale cyan methane haze.'
+    },
+    {
+      id: 'neptune',
+      name: 'Neptune',
+      order: '8th planet from Sun',
+      color: '#3b82f6',
+      desc: 'Eighth and most distant planet. Deep azure ice giant swept by supersonic supersonic winds exceeding 2,000 km/h.'
+    }
+  ];
+
   // Application State
   const state = {
-    name: 'COSMOS',
-    planetId: 'jupiter',
-    planet: null,
-    mode: 'day',
-    size: 'portrait',
-    weight: null,
-    dob: '',
-    texture: null,
-    planets: [],
-    activeTab: '2d'
+    selectedPlanetId: 'earth',
+    planets: DEFAULT_PLANETS
   };
 
-  // Core DOM Elements
-  const nameInput = document.getElementById('name-input');
-  const charCount = document.getElementById('char-count');
-  const planetSelect = document.getElementById('planet-select');
-  const planetHint = document.getElementById('planet-hint');
-  const dayBtn = document.getElementById('mode-day-btn');
-  const nightBtn = document.getElementById('mode-night-btn');
-  const modeHint = document.getElementById('mode-hint');
-  const sizeSelect = document.getElementById('size-select');
-  const downloadBtn = document.getElementById('download-btn');
-  const surpriseBtn = document.getElementById('surprise-btn');
-  const copyLinkBtn = document.getElementById('copy-link-btn');
-  const copyStatus = document.getElementById('copy-status');
-  const copyToast = document.getElementById('copy-toast');
-  const canvasElement = document.getElementById('poster-canvas');
-  const resolutionBadge = document.getElementById('resolution-badge');
-  const loadingOverlay = document.getElementById('loading-overlay');
-  const loadingStatus = document.getElementById('loading-status');
+  // ---------------------------------------------------------------------------
+  // 2. DOM Elements Cache
+  // ---------------------------------------------------------------------------
+  const canvasElement = document.getElementById('solar-canvas');
+  const drawerToggleBtn = document.getElementById('drawer-toggle');
+  const drawerCloseBtn = document.getElementById('drawer-close');
+  const planetDrawer = document.getElementById('planet-drawer');
+  const drawerBackdrop = document.getElementById('drawer-backdrop');
+  const planetMenuList = document.getElementById('planet-menu');
 
-  // Stage 03 DOM Elements (Life on Another World)
-  const lifePlanetName = document.getElementById('life-planet-name');
-  const weightInput = document.getElementById('weight-input');
-  const dobInput = document.getElementById('dob-input');
-  const calcWeightVal = document.getElementById('calc-weight-val');
-  const calcWeightSub = document.getElementById('calc-weight-sub');
-  const calcAgeVal = document.getElementById('calc-age-val');
-  const calcAgeSub = document.getElementById('calc-age-sub');
-  const calcDayVal = document.getElementById('calc-day-val');
-  const calcDaySub = document.getElementById('calc-day-sub');
+  // Detail / Placeholder panel elements
+  const panelPlanetDot = document.getElementById('panel-planet-dot');
+  const panelPlanetName = document.getElementById('panel-planet-name');
+  const panelPlanetDesc = document.getElementById('panel-planet-desc');
 
-  // Stage 08 DOM Elements (3D Lit Globe)
-  const tab2dBtn = document.getElementById('tab-2d-btn');
-  const tab3dBtn = document.getElementById('tab-3d-btn');
-  const canvasContainer = document.getElementById('canvas-container');
-  const sphereContainer = document.getElementById('sphere-container');
-  const sphereCanvas = document.getElementById('sphere-canvas');
-  const terminatorSlider = document.getElementById('terminator-slider');
-  const terminatorAngleVal = document.getElementById('terminator-angle-val');
-  const autorotateBtn = document.getElementById('autorotate-btn');
-  const captureSphereBtn = document.getElementById('capture-sphere-btn');
-
-  let isAutoRotating = true;
-
-  /**
-   * Shows or hides the loading spinner overlay with accessible status text.
-   * @param {boolean} show
-   * @param {string} message
-   */
-  function setLoading(show, message = 'Synthesizing celestial textures...') {
-    if (show) {
-      loadingStatus.textContent = message;
-      loadingOverlay.classList.add('visible');
-    } else {
-      loadingOverlay.classList.remove('visible');
-    }
-  }
-
-  /**
-   * Updates resolution badge and canvas container aspect ratio.
-   * @param {string} sizeKey
-   */
-  function syncCanvasDimensions(sizeKey) {
-    const layout = CanvasRenderer.getLayout(sizeKey);
-    if (resolutionBadge) {
-      resolutionBadge.innerHTML = `${layout.width} &times; ${layout.height} px`;
-    }
-    if (canvasElement) {
-      canvasElement.style.aspectRatio = layout.aspectRatio;
-    }
-  }
-
-  /**
-   * Loads both solar system bodies (planets & moons) and NASA Exoplanet datasets.
-   * @returns {Promise<Array>}
-   */
-  async function loadAllCelestialData() {
-    let solarBodies = [];
-    let exoplanets = [];
-
-    // 1. Fetch Planets and Moons
-    try {
-      const resPlanets = await fetch('data/planets.json');
-      if (resPlanets.ok) {
-        solarBodies = await resPlanets.json();
-      }
-    } catch (e) {
-      console.warn('Could not load data/planets.json, using fallback:', e);
-    }
-
-    // 2. Fetch Confirmed Exoplanets (Stage 07)
-    try {
-      const resExo = await fetch('data/exoplanets.json');
-      if (resExo.ok) {
-        const exoData = await resExo.json();
-        exoplanets = exoData.planets || [];
-      }
-    } catch (e) {
-      console.warn('Could not load data/exoplanets.json:', e);
-    }
-
-    // Combine datasets
-    const combined = [...solarBodies, ...exoplanets];
-    return combined.length > 0 ? combined : [
-      {
-        id: 'jupiter',
-        name: 'Jupiter',
-        type: 'planet',
-        dayTemp: '-110 °C',
-        nightTemp: '-110 °C',
-        lengthOfDay: '9.9 hours',
-        gravity: '24.8 m/s²',
-        orbitalPeriodYears: 11.86,
-        textureSource: 'NASA / JPL-Caltech',
-        dataSource: 'NASA Fact Sheet',
-        palette: { primary: '#c28d54', secondary: '#7a482b', accent: '#e3b584', glow: 'rgba(227, 181, 132, 0.5)' }
-      }
-    ];
-  }
-
-  /**
-   * Populates the HTML <select> dropdown with organized <optgroup> categories.
-   * @param {Array} bodies
-   */
-  function populatePlanetSelect(bodies) {
-    planetSelect.innerHTML = '';
-
-    const groups = {
-      planets: document.createElement('optgroup'),
-      moons: document.createElement('optgroup'),
-      exoplanets: document.createElement('optgroup'),
-      stars: document.createElement('optgroup')
-    };
-
-    groups.planets.label = 'Solar System Planets';
-    groups.moons.label = 'Moons & Natural Satellites';
-    groups.exoplanets.label = 'Confirmed Exoplanets (NASA Archive)';
-    groups.stars.label = 'Stars';
-
-    bodies.forEach((body) => {
-      const option = document.createElement('option');
-      option.value = body.id;
-      option.textContent = body.parent ? `${body.name} (${body.parent})` : body.name;
-      if (body.id === state.planetId) {
-        option.selected = true;
-      }
-
-      if (body.type === 'moon') {
-        groups.moons.appendChild(option);
-      } else if (body.type === 'exoplanet') {
-        groups.exoplanets.appendChild(option);
-      } else if (body.type === 'star') {
-        groups.stars.appendChild(option);
-      } else {
-        groups.planets.appendChild(option);
-      }
-    });
-
-    if (groups.planets.children.length) planetSelect.appendChild(groups.planets);
-    if (groups.moons.children.length) planetSelect.appendChild(groups.moons);
-    if (groups.stars.children.length) planetSelect.appendChild(groups.stars);
-    if (groups.exoplanets.children.length) planetSelect.appendChild(groups.exoplanets);
-  }
-
-  /**
-   * Updates the "Life on Another World" biophysical calculations.
-   */
-  function updateLifeCalculations() {
-    if (!state.planet) return;
-
-    if (lifePlanetName) {
-      lifePlanetName.textContent = state.planet.name;
-    }
-
-    // Weight Calculation
-    const rawWeight = weightInput ? parseFloat(weightInput.value) : null;
-    state.weight = !isNaN(rawWeight) && rawWeight > 0 ? rawWeight : null;
-    
-    // Check if gravity is known
-    const gravVal = CelestialCalculator.parseGravity(state.planet.gravity);
-    const weightResult = CelestialCalculator.calculateWeightOnPlanet(state.weight, state.planet.gravity);
-    
-    if (calcWeightVal) {
-      calcWeightVal.textContent = state.planet.gravity === 'unknown' ? 'Unknown' : weightResult.formatted;
-    }
-    if (calcWeightSub) {
-      calcWeightSub.textContent = state.planet.gravity === 'unknown' 
-        ? 'Mass or radius unmeasured' 
-        : weightResult.message;
-    }
-
-    // Age Calculation
-    const rawDob = dobInput ? dobInput.value : '';
-    state.dob = rawDob;
-    const ageResult = CelestialCalculator.calculateAgeOnPlanet(
-      rawDob,
-      state.planet.orbitalPeriodYears
-    );
-    if (calcAgeVal) {
-      calcAgeVal.textContent = state.planet.orbitalPeriodYears ? ageResult.formatted : 'N/A';
-    }
-    if (calcAgeSub) {
-      calcAgeSub.textContent = state.planet.orbitalPeriodYears 
-        ? ageResult.message 
-        : (state.planet.type === 'star' ? 'Stars do not orbit host stars' : 'Orbital period unknown');
-      calcAgeSub.style.color = ageResult.error ? '#f87171' : 'var(--color-text-secondary)';
-    }
-
-    // Diurnal Day Ratio
-    const dayResult = CelestialCalculator.calculateDiurnalRatio(state.planet.lengthOfDay);
-    if (calcDayVal) {
-      calcDayVal.textContent = state.planet.lengthOfDay === 'unknown' ? 'Unknown' : dayResult.formatted;
-    }
-    if (calcDaySub) {
-      let tidallyLockedNote = state.planet.isTidallyLocked 
-        ? `Tidally locked to ${state.planet.parent || 'host'}` 
-        : dayResult.message;
-      calcDaySub.textContent = tidallyLockedNote;
-    }
-  }
-
-  /**
-   * Updates state texture, syncs URL query string, and repaints canvas and 3D globe.
-   */
-  async function updateAndRender() {
-    setLoading(true, `Loading texture for ${state.planet.name}...`);
-    try {
-      // 1. Sync canvas aspect ratio & layout
-      syncCanvasDimensions(state.size);
-
-      // 2. Fetch texture (image file or procedural fallback)
-      state.texture = await TextureManager.getPlanetTexture(state.planet, state.mode);
-
-      // 3. Render 2D Canvas poster
-      CanvasRenderer.render(state);
-
-      // 4. Update WebGL 3D Sphere if supported
-      if (Sphere3DViewer.isSupported()) {
-        Sphere3DViewer.setTexture(state.texture, state.planet);
-      }
-
-      // 5. Update address bar with clean shareable URL (replaceState)
-      ShareManager.updateBrowserUrl(state);
-
-      // 6. Update accessible screen-reader description for the canvas
-      const canvasAccessibleDesc = document.getElementById('canvas-accessible-desc');
-      if (canvasAccessibleDesc) {
-        const layout = CanvasRenderer.getLayout(state.size);
-        canvasAccessibleDesc.textContent = `Poster artwork displaying "${state.name || 'COSMOS'}" textured with ${state.planet.name} in ${state.mode} illumination mode at ${layout.label} size.`;
-      }
-    } catch (err) {
-      console.error('Render error:', err);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  /**
-   * Sets the active illumination mode (Day or Night).
-   * @param {string} mode - 'day' or 'night'
-   */
-  function setMode(mode) {
-    if (state.mode === mode) return;
-    state.mode = mode;
-
-    if (mode === 'day') {
-      dayBtn.classList.add('active');
-      dayBtn.setAttribute('aria-checked', 'true');
-      nightBtn.classList.remove('active');
-      nightBtn.setAttribute('aria-checked', 'false');
-      modeHint.textContent = 'Day reveals bright surface features with a subtle rim light.';
-    } else {
-      nightBtn.classList.add('active');
-      nightBtn.setAttribute('aria-checked', 'true');
-      dayBtn.classList.remove('active');
-      dayBtn.setAttribute('aria-checked', 'false');
-      modeHint.textContent = 'Night darkens the planet and casts a luminous atmospheric glow.';
-    }
-
-    updateAndRender();
-  }
-
-  /**
-   * "Surprise Me" button: picks a random planet/moon/exoplanet and mode without repeating combo.
-   */
-  function surpriseMe() {
-    let nextPlanet, nextMode;
-    do {
-      nextPlanet = state.planets[Math.floor(Math.random() * state.planets.length)];
-      nextMode = Math.random() > 0.5 ? 'day' : 'night';
-    } while (
-      state.planets.length > 1 &&
-      nextPlanet.id === state.planetId &&
-      nextMode === state.mode
-    );
-
-    // Apply selections
-    state.planetId = nextPlanet.id;
-    state.planet = nextPlanet;
-    planetSelect.value = nextPlanet.id;
-    planetHint.textContent = `Gravity: ${nextPlanet.gravity} | Length of day: ${nextPlanet.lengthOfDay}`;
-
-    // Apply mode
-    if (state.mode !== nextMode) {
-      state.mode = nextMode;
-      if (nextMode === 'day') {
-        dayBtn.classList.add('active');
-        dayBtn.setAttribute('aria-checked', 'true');
-        nightBtn.classList.remove('active');
-        nightBtn.setAttribute('aria-checked', 'false');
-      } else {
-        nightBtn.classList.add('active');
-        nightBtn.setAttribute('aria-checked', 'true');
-        dayBtn.classList.remove('active');
-        dayBtn.setAttribute('aria-checked', 'false');
-      }
-    }
-
-    updateLifeCalculations();
-    updateAndRender();
-  }
-
-  /**
-   * "Copy Link" button: copies current share URL and announces to screen readers.
-   */
-  async function handleCopyLink() {
-    const success = await ShareManager.copyShareableLink();
-    if (success) {
-      if (copyStatus) copyStatus.textContent = 'Shareable poster link copied to clipboard!';
-      if (copyToast) {
-        copyToast.classList.add('show');
-        setTimeout(() => copyToast.classList.remove('show'), 2500);
-      }
-    }
-  }
-
-  /**
-   * Switches view between 2D Poster Card and 3D Lit Globe.
-   * @param {string} tab - '2d' or '3d'
-   */
-  function switchViewTab(tab) {
-    state.activeTab = tab;
-    if (tab === '3d') {
-      tab3dBtn.classList.add('active');
-      tab3dBtn.setAttribute('aria-selected', 'true');
-      tab2dBtn.classList.remove('active');
-      tab2dBtn.setAttribute('aria-selected', 'false');
-
-      canvasContainer.style.display = 'none';
-      sphereContainer.style.display = 'flex';
-      Sphere3DViewer.start();
-    } else {
-      tab2dBtn.classList.add('active');
-      tab2dBtn.setAttribute('aria-selected', 'true');
-      tab3dBtn.classList.remove('active');
-      tab3dBtn.setAttribute('aria-selected', 'false');
-
-      sphereContainer.style.display = 'none';
-      canvasContainer.style.display = 'block';
-      Sphere3DViewer.stop();
-    }
-  }
-
-  /**
-   * Binds user interaction events to state updates.
-   */
-  function bindEvents() {
-    // 1. Name input with live debounced update
-    let debounceTimer = null;
-    nameInput.addEventListener('input', (e) => {
-      const val = ShareManager.sanitizeText(e.target.value, 20);
-      state.name = val;
-      charCount.textContent = `${val.length} / 20`;
-
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => {
-        CanvasRenderer.render(state);
-        ShareManager.updateBrowserUrl(state);
-      }, 60);
-    });
-
-    // 2. Planet selector change
-    planetSelect.addEventListener('change', (e) => {
-      const selectedId = e.target.value;
-      const found = state.planets.find((p) => p.id === selectedId);
-      if (found) {
-        state.planetId = found.id;
-        state.planet = found;
-        planetHint.textContent = `Gravity: ${found.gravity} | Length of day: ${found.lengthOfDay}`;
-        updateLifeCalculations();
-        updateAndRender();
-      }
-    });
-
-    // 3. Mode Toggle buttons
-    dayBtn.addEventListener('click', () => setMode('day'));
-    nightBtn.addEventListener('click', () => setMode('night'));
-
-    // 4. Export Size selector change
-    if (sizeSelect) {
-      sizeSelect.addEventListener('change', (e) => {
-        state.size = e.target.value;
-        syncCanvasDimensions(state.size);
-        CanvasRenderer.render(state);
-        ShareManager.updateBrowserUrl(state);
+  // ---------------------------------------------------------------------------
+  // 3. Optional Enrichment from planets.json
+  // ---------------------------------------------------------------------------
+  try {
+    const res = await fetch('data/planets.json');
+    if (res.ok) {
+      const data = await res.json();
+      // Merge extra details (notes, facts) if available
+      state.planets = state.planets.map((p) => {
+        const match = data.find((item) => item.id === p.id);
+        if (match && match.notes) {
+          return { ...p, desc: match.notes };
+        }
+        return p;
       });
     }
+  } catch (err) {
+    // If running from local file:// or network offline, gracefully proceed with DEFAULT_PLANETS
+    console.info('Using local planet defaults:', err);
+  }
 
-    // 5. Actions: Download, Surprise Me, Copy Link
-    downloadBtn.addEventListener('click', () => {
-      const cleanName = (state.name.trim() || 'COSMOS').toLowerCase().replace(/[^a-z0-9_-]/g, '_');
-      const filename = `poster-${state.planet.id}-${state.mode}-${state.size}-${cleanName}.png`;
-      CanvasRenderer.exportPNG(filename);
-    });
+  // ---------------------------------------------------------------------------
+  // 4. Render Left Planet Menu
+  // ---------------------------------------------------------------------------
+  function renderPlanetMenu() {
+    planetMenuList.innerHTML = '';
 
-    if (surpriseBtn) surpriseBtn.addEventListener('click', surpriseMe);
-    if (copyLinkBtn) copyLinkBtn.addEventListener('click', handleCopyLink);
+    state.planets.forEach((planet, index) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'planet-btn';
+      btn.setAttribute('role', 'menuitem');
+      btn.setAttribute('data-planet-id', planet.id);
+      btn.setAttribute('aria-label', `Select ${planet.name}, ${planet.order}`);
 
-    // 6. Stage 08 3D Viewer tabs & controls
-    if (tab2dBtn) tab2dBtn.addEventListener('click', () => switchViewTab('2d'));
-    if (tab3dBtn) tab3dBtn.addEventListener('click', () => switchViewTab('3d'));
+      if (planet.id === state.selectedPlanetId) {
+        btn.classList.add('active');
+        btn.setAttribute('aria-current', 'true');
+      }
 
-    if (terminatorSlider) {
-      terminatorSlider.addEventListener('input', (e) => {
-        const val = parseInt(e.target.value, 10);
-        if (terminatorAngleVal) terminatorAngleVal.textContent = `${val}°`;
-        Sphere3DViewer.setLightAngle(val);
-      });
-    }
+      // Planet color swatch dot
+      const swatch = document.createElement('span');
+      swatch.className = 'planet-swatch';
+      swatch.style.backgroundColor = planet.color;
+      swatch.style.color = planet.color;
+      swatch.setAttribute('aria-hidden', 'true');
 
-    if (autorotateBtn) {
-      autorotateBtn.addEventListener('click', () => {
-        isAutoRotating = !isAutoRotating;
-        Sphere3DViewer.setAutoRotate(isAutoRotating);
-        autorotateBtn.textContent = isAutoRotating ? 'Pause Rotation' : 'Resume Rotation';
-      });
-    }
+      // Planet label & subtitle
+      const meta = document.createElement('div');
+      meta.className = 'planet-meta';
 
-    if (captureSphereBtn) {
-      captureSphereBtn.addEventListener('click', () => {
-        const dataUrl = Sphere3DViewer.captureViewDataUrl();
-        if (dataUrl) {
-          const a = document.createElement('a');
-          a.href = dataUrl;
-          a.download = `globe-3d-${state.planet.id}.png`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'planet-btn-name';
+      nameSpan.textContent = planet.name;
+
+      const subSpan = document.createElement('span');
+      subSpan.className = 'planet-btn-sub';
+      subSpan.textContent = planet.order;
+
+      meta.appendChild(nameSpan);
+      meta.appendChild(subSpan);
+
+      btn.appendChild(swatch);
+      btn.appendChild(meta);
+
+      // Menu button click handler
+      btn.addEventListener('click', () => {
+        selectPlanet(planet.id, { source: 'drawer' });
+
+        // If on small screen / mobile drawer is open, auto-close so the user can see the canvas
+        if (window.innerWidth < 820 && planetDrawer.classList.contains('open')) {
+          closeDrawer();
         }
       });
-    }
 
-    // 7. Life on Another World inputs
-    if (weightInput) {
-      weightInput.addEventListener('input', () => {
-        updateLifeCalculations();
-        ShareManager.updateBrowserUrl(state);
+      // Keyboard navigation within the menu (Arrow Up / Down)
+      btn.addEventListener('keydown', (e) => {
+        const buttons = Array.from(planetMenuList.querySelectorAll('.planet-btn'));
+        const currentIndex = buttons.indexOf(btn);
+
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          const nextIndex = (currentIndex + 1) % buttons.length;
+          buttons[nextIndex].focus();
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          const prevIndex = (currentIndex - 1 + buttons.length) % buttons.length;
+          buttons[prevIndex].focus();
+        }
       });
-    }
-    if (dobInput) {
-      dobInput.addEventListener('input', () => {
-        updateLifeCalculations();
-        ShareManager.updateBrowserUrl(state);
-      });
-      dobInput.addEventListener('change', () => {
-        updateLifeCalculations();
-        ShareManager.updateBrowserUrl(state);
-      });
-    }
+
+      planetMenuList.appendChild(btn);
+    });
   }
 
+  // ---------------------------------------------------------------------------
+  // 5. Two-Way Selection Synchronization
+  // ---------------------------------------------------------------------------
   /**
-   * Application Bootstrap
+   * Selects a planet, updates visual states across menu, canvas, and info panel.
+   *
+   * @param {string} planetId - Unique identifier (e.g. 'earth', 'mars')
+   * @param {Object} options - { source: 'drawer' | 'canvas' }
    */
-  async function initApp() {
-    setLoading(true, 'Initializing typography & planetary datasets...');
+  function selectPlanet(planetId, options = {}) {
+    const planet = state.planets.find((p) => p.id === planetId);
+    if (!planet) return;
 
-    // 1. Initialize 2D Canvas renderer
-    CanvasRenderer.init(canvasElement);
+    state.selectedPlanetId = planetId;
 
-    // 2. Initialize WebGL 3D Sphere viewer
-    if (sphereCanvas) {
-      Sphere3DViewer.init(sphereCanvas);
+    // 1. Notify SolarBackground canvas engine
+    if (typeof SolarBackground !== 'undefined' && SolarBackground.setSelectedPlanet) {
+      SolarBackground.setSelectedPlanet(planetId);
     }
 
-    // 3. Load and verify serif fonts
-    await TextureManager.ensureFontsReady('900 130px "Cinzel"');
+    // 2. Synchronize Drawer Menu Buttons
+    const buttons = planetMenuList.querySelectorAll('.planet-btn');
+    buttons.forEach((btn) => {
+      const isTarget = btn.getAttribute('data-planet-id') === planetId;
+      btn.classList.toggle('active', isTarget);
+      if (isTarget) {
+        btn.setAttribute('aria-current', 'true');
+        // If selection was triggered from canvas click, scroll menu button into view
+        if (options.source === 'canvas') {
+          btn.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+      } else {
+        btn.removeAttribute('aria-current');
+      }
+    });
 
-    // 4. Load celestial dataset (Planets, Moons, Exoplanets)
-    state.planets = await loadAllCelestialData();
-
-    // 5. Parse incoming URL parameters and restore state
-    const urlState = ShareManager.parseUrlParams(window.location.search, state.planets);
-    state.name = urlState.name;
-    state.planetId = urlState.planetId;
-    state.mode = urlState.mode;
-    state.size = urlState.size;
-    state.weight = urlState.weight;
-    state.dob = urlState.dob;
-
-    // 6. Synchronize DOM controls with restored state
-    populatePlanetSelect(state.planets);
-    planetSelect.value = state.planetId;
-    nameInput.value = state.name;
-    charCount.textContent = `${state.name.length} / 20`;
-
-    if (sizeSelect) sizeSelect.value = state.size;
-    if (weightInput && state.weight) weightInput.value = state.weight;
-    if (dobInput && state.dob) dobInput.value = state.dob;
-
-    // Mode buttons state
-    if (state.mode === 'night') {
-      nightBtn.classList.add('active');
-      nightBtn.setAttribute('aria-checked', 'true');
-      dayBtn.classList.remove('active');
-      dayBtn.setAttribute('aria-checked', 'false');
-      modeHint.textContent = 'Night darkens the planet and casts a luminous atmospheric glow.';
-    } else {
-      dayBtn.classList.add('active');
-      dayBtn.setAttribute('aria-checked', 'true');
-      nightBtn.classList.remove('active');
-      nightBtn.setAttribute('aria-checked', 'false');
-      modeHint.textContent = 'Day reveals bright surface features with a subtle rim light.';
+    // 3. Update Selected World Detail Card
+    if (panelPlanetDot) {
+      panelPlanetDot.style.backgroundColor = planet.color;
+      panelPlanetDot.style.color = planet.color;
+      panelPlanetDot.style.boxShadow = `0 0 16px ${planet.color}`;
     }
 
-    // Set active planet object
-    state.planet = state.planets.find((p) => p.id === state.planetId) || state.planets[0];
-    planetHint.textContent = `Gravity: ${state.planet.gravity} | Length of day: ${state.planet.lengthOfDay}`;
+    if (panelPlanetName) {
+      panelPlanetName.textContent = planet.name;
+    }
 
-    // 7. Bind events
-    bindEvents();
-
-    // 8. Calculate biophysics & perform initial render
-    updateLifeCalculations();
-    await updateAndRender();
+    if (panelPlanetDesc) {
+      panelPlanetDesc.textContent = planet.desc;
+    }
   }
 
-  // Launch application
-  await initApp();
+  // ---------------------------------------------------------------------------
+  // 6. Mobile Drawer Open / Close Handlers
+  // ---------------------------------------------------------------------------
+  function openDrawer() {
+    planetDrawer.classList.add('open');
+    drawerBackdrop.classList.add('open');
+    drawerToggleBtn.setAttribute('aria-expanded', 'true');
+
+    // Focus active or first button for screen readers and keyboard users
+    const activeBtn = planetMenuList.querySelector('.planet-btn.active') || planetMenuList.querySelector('.planet-btn');
+    if (activeBtn) activeBtn.focus();
+  }
+
+  function closeDrawer() {
+    planetDrawer.classList.remove('open');
+    drawerBackdrop.classList.remove('open');
+    drawerToggleBtn.setAttribute('aria-expanded', 'false');
+  }
+
+  function toggleDrawer() {
+    if (planetDrawer.classList.contains('open')) {
+      closeDrawer();
+    } else {
+      openDrawer();
+    }
+  }
+
+  // Bind drawer controls
+  if (drawerToggleBtn) drawerToggleBtn.addEventListener('click', toggleDrawer);
+  if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', closeDrawer);
+  if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
+
+  // Close drawer when pressing Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && planetDrawer.classList.contains('open')) {
+      closeDrawer();
+      if (drawerToggleBtn) drawerToggleBtn.focus();
+    }
+  });
+
+  // ---------------------------------------------------------------------------
+  // 7. Initialize Canvas Background & Wire Selection Callback
+  // ---------------------------------------------------------------------------
+  if (canvasElement && typeof SolarBackground !== 'undefined') {
+    // When a planet is clicked directly on the canvas, this callback is fired
+    SolarBackground.init(canvasElement, (clickedPlanetId) => {
+      selectPlanet(clickedPlanetId, { source: 'canvas' });
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // 8. Initial Render & Default Selection
+  // ---------------------------------------------------------------------------
+  renderPlanetMenu();
+  selectPlanet('earth', { source: 'init' });
 });
