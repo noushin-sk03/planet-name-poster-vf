@@ -2,13 +2,14 @@
  * background.js - Interactive Solar System Canvas Animation
  * -----------------------------------------------------------
  * Responsibilities:
- * 1. Full-Screen Backdrop: Renders the Milky Way solar system image as base,
- *    aligning coordinate systems with the golden Sun in the user's reference image.
- * 2. 3D Perspective Orbital Math: Projects planets along elliptical tilted orbits.
- * 3. Two-Way Interactive Hit-Testing:
- *    Detects clicks and touches on moving planets with generous tap target padding.
- * 4. Selection Feedback: Pulsing target halo around the active planet and glowing orbit path.
- * 5. Celestial Polish: Occasional shooting stars, hover tooltips, and tab-pause logic.
+ * 1. Deep-Space Starry Backdrop: Renders the dark Milky Way astrophotography image.
+ * 2. Radiant Center Sun: Golden star with breathing corona and atmospheric flare.
+ * 3. 3D Perspective Orbital Math: Projects planets along tilted elliptical orbits.
+ * 4. Realistic Sun-Facing Lighting: Shading gradients originate from the center Sun.
+ * 5. Two-Way Interactive Hit-Testing: Generous touch padding for effortless clicking.
+ * 6. Visual Selection Feedback: Pulsing cyan beacon halo and glowing orbital path.
+ * 7. Shooting Stars: Luminous meteors with fading tails streaking across the starfield.
+ * 8. Performance: Tab-pause via visibilitychange and prefers-reduced-motion support.
  */
 
 const SolarBackground = (() => {
@@ -21,7 +22,7 @@ const SolarBackground = (() => {
   let isPaused = false;
   let prefersReducedMotion = false;
 
-  // Center point & scale aligned with the reference image
+  // Center point & scale of the solar system
   let sunCenterX = 0;
   let sunCenterY = 0;
   let baseRadius = 0;
@@ -31,39 +32,39 @@ const SolarBackground = (() => {
   let selectedPlanetId = 'earth';
   let hoveredPlanetId = null;
 
-  // Base Milky Way backdrop image
+  // Dark Milky Way astrophotography backdrop
   const baseImage = new Image();
   let baseImageLoaded = false;
   baseImage.onload = () => {
     baseImageLoaded = true;
     updateLayout();
   };
-  baseImage.src = 'assets/solar_system.jpg';
+  baseImage.src = 'assets/milkyway.jpg';
 
   // 8 Solar System Planets Configuration
-  // Orbit ratios are scaled relative to canvas dimensions
+  // Orbit scales are spaced cleanly from Sun outward
   const planets = [
     {
       id: 'mercury',
       name: 'Mercury',
-      color: '#a3a3a3',
-      secondaryColor: '#737373',
-      radius: 6,
-      orbitScale: 0.17,
+      color: '#e2e8f0',
+      secondaryColor: '#64748b',
+      radius: 5.5,
+      orbitScale: 0.19,
       speed: 0.0016,
-      angle: 0.5,
+      angle: 0.8,
       projX: 0,
       projY: 0
     },
     {
       id: 'venus',
       name: 'Venus',
-      color: '#eab308',
-      secondaryColor: '#ca8a04',
-      radius: 9,
-      orbitScale: 0.24,
+      color: '#fde047',
+      secondaryColor: '#d97706',
+      radius: 8.5,
+      orbitScale: 0.29,
       speed: 0.0012,
-      angle: 1.8,
+      angle: 2.1,
       projX: 0,
       projY: 0
     },
@@ -71,76 +72,75 @@ const SolarBackground = (() => {
       id: 'earth',
       name: 'Earth',
       color: '#38bdf8',
-      secondaryColor: '#16a34a',
-      radius: 11,
-      orbitScale: 0.32,
+      secondaryColor: '#15803d',
+      radius: 9.5,
+      orbitScale: 0.39,
       speed: 0.0009,
-      angle: 3.4,
+      angle: 3.7,
       projX: 0,
       projY: 0
     },
     {
       id: 'mars',
       name: 'Mars',
-      color: '#ef4444',
+      color: '#f87171',
       secondaryColor: '#991b1b',
-      radius: 8,
-      orbitScale: 0.40,
+      radius: 7.5,
+      orbitScale: 0.49,
       speed: 0.0007,
-      angle: 5.1,
+      angle: 5.2,
       projX: 0,
       projY: 0
     },
     {
       id: 'jupiter',
       name: 'Jupiter',
-      color: '#f97316',
-      secondaryColor: '#c2410c',
-      radius: 20,
-      orbitScale: 0.53,
+      color: '#fb923c',
+      secondaryColor: '#9a3412',
+      radius: 19,
+      orbitScale: 0.62,
       speed: 0.00045,
-      angle: 2.1,
-      hasBands: true,
+      angle: 1.4,
       projX: 0,
       projY: 0
     },
     {
       id: 'saturn',
       name: 'Saturn',
-      color: '#fde047',
+      color: '#fef08a',
       secondaryColor: '#ca8a04',
-      radius: 17,
-      orbitScale: 0.67,
+      radius: 16,
+      orbitScale: 0.74,
       speed: 0.00032,
-      angle: 4.2,
+      angle: 4.4,
       hasRings: true,
-      ringRadius: 32,
+      ringRadius: 28,
       projX: 0,
       projY: 0
     },
     {
       id: 'uranus',
       name: 'Uranus',
-      color: '#2dd4bf',
+      color: '#5eead4',
       secondaryColor: '#0f766e',
-      radius: 14,
-      orbitScale: 0.81,
+      radius: 13,
+      orbitScale: 0.86,
       speed: 0.00022,
-      angle: 0.9,
+      angle: 0.3,
       hasRings: true,
-      ringRadius: 22,
+      ringRadius: 21,
       projX: 0,
       projY: 0
     },
     {
       id: 'neptune',
       name: 'Neptune',
-      color: '#3b82f6',
-      secondaryColor: '#1d4ed8',
-      radius: 13,
-      orbitScale: 0.94,
+      color: '#60a5fa',
+      secondaryColor: '#1e40af',
+      radius: 12.5,
+      orbitScale: 0.97,
       speed: 0.00015,
-      angle: 2.9,
+      angle: 2.8,
       projX: 0,
       projY: 0
     }
@@ -148,14 +148,14 @@ const SolarBackground = (() => {
 
   // Shooting Stars Collection
   const shootingStars = [];
-  let nextShootingStarTime = Date.now() + 2000;
+  let nextShootingStarTime = Date.now() + 1500;
 
   function spawnShootingStar() {
     const startX = Math.random() * (width * 0.8) + width * 0.2;
     const startY = Math.random() * (height * 0.4);
     const speed = Math.random() * 8 + 8;
     const angle = Math.PI * 0.75 + (Math.random() * 0.2 - 0.1);
-    const length = Math.random() * 100 + 70;
+    const length = Math.random() * 110 + 80;
 
     shootingStars.push({
       x: startX,
@@ -169,7 +169,7 @@ const SolarBackground = (() => {
   }
 
   /**
-   * Resizes canvas to fill viewport with high-DPI crispness and aligns center with Sun.
+   * Resizes canvas and positions center Sun relative to viewport.
    */
   function updateLayout() {
     if (!canvas) return;
@@ -182,31 +182,16 @@ const SolarBackground = (() => {
     canvas.height = Math.floor(height * dpr);
     ctx.scale(dpr, dpr);
 
-    if (baseImageLoaded && baseImage.width > 0) {
-      const imgAspect = baseImage.width / baseImage.height;
-      const screenAspect = width / height;
-      let drawW, drawH, drawX, drawY;
-
-      if (screenAspect > imgAspect) {
-        drawW = width;
-        drawH = width / imgAspect;
-        drawX = 0;
-        drawY = (height - drawH) / 2;
-      } else {
-        drawH = height;
-        drawW = height * imgAspect;
-        drawX = (width - drawW) / 2;
-        drawY = 0;
-      }
-
-      // In solar_system.jpg, Sun's center is at 52.0% X, 46.3% Y
-      sunCenterX = drawX + drawW * 0.520;
-      sunCenterY = drawY + drawH * 0.463;
-      baseRadius = Math.max(drawW, drawH) * 0.52;
+    // Center point of the solar system:
+    // On desktop, offset slightly to account for the 250px left sidebar
+    if (width >= 820) {
+      sunCenterX = 250 + (width - 250) * 0.50;
+      sunCenterY = height * 0.46;
+      baseRadius = Math.min((width - 250) * 0.49, height * 0.60);
     } else {
-      sunCenterX = width * 0.52;
-      sunCenterY = height * 0.50;
-      baseRadius = Math.max(width, height) * 0.50;
+      sunCenterX = width * 0.50;
+      sunCenterY = height * 0.44;
+      baseRadius = Math.min(width * 0.53, height * 0.46);
     }
   }
 
@@ -220,10 +205,8 @@ const SolarBackground = (() => {
    */
   function projectOrbit(scaleRatio, angle) {
     const a = baseRadius * scaleRatio;
-    const b = a * 0.44; // Vertical foreshortening ratio
-
-    // Orbital inclination plane angle (~ -18 degrees to match the Milky Way image)
-    const tilt = -0.32; // Radians
+    const b = a * 0.42; // Vertical foreshortening ratio
+    const tilt = -0.32; // -18.3 degrees inclination angle
 
     // Parametric ellipse formula with 2D rotation matrix:
     const ex = a * Math.cos(angle);
@@ -259,11 +242,10 @@ const SolarBackground = (() => {
   }
 
   /**
-   * Draws the base astronomical backdrop.
+   * Draws the dark Milky Way astrophotography backdrop.
    */
   function drawBackdrop() {
     if (baseImageLoaded) {
-      // Draw uploaded Milky Way solar-system image covering canvas
       const imgAspect = baseImage.width / baseImage.height;
       const screenAspect = width / height;
       let drawW, drawH, drawX, drawY;
@@ -282,42 +264,89 @@ const SolarBackground = (() => {
 
       ctx.drawImage(baseImage, drawX, drawY, drawW, drawH);
 
-      // Dark subtle vignette to ensure UI text readability
-      const vignette = ctx.createRadialGradient(width / 2, height / 2, width * 0.2, width / 2, height / 2, width * 0.75);
-      vignette.addColorStop(0, 'rgba(5, 6, 12, 0.20)');
-      vignette.addColorStop(1, 'rgba(4, 5, 10, 0.75)');
+      // Deep celestial vignette for high text legibility & cosmic mood
+      const vignette = ctx.createRadialGradient(
+        sunCenterX, sunCenterY, baseRadius * 0.25,
+        sunCenterX, sunCenterY, Math.max(width, height) * 0.85
+      );
+      vignette.addColorStop(0, 'rgba(5, 7, 14, 0.12)');
+      vignette.addColorStop(0.65, 'rgba(4, 6, 12, 0.52)');
+      vignette.addColorStop(1, 'rgba(2, 3, 6, 0.88)');
       ctx.fillStyle = vignette;
       ctx.fillRect(0, 0, width, height);
     } else {
-      // Fallback cosmic gradient if asset is loading
-      const bgGrad = ctx.createRadialGradient(sunCenterX, sunCenterY, 50, sunCenterX, sunCenterY, width * 0.8);
-      bgGrad.addColorStop(0, '#1e293b');
-      bgGrad.addColorStop(0.5, '#07090e');
-      bgGrad.addColorStop(1, '#020305');
+      // Cosmic gradient fallback
+      const bgGrad = ctx.createRadialGradient(sunCenterX, sunCenterY, 30, sunCenterX, sunCenterY, width * 0.8);
+      bgGrad.addColorStop(0, '#0f172a');
+      bgGrad.addColorStop(0.5, '#05070f');
+      bgGrad.addColorStop(1, '#020306');
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, width, height);
-
-      // Sun glow placeholder
-      const sunGrad = ctx.createRadialGradient(sunCenterX, sunCenterY, 5, sunCenterX, sunCenterY, 40);
-      sunGrad.addColorStop(0, '#fef08a');
-      sunGrad.addColorStop(0.5, '#f59e0b');
-      sunGrad.addColorStop(1, 'rgba(245, 158, 11, 0)');
-      ctx.fillStyle = sunGrad;
-      ctx.beginPath();
-      ctx.arc(sunCenterX, sunCenterY, 40, 0, Math.PI * 2);
-      ctx.fill();
     }
   }
 
   /**
-   * Draws elliptical orbit guide paths with subtle luminescent styling.
+   * Draws the glowing golden Sun in the center with breathing corona.
+   */
+  function drawSun(time) {
+    ctx.save();
+    const pulse = Math.sin(time * 0.003) * 2;
+    const sunRadius = 24;
+
+    // 1. Broad outer corona glow
+    const outerGrad = ctx.createRadialGradient(
+      sunCenterX, sunCenterY, sunRadius * 0.5,
+      sunCenterX, sunCenterY, sunRadius * 3.4 + pulse
+    );
+    outerGrad.addColorStop(0, 'rgba(251, 191, 36, 0.42)');
+    outerGrad.addColorStop(0.35, 'rgba(245, 158, 11, 0.18)');
+    outerGrad.addColorStop(1, 'rgba(217, 119, 6, 0)');
+    ctx.fillStyle = outerGrad;
+    ctx.beginPath();
+    ctx.arc(sunCenterX, sunCenterY, sunRadius * 3.4 + pulse, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 2. Inner warm corona
+    const innerGrad = ctx.createRadialGradient(
+      sunCenterX, sunCenterY, sunRadius * 0.2,
+      sunCenterX, sunCenterY, sunRadius * 1.6
+    );
+    innerGrad.addColorStop(0, 'rgba(254, 240, 138, 0.85)');
+    innerGrad.addColorStop(0.65, 'rgba(245, 158, 11, 0.5)');
+    innerGrad.addColorStop(1, 'rgba(234, 88, 12, 0)');
+    ctx.fillStyle = innerGrad;
+    ctx.beginPath();
+    ctx.arc(sunCenterX, sunCenterY, sunRadius * 1.6, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 3. Sun Core (Photosphere)
+    const coreGrad = ctx.createRadialGradient(
+      sunCenterX - 3, sunCenterY - 3, 0,
+      sunCenterX, sunCenterY, sunRadius
+    );
+    coreGrad.addColorStop(0, '#ffffff');
+    coreGrad.addColorStop(0.35, '#fef08a');
+    coreGrad.addColorStop(0.8, '#f59e0b');
+    coreGrad.addColorStop(1, '#ea580c');
+
+    ctx.fillStyle = coreGrad;
+    ctx.shadowColor = '#f59e0b';
+    ctx.shadowBlur = 24;
+    ctx.beginPath();
+    ctx.arc(sunCenterX, sunCenterY, sunRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  /**
+   * Draws elliptical orbit guide paths with luminescent highlights.
    */
   function drawOrbitLines() {
     ctx.save();
     planets.forEach((p) => {
       const isSelected = p.id === selectedPlanetId;
       ctx.beginPath();
-      // Render smooth ellipse using projectOrbit
       for (let theta = 0; theta <= Math.PI * 2; theta += 0.08) {
         const pt = projectOrbit(p.orbitScale, theta);
         if (theta === 0) ctx.moveTo(pt.x, pt.y);
@@ -326,7 +355,7 @@ const SolarBackground = (() => {
       ctx.closePath();
 
       if (isSelected) {
-        ctx.strokeStyle = 'rgba(56, 189, 248, 0.55)';
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.6)';
         ctx.lineWidth = 1.6;
         ctx.shadowColor = '#38bdf8';
         ctx.shadowBlur = 9;
@@ -341,7 +370,7 @@ const SolarBackground = (() => {
   }
 
   /**
-   * Draws a single planet with realistic shading, rings, and selection halos.
+   * Draws a single planet with Sun-facing 3D spherical lighting, rings, and halos.
    */
   function drawPlanet(p, time) {
     const isSelected = p.id === selectedPlanetId;
@@ -367,19 +396,29 @@ const SolarBackground = (() => {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'bottom';
       ctx.fillStyle = '#ffffff';
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
-      ctx.shadowBlur = 5;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
+      ctx.shadowBlur = 6;
       ctx.fillText(p.name.toUpperCase(), p.projX, p.projY - haloRadius - 4);
     }
 
-    // 2. Planet Body (Sphere with sun-facing lighting gradient)
+    // 2. Realistic Sun-Facing Spherical Shading
+    // Light highlight is offset toward the center Sun
+    const toSunX = sunCenterX - p.projX;
+    const toSunY = sunCenterY - p.projY;
+    const sunDist = Math.hypot(toSunX, toSunY) || 1;
+    const nx = toSunX / sunDist;
+    const ny = toSunY / sunDist;
+
+    const highlightX = p.projX + nx * (p.radius * 0.35);
+    const highlightY = p.projY + ny * (p.radius * 0.35);
+
     const sphereGrad = ctx.createRadialGradient(
-      p.projX - p.radius * 0.35, p.projY - p.radius * 0.35, 1,
+      highlightX, highlightY, 1,
       p.projX, p.projY, p.radius
     );
     sphereGrad.addColorStop(0, p.color);
-    sphereGrad.addColorStop(0.7, p.secondaryColor);
-    sphereGrad.addColorStop(1, '#05070a');
+    sphereGrad.addColorStop(0.65, p.secondaryColor);
+    sphereGrad.addColorStop(1, '#020408');
 
     ctx.fillStyle = sphereGrad;
     ctx.shadowBlur = isSelected ? 12 : 4;
@@ -392,12 +431,12 @@ const SolarBackground = (() => {
     if (p.hasRings) {
       ctx.save();
       ctx.translate(p.projX, p.projY);
-      ctx.rotate(-0.35); // Ring tilt
-      ctx.scale(1.0, 0.3); // Foreshortened perspective
+      ctx.rotate(-0.32); // Align with orbit plane tilt
+      ctx.scale(1.0, 0.34); // Foreshortened perspective
       ctx.beginPath();
       ctx.arc(0, 0, p.ringRadius, 0, Math.PI * 2);
-      ctx.strokeStyle = p.id === 'saturn' ? 'rgba(254, 240, 138, 0.75)' : 'rgba(153, 246, 228, 0.55)';
-      ctx.lineWidth = p.id === 'saturn' ? 6 : 2;
+      ctx.strokeStyle = p.id === 'saturn' ? 'rgba(254, 240, 138, 0.8)' : 'rgba(153, 246, 228, 0.55)';
+      ctx.lineWidth = p.id === 'saturn' ? 5 : 2;
       ctx.stroke();
       ctx.restore();
     }
@@ -453,7 +492,7 @@ const SolarBackground = (() => {
 
     ctx.clearRect(0, 0, width + 10, height + 10);
 
-    // 1. Draw base backdrop
+    // 1. Draw base deep-space backdrop
     drawBackdrop();
 
     // 2. Draw shooting stars
@@ -462,14 +501,15 @@ const SolarBackground = (() => {
     // 3. Draw orbit guide tracks
     drawOrbitLines();
 
-    // 4. Update and draw planets
+    // 4. Draw central Sun
+    drawSun(time);
+
+    // 5. Update and draw planets
     planets.forEach((p) => {
-      // Advance orbit unless user prefers reduced motion
       if (!prefersReducedMotion) {
         p.angle += p.speed;
       }
 
-      // Compute current screen coordinates
       const pos = projectOrbit(p.orbitScale, p.angle);
       p.projX = pos.x;
       p.projY = pos.y;
@@ -501,7 +541,7 @@ const SolarBackground = (() => {
       prefersReducedMotion = e.matches;
     });
 
-    // Pause animation when user switches tabs (saves battery and CPU)
+    // Pause animation when tab is inactive
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         isPaused = true;
@@ -528,7 +568,7 @@ const SolarBackground = (() => {
       }
     });
 
-    // Click / Tap selection detection
+    // Click / Touch selection detection
     function handlePointerSelect(clientX, clientY) {
       const rect = canvas.getBoundingClientRect();
       const mx = clientX - rect.left;
@@ -556,7 +596,7 @@ const SolarBackground = (() => {
   }
 
   /**
-   * Sets active selected planet from external sources (e.g. left menu).
+   * Sets active selected planet from external sources.
    * @param {string} planetId
    */
   function setSelectedPlanet(planetId) {
