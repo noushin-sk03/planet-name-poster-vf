@@ -39,18 +39,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       desc: 'Second world from the Sun. Enveloped in a dense, runaway greenhouse atmosphere with crushing pressure, hotter than an oven.'
     },
     {
-      id: 'moon',
-      name: 'The Moon',
-      order: 'Earth\'s Natural Satellite',
-      color: '#e2e8f0',
-      desc: 'Earth\'s companion. Airless, heavily cratered world tidally locked in synchronous rotation, swinging between 120 °C and -130 °C.'
-    },
-    {
       id: 'earth',
       name: 'Earth',
       order: '3rd planet from Sun',
       color: '#38bdf8',
       desc: 'Third rock from the Sun. Dense nitrogen-oxygen atmosphere, liquid oceans, and a thriving biosphere.'
+    },
+    {
+      id: 'moon',
+      name: 'The Moon',
+      order: 'Earth\'s Natural Satellite',
+      color: '#e2e8f0',
+      desc: 'Earth\'s companion. Airless, heavily cratered world tidally locked in synchronous rotation, swinging between 120 °C and -130 °C.'
     },
     {
       id: 'mars',
