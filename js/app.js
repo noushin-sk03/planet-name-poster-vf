@@ -3,9 +3,13 @@
  * -------------------------------------------------------------
  * Educational Pair-Programming Project: "Planet Name Poster"
  * 
- * Verified Data Integrity:
- * All celestial figures (Gravity, Day Length, Mean Temperature) are verified
- * directly against NASA's Official Planetary Fact Sheet (NASA Goddard Space Flight Center).
+ * Features:
+ * 1. Coordinates full Solar System navigation (System Overview, The Sun, 8 Planets, Moon, and Pluto).
+ * 2. Two-way synchronized selection:
+ *    - Clicking any world or its ORBIT LINE highlights it in both the canvas and the telemetry card.
+ *    - Choosing "System Overview" deselects individual planets, showing the full simulation in motion.
+ * 3. 100% verified scientific figures from NASA Fact Sheets.
+ * 4. Responsive drawer toggle & accessible keyboard navigation.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -13,6 +17,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // 1. Celestial Worlds Definition (100% NASA Verified Figures)
   // ---------------------------------------------------------------------------
   const WORLDS = [
+    {
+      id: 'overview',
+      name: 'System Overview',
+      order: 'All Worlds in Motion',
+      type: 'Full Simulation',
+      color: '#38bdf8'
+    },
     {
       id: 'sun',
       name: 'The Sun',
@@ -115,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     {
       id: 'pluto',
-      name: 'Pluto',
+      name: 'Pluto ✨',
       order: 'Kuiper Belt World',
       type: 'Special Dwarf Planet ✨',
       color: '#f3e8d2',
@@ -146,9 +157,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const panelPlanetName = document.getElementById('panel-planet-name');
   const panelPlanetOrder = document.getElementById('panel-planet-order');
   const panelPlanetType = document.getElementById('panel-planet-type');
+  const panelFact1Label = document.getElementById('panel-fact-1-label');
   const panelGravity = document.getElementById('panel-gravity');
+  const panelFact2Label = document.getElementById('panel-fact-2-label');
   const panelDayLength = document.getElementById('panel-day-length');
+  const panelFact3Label = document.getElementById('panel-fact-3-label');
   const panelTemp = document.getElementById('panel-temp');
+  const panelCreditSource = document.getElementById('panel-credit-source');
 
   // ---------------------------------------------------------------------------
   // 3. Render Navigation Menu
@@ -169,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.setAttribute('aria-current', 'true');
       }
 
-      // Visual color swatch
+      // Visual color swatch / icon
       const swatch = document.createElement('span');
       swatch.className = 'planet-swatch';
       swatch.style.backgroundColor = world.color;
@@ -198,7 +213,6 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.addEventListener('click', () => {
         selectWorld(world.id, { source: 'drawer' });
 
-        // Auto-close on mobile so the user sees the world on the canvas
         if (window.innerWidth < 820 && planetDrawer.classList.contains('open')) {
           closeDrawer();
         }
@@ -253,35 +267,49 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // 3. Update Right-Docked NASA Verified Telemetry Card
-    if (panelPlanetDot) {
-      panelPlanetDot.style.backgroundColor = world.color;
-      panelPlanetDot.style.color = world.color;
-      panelPlanetDot.style.boxShadow = `0 0 16px ${world.color}`;
-    }
+    // 3. Update Right-Docked Telemetry Card
+    if (bodyId === 'overview') {
+      // Solar System Overview Mode
+      if (panelPlanetDot) {
+        panelPlanetDot.style.backgroundColor = '#38bdf8';
+        panelPlanetDot.style.color = '#38bdf8';
+        panelPlanetDot.style.boxShadow = '0 0 16px #38bdf8';
+      }
+      if (panelPlanetName) panelPlanetName.textContent = 'Solar System';
+      if (panelPlanetOrder) panelPlanetOrder.textContent = 'Orion-Cygnus Arm';
+      if (panelPlanetType) panelPlanetType.textContent = 'Milky Way Galaxy';
 
-    if (panelPlanetName) {
-      panelPlanetName.textContent = world.name;
-    }
+      if (panelFact1Label) panelFact1Label.textContent = 'Galactic Speed';
+      if (panelGravity) panelGravity.textContent = '~230 km/s';
 
-    if (panelPlanetOrder) {
-      panelPlanetOrder.textContent = world.order;
-    }
+      if (panelFact2Label) panelFact2Label.textContent = 'Galactic Year';
+      if (panelDayLength) panelDayLength.textContent = '~230M yrs';
 
-    if (panelPlanetType) {
-      panelPlanetType.textContent = world.type;
-    }
+      if (panelFact3Label) panelFact3Label.textContent = 'System Age';
+      if (panelTemp) panelTemp.textContent = '4.6B yrs';
 
-    if (panelGravity) {
-      panelGravity.textContent = world.gravity;
-    }
+      if (panelCreditSource) panelCreditSource.textContent = 'NASA Solar System Exploration';
+    } else {
+      // Planet / Sun / Moon / Pluto Mode
+      if (panelPlanetDot) {
+        panelPlanetDot.style.backgroundColor = world.color;
+        panelPlanetDot.style.color = world.color;
+        panelPlanetDot.style.boxShadow = `0 0 16px ${world.color}`;
+      }
+      if (panelPlanetName) panelPlanetName.textContent = world.name;
+      if (panelPlanetOrder) panelPlanetOrder.textContent = world.order;
+      if (panelPlanetType) panelPlanetType.textContent = world.type;
 
-    if (panelDayLength) {
-      panelDayLength.textContent = world.dayLength;
-    }
+      if (panelFact1Label) panelFact1Label.textContent = 'Gravity';
+      if (panelGravity) panelGravity.textContent = world.gravity;
 
-    if (panelTemp) {
-      panelTemp.textContent = world.temp;
+      if (panelFact2Label) panelFact2Label.textContent = 'Day Length';
+      if (panelDayLength) panelDayLength.textContent = world.dayLength;
+
+      if (panelFact3Label) panelFact3Label.textContent = 'Mean Temp';
+      if (panelTemp) panelTemp.textContent = world.temp;
+
+      if (panelCreditSource) panelCreditSource.textContent = 'NASA Planetary Fact Sheet';
     }
   }
 
@@ -326,6 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 6. Initialize Canvas Background & Wire Selection Callback
   // ---------------------------------------------------------------------------
   if (canvasElement && typeof SolarBackground !== 'undefined') {
+    // When a planet, moon, sun, OR ORBIT LINE is clicked, this callback fires
     SolarBackground.init(canvasElement, (clickedBodyId) => {
       selectWorld(clickedBodyId, { source: 'canvas' });
     });

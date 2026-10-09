@@ -2,8 +2,9 @@
  * background.js - High-Fidelity Procedural Solar System Canvas Engine
  * -------------------------------------------------------------------
  * Design & Visual Features:
- * 1. Procedural Deep-Space Starfield:
- *    - 3-layer parallax twinkling stars with realistic color temperatures.
+ * 1. Procedural Deep-Space Starfield with Galactic Parallax Drift:
+ *    - Stars drift continuously to simulate the Solar System's ~230 km/s voyage through the Milky Way.
+ *    - 3-layer parallax twinkling stars with realistic stellar color temperatures.
  *    - Soft atmospheric cosmic nebulae clouds for deep cinematic contrast.
  * 2. Luminous Central Star (The Sun):
  *    - Multi-layered pulsating plasma corona and solar flare breathing.
@@ -11,18 +12,23 @@
  * 3. 3D Perspective Orbital Mechanics:
  *    - 8 planetary tilted elliptical tracks with astronomical foreshortening.
  *    - Glowing neon cyan illumination on the active planet's orbit track.
- * 4. Earth & Moon System:
+ *    - Full Orbit-Line Hit-Testing: Clicking or hovering anywhere along an orbit line selects the planet!
+ * 4. Animated Asteroid Belt & Stray Asteroids:
+ *    - 220 orbiting asteroids between Mars and Jupiter with authentic rock palettes.
+ *    - Stray tumbling asteroids (Ceres and Vesta) drifting along the belt.
+ * 5. Earth & Moon System:
  *    - The Moon realistically orbits Earth with foreshortened lunar trajectory.
  *    - Both Earth and The Moon are independently clickable and selectable!
- * 5. Authentic Sun-Facing Spherical Lighting:
+ * 6. Pluto Special Dwarf Planet:
+ *    - Orbiting at the outer edge with special dashed orbit line.
+ * 7. System Overview Mode ("None" / Overview):
+ *    - Allows the user to deselect individual planets and enjoy the pure, serene celestial simulation.
+ * 8. Authentic Sun-Facing Spherical Lighting:
  *    - Every planet's spherical highlight vector accurately points directly at the Sun.
  *    - Saturn's rings with Cassini division; Uranus rings; Jupiter cloud bands.
- * 6. Interactive Two-Way Selection & Hover Feedback:
- *    - Generous touch padding (+18px) for effortless clicking on all devices.
- *    - Pulsing targeting beacons and floating celestial nameplates.
- * 7. Shooting Stars:
+ * 9. Shooting Stars:
  *    - Periodic meteors streaking diagonally across deep space with luminous tails.
- * 8. Performance & Accessibility:
+ * 10. Performance & Accessibility:
  *    - DPR-capped crisp rendering, tab-pause via Page Visibility API, and reduced-motion support.
  */
 
@@ -42,12 +48,17 @@ const SolarBackground = (() => {
   let baseRadius = 0;
 
   // Selection callback & state
+  // Can be 'overview' or a body id ('sun', 'earth', 'mars', etc.)
   let onSelectCallback = null;
   let selectedBodyId = 'earth';
   let hoveredBodyId = null;
 
   // Earth-Moon orbital angle
   let moonAngle = 1.2;
+
+  // Galactic drift coordinates (simulates solar system moving through Milky Way at ~230 km/s)
+  let galacticDriftX = 0;
+  let galacticDriftY = 0;
 
   // ---------------------------------------------------------------------------
   // 1. Procedural Starfield & Nebulae
@@ -58,7 +69,6 @@ const SolarBackground = (() => {
   function initStarfield() {
     stars.length = 0;
     for (let i = 0; i < STAR_COUNT; i++) {
-      // Pick authentic stellar colors (O/B blue, A/F white, G yellow, K orange)
       const roll = Math.random();
       let starColor = '#ffffff';
       if (roll > 0.85) starColor = '#93c5fd'; // Ice blue
@@ -72,13 +82,54 @@ const SolarBackground = (() => {
         baseAlpha: Math.random() * 0.7 + 0.25,
         twinkleSpeed: Math.random() * 0.025 + 0.008,
         twinklePhase: Math.random() * Math.PI * 2,
-        color: starColor
+        color: starColor,
+        parallaxSpeed: Math.random() * 0.4 + 0.8
       });
     }
   }
 
   // ---------------------------------------------------------------------------
-  // 2. Celestial Bodies Configuration (Sun, Moon + 8 Planets)
+  // 2. Animated Asteroid Belt (Between Mars at 0.50 and Jupiter at 0.63)
+  // ---------------------------------------------------------------------------
+  const asteroidBelt = [];
+  const ASTEROID_COUNT = 220;
+
+  function initAsteroidBelt() {
+    asteroidBelt.length = 0;
+    for (let i = 0; i < ASTEROID_COUNT; i++) {
+      asteroidBelt.push({
+        orbitScale: 0.535 + Math.random() * 0.055, // belt band 0.535 - 0.590
+        angle: Math.random() * Math.PI * 2,
+        speed: 0.00055 + (Math.random() - 0.5) * 0.00012,
+        radius: Math.random() * 1.5 + 0.45,
+        alpha: Math.random() * 0.55 + 0.35,
+        color: Math.random() > 0.6 ? '#cbd5e1' : (Math.random() > 0.3 ? '#94a3b8' : '#78716c')
+      });
+    }
+  }
+
+  // Stray tumbling major asteroids (Ceres and Vesta)
+  const majorAsteroids = [
+    {
+      name: 'Ceres',
+      orbitScale: 0.555,
+      angle: 0.4,
+      speed: 0.00054,
+      radius: 3.2,
+      color: '#cbd5e1'
+    },
+    {
+      name: 'Vesta',
+      orbitScale: 0.575,
+      angle: 3.2,
+      speed: 0.00052,
+      radius: 2.8,
+      color: '#94a3b8'
+    }
+  ];
+
+  // ---------------------------------------------------------------------------
+  // 3. Celestial Bodies Configuration (Sun, Moon, 8 Planets, Pluto)
   // ---------------------------------------------------------------------------
   const sunBody = {
     id: 'sun',
@@ -218,7 +269,7 @@ const SolarBackground = (() => {
   ];
 
   // ---------------------------------------------------------------------------
-  // 3. Shooting Stars Collection
+  // 4. Shooting Stars Collection
   // ---------------------------------------------------------------------------
   const shootingStars = [];
   let nextShootingStarTime = Date.now() + 1500;
@@ -242,7 +293,7 @@ const SolarBackground = (() => {
   }
 
   // ---------------------------------------------------------------------------
-  // 4. Viewport Layout & Coordinate System
+  // 5. Viewport Layout & Coordinate System
   // ---------------------------------------------------------------------------
   function updateLayout() {
     if (!canvas) return;
@@ -255,17 +306,14 @@ const SolarBackground = (() => {
     canvas.height = Math.floor(height * dpr);
     ctx.scale(dpr, dpr);
 
-    // Center point of the Solar System
-    // On desktop, offset slightly to account for the 250px left sidebar
     if (width >= 820) {
-      // Space between left sidebar (250px) and right panel
       sunCenterX = 250 + (width - 250) * 0.46;
       sunCenterY = height * 0.52;
-      baseRadius = Math.min((width - 250) * 0.45, height * 0.56);
+      baseRadius = Math.min((width - 250) * 0.44, height * 0.54);
     } else {
       sunCenterX = width * 0.50;
       sunCenterY = height * 0.40;
-      baseRadius = Math.min(width * 0.50, height * 0.42);
+      baseRadius = Math.min(width * 0.48, height * 0.40);
     }
 
     sunBody.projX = sunCenterX;
@@ -290,36 +338,64 @@ const SolarBackground = (() => {
   }
 
   // ---------------------------------------------------------------------------
-  // 5. Interactive Hit-Testing (Sun, Moon, Planets)
+  // 6. Interactive Hit-Testing: Planet Bodies & Full Orbit Line Detection!
   // ---------------------------------------------------------------------------
   function hitTest(mx, my) {
-    // 1. Check Moon first (smallest target orbiting Earth)
+    // 1. Direct hit on Moon
     const dMoon = Math.hypot(mx - moonBody.projX, my - moonBody.projY);
     if (dMoon <= moonBody.radius + 14) {
       return moonBody;
     }
 
-    // 2. Check Sun at center
+    // 2. Direct hit on Sun
     const dSun = Math.hypot(mx - sunBody.projX, my - sunBody.projY);
     if (dSun <= sunBody.radius + 12) {
       return sunBody;
     }
 
-    // 3. Check Planets in reverse order (foreground / larger worlds first)
+    // 3. Direct hit on Planet bodies
     for (let i = planets.length - 1; i >= 0; i--) {
       const p = planets[i];
       const dist = Math.hypot(mx - p.projX, my - p.projY);
-      // Generous +18px touch padding for effortless clicking
       if (dist <= p.radius + 18) {
         return p;
       }
+    }
+
+    // 4. CLICKING ON AN ORBIT LINE: Detects which elliptical orbit was clicked!
+    // Un-rotate click coordinates relative to central Sun
+    const dx = mx - sunCenterX;
+    const dy = my - sunCenterY;
+    const tilt = -0.32;
+    const cosT = Math.cos(-tilt);
+    const sinT = Math.sin(-tilt);
+    const rx = dx * cosT - dy * sinT;
+    const ry = dx * sinT + dy * cosT;
+
+    // Calculate effective elliptical radius
+    const rEff = Math.hypot(rx, ry / 0.43);
+    const clickScale = rEff / baseRadius;
+
+    let closestPlanet = null;
+    let minDiff = Infinity;
+    planets.forEach((p) => {
+      const diff = Math.abs(p.orbitScale - clickScale);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestPlanet = p;
+      }
+    });
+
+    // If within 15px of an orbit line, select that planet!
+    if (closestPlanet && minDiff * baseRadius <= 15) {
+      return closestPlanet;
     }
 
     return null;
   }
 
   // ---------------------------------------------------------------------------
-  // 6. Drawing Routines: Deep Space, Nebulae, Stars
+  // 7. Drawing Routines: Deep Space, Nebulae, Stars & Galactic Parallax Drift
   // ---------------------------------------------------------------------------
   function drawDeepSpace() {
     // 1. Base deep cosmic backdrop gradient
@@ -333,8 +409,13 @@ const SolarBackground = (() => {
     ctx.fillStyle = deepGrad;
     ctx.fillRect(0, 0, width, height);
 
-    // 2. Luminous celestial nebulae clouds (subtle galactic dust)
-    // Blue-violet nebula pocket in upper-left
+    // Galactic Drift: Simulates the entire Solar System hurtling through the Milky Way at ~230 km/s
+    if (!prefersReducedMotion) {
+      galacticDriftX += 0.08;
+      galacticDriftY -= 0.035;
+    }
+
+    // 2. Cosmic nebulae clouds
     const neb1 = ctx.createRadialGradient(
       width * 0.25, height * 0.25, 20,
       width * 0.25, height * 0.25, width * 0.4
@@ -345,7 +426,6 @@ const SolarBackground = (() => {
     ctx.fillStyle = neb1;
     ctx.fillRect(0, 0, width, height);
 
-    // Golden-amber galactic core glow in center-right
     const neb2 = ctx.createRadialGradient(
       sunCenterX + baseRadius * 0.4, sunCenterY - baseRadius * 0.15, 10,
       sunCenterX + baseRadius * 0.4, sunCenterY - baseRadius * 0.15, width * 0.35
@@ -356,15 +436,19 @@ const SolarBackground = (() => {
     ctx.fillStyle = neb2;
     ctx.fillRect(0, 0, width, height);
 
-    // 3. Twinkling starry starfield
+    // 3. Twinkling starry starfield with galactic parallax drift
     for (let i = 0; i < stars.length; i++) {
       const s = stars[i];
       if (!prefersReducedMotion) {
         s.twinklePhase += s.twinkleSpeed;
       }
       const alpha = s.baseAlpha * (0.6 + 0.4 * Math.sin(s.twinklePhase));
-      const sx = s.xRatio * width;
-      const sy = s.yRatio * height;
+
+      // Wrap-around parallax drift
+      const rawX = s.xRatio * width + galacticDriftX * s.parallaxSpeed;
+      const rawY = s.yRatio * height + galacticDriftY * s.parallaxSpeed;
+      const sx = ((rawX % width) + width) % width;
+      const sy = ((rawY % height) + height) % height;
 
       ctx.save();
       ctx.globalAlpha = Math.max(0.1, Math.min(1.0, alpha));
@@ -373,7 +457,6 @@ const SolarBackground = (() => {
       ctx.arc(sx, sy, s.radius, 0, Math.PI * 2);
       ctx.fill();
 
-      // Delicate soft glow on brightest stars
       if (s.radius > 1.2) {
         ctx.shadowColor = s.color;
         ctx.shadowBlur = 4;
@@ -381,10 +464,20 @@ const SolarBackground = (() => {
       }
       ctx.restore();
     }
+
+    // 4. Subtle Galactic Voyage Vector (indicates Solar System's ~230 km/s motion)
+    if (selectedBodyId === 'overview') {
+      ctx.save();
+      ctx.font = '500 11px "Space Grotesk", sans-serif';
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.55)';
+      ctx.textAlign = 'center';
+      ctx.fillText('⟡ Galactic Motion: Solar System voyaging at ~230 km/s toward Solar Apex', sunCenterX, height - 18);
+      ctx.restore();
+    }
   }
 
   // ---------------------------------------------------------------------------
-  // 7. Drawing Routines: Central Sun
+  // 8. Drawing Routines: Central Sun
   // ---------------------------------------------------------------------------
   function drawSun(time) {
     ctx.save();
@@ -394,7 +487,7 @@ const SolarBackground = (() => {
     const pulse = Math.sin(time * 0.003) * 2;
     const r = sunBody.radius;
 
-    // 1. Selection / Hover Halo
+    // Selection / Hover Halo
     if (isSelected || isHovered) {
       const haloR = r + 11 + Math.sin(time * 0.005) * 3;
       ctx.beginPath();
@@ -405,7 +498,6 @@ const SolarBackground = (() => {
       ctx.shadowBlur = isSelected ? 16 : 8;
       ctx.stroke();
 
-      // Nameplate
       ctx.font = '600 12px "Space Grotesk", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'bottom';
@@ -415,7 +507,7 @@ const SolarBackground = (() => {
       ctx.fillText('THE SUN', sunCenterX, sunCenterY - haloR - 4);
     }
 
-    // 2. Broad outer corona glow
+    // Outer corona glow
     const outerGrad = ctx.createRadialGradient(
       sunCenterX, sunCenterY, r * 0.5,
       sunCenterX, sunCenterY, r * 3.4 + pulse
@@ -428,7 +520,7 @@ const SolarBackground = (() => {
     ctx.arc(sunCenterX, sunCenterY, r * 3.4 + pulse, 0, Math.PI * 2);
     ctx.fill();
 
-    // 3. Inner warm corona
+    // Inner warm corona
     const innerGrad = ctx.createRadialGradient(
       sunCenterX, sunCenterY, r * 0.2,
       sunCenterX, sunCenterY, r * 1.6
@@ -441,7 +533,7 @@ const SolarBackground = (() => {
     ctx.arc(sunCenterX, sunCenterY, r * 1.6, 0, Math.PI * 2);
     ctx.fill();
 
-    // 4. Sun Photosphere Core
+    // Photosphere Core
     const coreGrad = ctx.createRadialGradient(
       sunCenterX - 3, sunCenterY - 3, 0,
       sunCenterX, sunCenterY, r
@@ -462,13 +554,14 @@ const SolarBackground = (() => {
   }
 
   // ---------------------------------------------------------------------------
-  // 8. Drawing Routines: Orbit Guide Lines
+  // 9. Drawing Routines: Orbit Guide Lines
   // ---------------------------------------------------------------------------
   function drawOrbitLines() {
     ctx.save();
     planets.forEach((p) => {
-      // Glow if this planet is selected, or if Earth is selected and this is Earth
-      const isSelected = p.id === selectedBodyId || (p.id === 'earth' && selectedBodyId === 'moon');
+      const isSelected = selectedBodyId !== 'overview' && (p.id === selectedBodyId || (p.id === 'earth' && selectedBodyId === 'moon'));
+      const isHovered = hoveredBodyId === p.id;
+
       ctx.beginPath();
       for (let theta = 0; theta <= Math.PI * 2; theta += 0.08) {
         const pt = projectOrbit(p.orbitScale, theta);
@@ -477,12 +570,12 @@ const SolarBackground = (() => {
       }
       ctx.closePath();
 
-      if (isSelected) {
+      if (isSelected || isHovered) {
         ctx.setLineDash([]);
-        ctx.strokeStyle = 'rgba(56, 189, 248, 0.65)';
-        ctx.lineWidth = 1.6;
+        ctx.strokeStyle = isSelected ? 'rgba(56, 189, 248, 0.7)' : 'rgba(255, 255, 255, 0.45)';
+        ctx.lineWidth = isSelected ? 1.8 : 1.3;
         ctx.shadowColor = '#38bdf8';
-        ctx.shadowBlur = 9;
+        ctx.shadowBlur = isSelected ? 10 : 6;
       } else if (p.isDwarf) {
         ctx.setLineDash([4, 6]);
         ctx.strokeStyle = 'rgba(254, 215, 170, 0.16)';
@@ -501,24 +594,60 @@ const SolarBackground = (() => {
   }
 
   // ---------------------------------------------------------------------------
-  // 9. Drawing Routines: Earth-Moon Sub-System
+  // 10. Drawing Routines: Asteroid Belt & Stray Asteroids
+  // ---------------------------------------------------------------------------
+  function drawAsteroids() {
+    ctx.save();
+
+    // 1. Shimmering Asteroid Belt particles
+    asteroidBelt.forEach((ast) => {
+      if (!prefersReducedMotion) {
+        ast.angle += ast.speed;
+      }
+      const pt = projectOrbit(ast.orbitScale, ast.angle);
+
+      ctx.fillStyle = ast.color;
+      ctx.globalAlpha = ast.alpha;
+      ctx.beginPath();
+      ctx.arc(pt.x, pt.y, ast.radius, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // 2. Major tumbling asteroids (Ceres & Vesta)
+    majorAsteroids.forEach((mast) => {
+      if (!prefersReducedMotion) {
+        mast.angle += mast.speed;
+      }
+      const pt = projectOrbit(mast.orbitScale, mast.angle);
+
+      ctx.globalAlpha = 0.85;
+      ctx.fillStyle = mast.color;
+      ctx.beginPath();
+      ctx.arc(pt.x, pt.y, mast.radius, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    ctx.restore();
+  }
+
+  // ---------------------------------------------------------------------------
+  // 11. Drawing Routines: Earth-Moon Sub-System
   // ---------------------------------------------------------------------------
   function drawMoonSystem(earth, time) {
     const isSelected = selectedBodyId === 'moon';
     const isHovered = hoveredBodyId === 'moon';
 
-    // Update Moon's orbital position around Earth
     if (!prefersReducedMotion) {
       moonAngle += 0.007;
     }
 
-    const moonOrbitR = 25; // Distance from Earth
+    const moonOrbitR = 25;
     moonBody.projX = earth.projX + Math.cos(moonAngle) * moonOrbitR;
     moonBody.projY = earth.projY + Math.sin(moonAngle) * (moonOrbitR * 0.44);
 
     ctx.save();
 
-    // 1. Delicate lunar orbit track around Earth
+    // Lunar orbit track around Earth
     ctx.beginPath();
     for (let t = 0; t <= Math.PI * 2; t += 0.15) {
       const mx = earth.projX + Math.cos(t) * moonOrbitR;
@@ -531,7 +660,7 @@ const SolarBackground = (() => {
     ctx.lineWidth = 0.8;
     ctx.stroke();
 
-    // 2. Moon Beacon Halo on Selection / Hover
+    // Selection / Hover Halo
     if (isSelected || isHovered) {
       const pulse = Math.sin(time * 0.005) * 2;
       const haloRadius = moonBody.radius + (isSelected ? 8 : 6) + pulse;
@@ -544,7 +673,6 @@ const SolarBackground = (() => {
       ctx.shadowBlur = isSelected ? 14 : 6;
       ctx.stroke();
 
-      // Nameplate
       ctx.font = '600 11px "Space Grotesk", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'bottom';
@@ -554,7 +682,7 @@ const SolarBackground = (() => {
       ctx.fillText('THE MOON', moonBody.projX, moonBody.projY - haloRadius - 3);
     }
 
-    // 3. Moon Body (Sun-facing cratered shading)
+    // Moon Body
     const toSunX = sunCenterX - moonBody.projX;
     const toSunY = sunCenterY - moonBody.projY;
     const sunDist = Math.hypot(toSunX, toSunY) || 1;
@@ -581,15 +709,15 @@ const SolarBackground = (() => {
   }
 
   // ---------------------------------------------------------------------------
-  // 10. Drawing Routines: Planet Spheres & Rings
+  // 12. Drawing Routines: Planet Spheres & Rings
   // ---------------------------------------------------------------------------
   function drawPlanet(p, time) {
-    const isSelected = p.id === selectedBodyId;
-    const isHovered = p.id === hoveredBodyId;
+    const isSelected = selectedBodyId !== 'overview' && p.id === selectedBodyId;
+    const isHovered = hoveredBodyId === p.id;
 
     ctx.save();
 
-    // 1. Selection & Hover Beacon Halo
+    // Selection & Hover Halo
     if (isSelected || isHovered) {
       const pulse = Math.sin(time * 0.005) * 3;
       const haloRadius = p.radius + (isSelected ? 10 : 7) + pulse;
@@ -602,7 +730,6 @@ const SolarBackground = (() => {
       ctx.shadowBlur = isSelected ? 16 : 8;
       ctx.stroke();
 
-      // Celestial name tag above planet
       ctx.font = '600 12px "Space Grotesk", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'bottom';
@@ -612,7 +739,7 @@ const SolarBackground = (() => {
       ctx.fillText(p.name.toUpperCase(), p.projX, p.projY - haloRadius - 4);
     }
 
-    // 2. Realistic Sun-Facing Spherical Shading
+    // Realistic Sun-Facing Spherical Shading
     const toSunX = sunCenterX - p.projX;
     const toSunY = sunCenterY - p.projY;
     const sunDist = Math.hypot(toSunX, toSunY) || 1;
@@ -637,29 +764,26 @@ const SolarBackground = (() => {
     ctx.arc(p.projX, p.projY, p.radius, 0, Math.PI * 2);
     ctx.fill();
 
-    // 3. Planetary Rings (Saturn & Uranus)
+    // Planetary Rings
     if (p.hasRings) {
       ctx.save();
       ctx.translate(p.projX, p.projY);
-      ctx.rotate(-0.32); // Orbital tilt
-      ctx.scale(1.0, 0.34); // Foreshortened perspective
+      ctx.rotate(-0.32);
+      ctx.scale(1.0, 0.34);
 
       if (p.id === 'saturn') {
-        // Outer broad ring
         ctx.beginPath();
         ctx.arc(0, 0, p.ringRadius, 0, Math.PI * 2);
         ctx.strokeStyle = 'rgba(254, 240, 138, 0.75)';
         ctx.lineWidth = 5;
         ctx.stroke();
 
-        // Inner bright ring
         ctx.beginPath();
         ctx.arc(0, 0, p.ringRadius - 5, 0, Math.PI * 2);
         ctx.strokeStyle = 'rgba(253, 224, 71, 0.55)';
         ctx.lineWidth = 2.5;
         ctx.stroke();
       } else {
-        // Uranus pale ring
         ctx.beginPath();
         ctx.arc(0, 0, p.ringRadius, 0, Math.PI * 2);
         ctx.strokeStyle = 'rgba(153, 246, 228, 0.6)';
@@ -674,7 +798,7 @@ const SolarBackground = (() => {
   }
 
   // ---------------------------------------------------------------------------
-  // 11. Drawing Routines: Shooting Stars
+  // 13. Drawing Routines: Shooting Stars
   // ---------------------------------------------------------------------------
   function drawShootingStars() {
     if (Date.now() > nextShootingStarTime && !prefersReducedMotion) {
@@ -714,26 +838,29 @@ const SolarBackground = (() => {
   }
 
   // ---------------------------------------------------------------------------
-  // 12. Main Animation Frame Loop
+  // 14. Main Animation Frame Loop
   // ---------------------------------------------------------------------------
   function render(time) {
     if (isPaused) return;
 
     ctx.clearRect(0, 0, width + 10, height + 10);
 
-    // 1. Procedural deep-space starfield & nebulae
+    // 1. Procedural deep-space starfield with galactic parallax drift
     drawDeepSpace();
 
     // 2. Shooting stars
     drawShootingStars();
 
-    // 3. Orbit tracks
+    // 3. Orbit tracks (with orbit-hover glow)
     drawOrbitLines();
 
-    // 4. Central Sun
+    // 4. Asteroid Belt simulation
+    drawAsteroids();
+
+    // 5. Central Sun
     drawSun(time);
 
-    // 5. Update & draw planets
+    // 6. Planets
     let earthRef = null;
     planets.forEach((p) => {
       if (!prefersReducedMotion) {
@@ -751,7 +878,7 @@ const SolarBackground = (() => {
       drawPlanet(p, time);
     });
 
-    // 6. Earth's Moon sub-system
+    // 7. Earth's Moon sub-system
     if (earthRef) {
       drawMoonSystem(earthRef, time);
     }
@@ -760,7 +887,7 @@ const SolarBackground = (() => {
   }
 
   // ---------------------------------------------------------------------------
-  // 13. Public Initializer & Event Listeners
+  // 15. Public Initializer & Event Listeners
   // ---------------------------------------------------------------------------
   function init(canvasElement, onSelectPlanet) {
     canvas = canvasElement;
@@ -768,9 +895,11 @@ const SolarBackground = (() => {
     onSelectCallback = onSelectPlanet;
 
     initStarfield();
+    initAsteroidBelt();
     updateLayout();
     window.addEventListener('resize', () => {
       initStarfield();
+      initAsteroidBelt();
       updateLayout();
     });
 
@@ -792,7 +921,7 @@ const SolarBackground = (() => {
       }
     });
 
-    // Mouse move hover detection
+    // Mouse move hover detection (detects planet bodies AND orbit lines)
     canvas.addEventListener('mousemove', (e) => {
       const rect = canvas.getBoundingClientRect();
       const mx = e.clientX - rect.left;
@@ -801,14 +930,16 @@ const SolarBackground = (() => {
       const hit = hitTest(mx, my);
       if (hit) {
         hoveredBodyId = hit.id;
+        canvas.classList.add('pointer-active');
         canvas.style.cursor = 'pointer';
       } else {
         hoveredBodyId = null;
+        canvas.classList.remove('pointer-active');
         canvas.style.cursor = 'default';
       }
     });
 
-    // Click / Touch selection detection
+    // Click / Touch selection detection (works on planets, moon, sun, AND orbit lines)
     function handlePointerSelect(clientX, clientY) {
       const rect = canvas.getBoundingClientRect();
       const mx = clientX - rect.left;

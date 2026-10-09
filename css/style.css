@@ -477,3 +477,12 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* --- Cosmic Explorer Rocket Cursor --- */
+body, #solar-canvas {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M2 2 L12 6 L9 9 L15 15 L17 13 L20 16 L18 18 L15 15 L10 9 L7 12 Z' fill='%23f8fafc' stroke='%2338bdf8' stroke-width='1.2'/><circle cx='7' cy='7' r='1.5' fill='%2338bdf8'/><path d='M16 16 L22 22' stroke='%23f59e0b' stroke-width='1.5' stroke-linecap='round'/></svg>") 2 2, default;
+}
+
+button, a, .planet-btn, #solar-canvas.pointer-active, :focus {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M2 2 L12 6 L9 9 L15 15 L17 13 L20 16 L18 18 L15 15 L10 9 L7 12 Z' fill='%2338bdf8' stroke='%23ffffff' stroke-width='1.2'/><circle cx='7' cy='7' r='1.5' fill='%23ffffff'/><path d='M15 15 L23 23 M17 14 L23 19 M14 17 L19 23' stroke='%23f97316' stroke-width='1.8' stroke-linecap='round'/></svg>") 2 2, pointer !important;
+}

@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 
   <!-- Cache-busting query parameter ensures fresh CSS -->
-  <link rel="stylesheet" href="css/style.css?v=4.0">
+  <link rel="stylesheet" href="css/style.css?v=5.0">
 </head>
 <body>
   <!-- Full-Screen Interactive Solar System Canvas -->
@@ -86,27 +86,27 @@
       <!-- Verified NASA Fact Sheet telemetry -->
       <div class="panel-facts-grid">
         <div class="fact-box">
-          <span class="fact-label">Gravity</span>
+          <span class="fact-label" id="panel-fact-1-label">Gravity</span>
           <strong class="fact-value" id="panel-gravity">9.8 m/s²</strong>
         </div>
         <div class="fact-box">
-          <span class="fact-label">Day Length</span>
+          <span class="fact-label" id="panel-fact-2-label">Day Length</span>
           <strong class="fact-value" id="panel-day-length">24.0 hrs</strong>
         </div>
         <div class="fact-box">
-          <span class="fact-label">Mean Temp</span>
+          <span class="fact-label" id="panel-fact-3-label">Mean Temp</span>
           <strong class="fact-value" id="panel-temp">15 °C</strong>
         </div>
       </div>
 
       <div class="panel-credit-line">
-        Data verified from <span class="credit-source">NASA Planetary Fact Sheet</span>
+        Data verified from <span class="credit-source" id="panel-credit-source">NASA Planetary Fact Sheet</span>
       </div>
     </div>
   </aside>
 
   <!-- Scripts: Background animation, then app controller -->
-  <script src="js/background.js?v=4.0"></script>
-  <script src="js/app.js?v=4.0"></script>
+  <script src="js/background.js?v=5.0"></script>
+  <script src="js/app.js?v=5.0"></script>
 </body>
 </html>
