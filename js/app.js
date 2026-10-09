@@ -616,8 +616,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const nameInput = document.getElementById('name-input');
   const charCount = document.getElementById('char-count');
-  const modeDayBtn = document.getElementById('mode-day-btn');
-  const modeNightBtn = document.getElementById('mode-night-btn');
+
   const skyStatusPill = document.getElementById('sky-status-pill');
   const skyFontIndicator = document.getElementById('sky-font-indicator');
   const perfPill = document.getElementById('perf-pill');
@@ -1214,51 +1213,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       }, 40);
     });
 
-    // 2. Day / Night mode toggle
-    modeDayBtn.addEventListener('click', () => {
-      if (state.mode === 'day') return;
-      state.mode = 'day';
-      modeDayBtn.classList.add('active');
-      modeDayBtn.setAttribute('aria-pressed', 'true');
-      nightBtnActive(false);
-
-      updateStudioBadges();
-      syncUrlState();
-      PosterRenderer.render(state);
-
-      // Refresh globe texture with new mode (bypass cache so night→day is immediate)
-      const allWorlds = getAllWorlds();
-      const currentWorld = allWorlds.find(w => w.id === state.worldId);
-      if (currentWorld) updateGlobeTexture(currentWorld, true);
-    });
-
-    modeNightBtn.addEventListener('click', () => {
-      if (state.mode === 'night') return;
-      state.mode = 'night';
-      modeNightBtn.classList.add('active');
-      modeNightBtn.setAttribute('aria-pressed', 'true');
-      dayBtnActive(false);
-
-      updateStudioBadges();
-      syncUrlState();
-      PosterRenderer.render(state);
-
-      // Refresh globe texture with new mode (bypass cache so day→night is immediate)
-      const allWorlds = getAllWorlds();
-      const currentWorld = allWorlds.find(w => w.id === state.worldId);
-      if (currentWorld) updateGlobeTexture(currentWorld, true);
-    });
-
-    function dayBtnActive(active) {
-      modeDayBtn.classList.toggle('active', active);
-      modeDayBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
-    }
-
-    function nightBtnActive(active) {
-      modeNightBtn.classList.toggle('active', active);
-      modeNightBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
-    }
-
     // 3. Two-Stage Vertical Navigation Buttons
     if (scrollToStudioBtn) {
       scrollToStudioBtn.addEventListener('click', () => {
@@ -1547,8 +1501,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const randomMode = Math.random() > 0.5 ? 'night' : 'day';
 
         state.mode = randomMode;
-        dayBtnActive(randomMode === 'day');
-        nightBtnActive(randomMode === 'night');
 
         selectWorld(randomWorld.id);
         showToast(`🎲 Surprise: ${randomWorld.name} in ${randomMode.toUpperCase()} mode!`);
@@ -1915,11 +1867,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       if (userWeightInput && state.weight) userWeightInput.value = state.weight;
       if (userDobInput && state.dob) userDobInput.value = state.dob;
-
-      modeDayBtn.classList.toggle('active', state.mode === 'day');
-      modeDayBtn.setAttribute('aria-pressed', state.mode === 'day' ? 'true' : 'false');
-      modeNightBtn.classList.toggle('active', state.mode === 'night');
-      modeNightBtn.setAttribute('aria-pressed', state.mode === 'night' ? 'true' : 'false');
     }
   }
 
