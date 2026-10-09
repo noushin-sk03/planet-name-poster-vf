@@ -15,6 +15,21 @@
   <link rel="stylesheet" href="css/style.css?v=12.0">
 </head>
 <body>
+  <!-- Top Right: Blinking Asteroid User Guide Button -->
+  <button type="button" id="asteroid-guide-btn" class="asteroid-guide-btn" aria-label="Open Cosmic User Guide" title="Click for easy User Guide">
+    <span class="asteroid-icon-wrap" aria-hidden="true">
+      <svg class="asteroid-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 3 C22 4, 28 8, 29 15 C30 22, 25 28, 17 29 C9 30, 3 24, 3 17 C3 10, 10 2, 16 3 Z" fill="#94a3b8" stroke="#38bdf8" stroke-width="1.6" stroke-linejoin="round"/>
+        <circle cx="11" cy="11" r="2.2" fill="#475569"/>
+        <circle cx="21" cy="13" r="1.8" fill="#475569"/>
+        <circle cx="15" cy="20" r="2.5" fill="#475569"/>
+        <circle cx="22" cy="21" r="1.3" fill="#475569"/>
+        <circle cx="9" cy="19" r="1.5" fill="#475569"/>
+      </svg>
+    </span>
+    <span class="asteroid-guide-text">User Guide</span>
+  </button>
+
   <!-- Full-Screen Interactive Solar System Canvas -->
   <canvas id="solar-canvas" aria-label="Interactive animated 3D solar system background"></canvas>
 
@@ -168,7 +183,22 @@
           <!-- Stage 08 Stretch: Interactive 3D Planetary Sphere with Moving Day/Night Terminator -->
           <div class="globe-canvas-wrap" id="globe-canvas-wrap" style="display: none;">
             <div class="globe-viewport-box">
+              <!-- Personalized NASA Name Overlay on 3D Globe -->
+              <div class="globe-name-overlay" id="globe-name-overlay">
+                <span class="globe-agency-tag">NASA CELESTIAL SURVEY &bull; 3D SPHERICAL PROJECTION</span>
+                <span class="globe-name-title" id="globe-name-display">COSMOS</span>
+                <span class="globe-mission-tag" id="globe-mission-tag">EXPLORATION ARCHIVE MISSION</span>
+              </div>
+
               <canvas id="globe-canvas" width="600" height="600" aria-label="Interactive 3D Lit Planetary Globe with Day/Night Terminator"></canvas>
+
+              <div class="globe-footer-overlay" id="globe-footer-overlay">
+                <div class="globe-footer-world">
+                  <span class="globe-world-badge" id="globe-world-name">EARTH</span>
+                  <span class="globe-telemetry-badge" id="globe-telemetry-badge">1.00 AU &bull; 9.8 m/s&sup2;</span>
+                </div>
+                <span class="globe-credit-watermark">-Made by NSK with AI</span>
+              </div>
             </div>
             <div class="globe-controls-overlay">
               <div class="globe-control-group">
@@ -377,7 +407,7 @@
       <!-- Stage 2 Studio Footer: GitHub Link in Middle & Made By NSK in Right Corner -->
       <footer class="studio-bottom-footer" aria-label="Project credits and repository link">
         <div class="footer-center">
-          <a href="https://github.com/nsk/planet-name-poster" target="_blank" rel="noopener noreferrer" class="github-repo-link" title="Click here to see GitHub repository">
+          <a href="https://github.com/noushin-sk03/planet-name-poster" target="_blank" rel="noopener noreferrer" class="github-repo-link" title="Click here to see GitHub repository">
             <svg class="github-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
               <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
             </svg>
@@ -476,6 +506,77 @@
       </div>
     </div>
   </aside>
+
+  <!-- User Guide Interactive Modal Dialog -->
+  <div id="user-guide-modal-backdrop" class="user-guide-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="user-guide-title">
+    <div class="user-guide-card">
+      <div class="user-guide-header">
+        <div class="user-guide-title-wrap">
+          <div class="user-guide-asteroid-badge">
+            <svg class="asteroid-svg" viewBox="0 0 32 32" fill="none" width="22" height="22">
+              <path d="M16 3 C22 4, 28 8, 29 15 C30 22, 25 28, 17 29 C9 30, 3 24, 3 17 C3 10, 10 2, 16 3 Z" fill="#94a3b8" stroke="#38bdf8" stroke-width="1.6"/>
+              <circle cx="11" cy="11" r="2.2" fill="#475569"/>
+              <circle cx="21" cy="13" r="1.8" fill="#475569"/>
+              <circle cx="15" cy="20" r="2.5" fill="#475569"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="user-guide-title" id="user-guide-title">Cosmic User Guide</h2>
+            <div class="user-guide-subtitle">Personalized NASA Posters, 3D Lit Globes &amp; Space Physics</div>
+          </div>
+        </div>
+        <button type="button" id="user-guide-close-btn" class="user-guide-close-btn" aria-label="Close User Guide">&times;</button>
+      </div>
+
+      <div class="user-guide-content">
+        <div class="guide-step-card">
+          <div class="guide-step-num">1</div>
+          <div class="guide-step-body">
+            <div class="guide-step-title">🪐 Explore 30 Celestial Worlds &amp; Moons</div>
+            <p class="guide-step-desc">Click any planet or orbit line directly in the solar system, or switch between <strong>Solar System (18 worlds)</strong> and <strong>NASA Exoplanet Archive (12 worlds)</strong> in the left drawer.</p>
+          </div>
+        </div>
+
+        <div class="guide-step-card">
+          <div class="guide-step-num">2</div>
+          <div class="guide-step-body">
+            <div class="guide-step-title">✍️ Generate Your Personalized Name</div>
+            <p class="guide-step-desc">Type your name (up to 30 characters) in the Studio to instantly craft your customized NASA typography mission emblem with dual-color stencil styling.</p>
+          </div>
+        </div>
+
+        <div class="guide-step-card">
+          <div class="guide-step-num">3</div>
+          <div class="guide-step-body">
+            <div class="guide-step-title">🌐 2D Poster Preview &bull; WebGL 3D Lit Globe</div>
+            <p class="guide-step-desc">Toggle between the 2D NASA Poster and the <strong>WebGL 3D Lit Globe</strong>. Drag the <strong>☀️ Sun Angle slider</strong> to watch day and night sweep across the planet's terrain with realistic auto-rotation!</p>
+          </div>
+        </div>
+
+        <div class="guide-step-card">
+          <div class="guide-step-num">4</div>
+          <div class="guide-step-body">
+            <div class="guide-step-title">⚖️ Living on Another World (Biophysics)</div>
+            <p class="guide-step-desc">Enter your Earth weight (kg) and birth date to calculate your real weight under alien gravity and your local planetary age!</p>
+          </div>
+        </div>
+
+        <div class="guide-step-card">
+          <div class="guide-step-num">5</div>
+          <div class="guide-step-body">
+            <div class="guide-step-title">📥 Download Wallpapers &amp; Share Links</div>
+            <p class="guide-step-desc">Choose from 4K Desktop Wallpaper (16:9), Mobile Phone Story (9:16), Print Ready (3:4), or Custom formats. Click <strong>Download PNG Poster</strong> or <strong>Snapshot Globe</strong> to save your creation!</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="user-guide-footer">
+        <button type="button" id="user-guide-ok-btn" class="user-guide-action-btn">
+          <span>Got it, Let's Explore! 🚀</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Stage 04 Visual Toast Notification -->
   <div id="toast-notification" class="toast-notification" role="status" aria-live="polite"></div>

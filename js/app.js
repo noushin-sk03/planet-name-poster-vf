@@ -604,6 +604,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   const globeAutorotateBtn = document.getElementById('globe-autorotate-btn');
   const globeRotateLabel = document.getElementById('globe-rotate-label');
   const globeExportBtn = document.getElementById('globe-export-btn');
+  const globeNameDisplay = document.getElementById('globe-name-display');
+  const globeWorldName = document.getElementById('globe-world-name');
+  const globeTelemetryBadge = document.getElementById('globe-telemetry-badge');
+
+  // Asteroid User Guide Modal Elements
+  const asteroidGuideBtn = document.getElementById('asteroid-guide-btn');
+  const userGuideModalBackdrop = document.getElementById('user-guide-modal-backdrop');
+  const userGuideCloseBtn = document.getElementById('user-guide-close-btn');
+  const userGuideOkBtn = document.getElementById('user-guide-ok-btn');
 
   const nameInput = document.getElementById('name-input');
   const charCount = document.getElementById('char-count');
@@ -705,6 +714,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     renderPlanetMenu();
+    planetMenuList.scrollTop = 0;
 
     const activeList = getActiveWorldsList();
     const exists = activeList.some((w) => w.id === state.worldId);
@@ -749,13 +759,29 @@ document.addEventListener('DOMContentLoaded', async () => {
       const nameSpan = document.createElement('span');
       nameSpan.className = 'planet-btn-name';
       nameSpan.textContent = world.name;
-
-      const subSpan = document.createElement('span');
-      subSpan.className = 'planet-btn-sub';
-      subSpan.textContent = (world.type === 'exoplanet' && world.hostname) ? `Host: ${world.hostname} • ${world.distSun || ''}` : world.order;
-
       meta.appendChild(nameSpan);
-      meta.appendChild(subSpan);
+
+      if (world.type === 'exoplanet') {
+        const tagsRow = document.createElement('div');
+        tagsRow.className = 'planet-btn-tags';
+
+        const hostTag = document.createElement('span');
+        hostTag.className = 'planet-tag-host';
+        hostTag.textContent = `⭐ ${world.hostname || 'Archive'}`;
+
+        const distTag = document.createElement('span');
+        distTag.className = 'planet-tag-dist';
+        distTag.textContent = world.distSun || 'NASA';
+
+        tagsRow.appendChild(hostTag);
+        tagsRow.appendChild(distTag);
+        meta.appendChild(tagsRow);
+      } else {
+        const subSpan = document.createElement('span');
+        subSpan.className = 'planet-btn-sub';
+        subSpan.textContent = world.order;
+        meta.appendChild(subSpan);
+      }
 
       // If world is a Moon, render as a satellite branching with elbow arrow from parent planet
       if (world.parent || world.id === 'moon') {
@@ -992,6 +1018,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateBiophysics();
     syncUrlState();
     PosterRenderer.render(state);
+    if (globeNameDisplay) {
+      globeNameDisplay.textContent = state.name || 'COSMOS';
+    }
+    if (globeWorldName) {
+      globeWorldName.textContent = world.name;
+    }
+    if (globeTelemetryBadge) {
+      globeTelemetryBadge.textContent = `${world.distSun || ''} • ${world.gravity ? world.gravity + ' m/s²' : 'Unknown'}`;
+    }
+
     updateGlobeTexture(world);
   }
 
@@ -1160,6 +1196,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       const cleanText = e.target.value.replace(/[^\w\s-]/gi, '').slice(0, 30);
       state.name = cleanText;
       charCount.textContent = `${cleanText.length} / 30`;
+
+      if (globeNameDisplay) {
+        globeNameDisplay.textContent = cleanText || 'COSMOS';
+      }
 
       clearTimeout(inputDebounce);
       inputDebounce = setTimeout(() => {
@@ -1588,19 +1628,122 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       });
     }
+    // 11.1 Enhanced 3D Globe Personalized Poster Snapshot
     if (globeExportBtn) {
       globeExportBtn.addEventListener('click', () => {
         if (typeof Sphere3DViewer !== 'undefined') {
           const dataUrl = Sphere3DViewer.captureViewDataUrl();
-          if (dataUrl) {
+          if (!dataUrl) return;
+
+          const globeImg = new Image();
+          globeImg.onload = () => {
+            const outCanvas = document.createElement('canvas');
+            const W = 1080;
+            const H = 1350;
+            outCanvas.width = W;
+            outCanvas.height = H;
+            const ctx = outCanvas.getContext('2d');
+
+            // Deep space cosmic backdrop
+            const bgGrad = ctx.createRadialGradient(W / 2, H / 2, 80, W / 2, H / 2, 750);
+            bgGrad.addColorStop(0, '#0a1024');
+            bgGrad.addColorStop(0.6, '#050814');
+            bgGrad.addColorStop(1, '#020308');
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, W, H);
+
+            // Subtle starry particle field
+            ctx.fillStyle = '#ffffff';
+            for (let i = 0; i < 90; i++) {
+              const sx = (i * 137.5) % W;
+              const sy = (i * 241.3) % H;
+              const sr = ((i % 5) + 1) * 0.45;
+              ctx.globalAlpha = 0.2 + ((i % 4) * 0.2);
+              ctx.beginPath();
+              ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+              ctx.fill();
+            }
+            ctx.globalAlpha = 1.0;
+
+            // NASA Header
+            ctx.fillStyle = '#38bdf8';
+            ctx.font = '700 18px "Space Grotesk", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('NASA CELESTIAL EXPLORATION ARCHIVE', W / 2, 90);
+
+            // Large Personalized Generated Name
+            const userName = (state.name || 'COSMOS').toUpperCase();
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '900 64px "Space Grotesk", Cinzel, sans-serif';
+            ctx.shadowColor = 'rgba(56, 189, 248, 0.65)';
+            ctx.shadowBlur = 30;
+            ctx.fillText(userName, W / 2, 165);
+            ctx.shadowBlur = 0;
+
+            // Subtitle mission badge
+            const world = getAllWorlds().find((w) => w.id === state.worldId) || state.worlds[3];
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '600 16px Inter, sans-serif';
+            ctx.fillText(`${world.name.toUpperCase()} • 3D SPHERICAL SURVEY MISSION`, W / 2, 205);
+
+            // Draw 3D globe centered in frame
+            const globeSize = 780;
+            const gx = (W - globeSize) / 2;
+            const gy = 260;
+            ctx.drawImage(globeImg, gx, gy, globeSize, globeSize);
+
+            // Bottom telemetry details
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '800 32px "Space Grotesk", sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(world.name.toUpperCase(), 75, H - 90);
+
+            ctx.fillStyle = '#38bdf8';
+            ctx.font = '600 16px monospace';
+            const tele = `${world.distSun || '1.0 AU'}  •  GRAVITY: ${world.gravity ? world.gravity + ' m/s²' : 'Unknown'}`;
+            ctx.fillText(tele, 75, H - 60);
+
+            // NSK AI Watermark
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+            ctx.font = '500 16px Inter, sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillText('-Made by NSK with AI', W - 75, H - 60);
+
+            // Download snapshot
+            const compUrl = outCanvas.toDataURL('image/png');
             const anchor = document.createElement('a');
-            anchor.href = dataUrl;
-            anchor.download = `${state.worldId}_3D_Globe.png`;
+            anchor.href = compUrl;
+            anchor.download = `${world.name}_3D_Globe_${userName.replace(/\s+/g, '_')}.png`;
             document.body.appendChild(anchor);
             anchor.click();
             document.body.removeChild(anchor);
-            showToast(`📷 Snapshot downloaded: ${state.worldId}_3D_Globe.png`);
-          }
+            showToast(`📷 Personalized 3D Globe poster downloaded!`);
+          };
+          globeImg.src = dataUrl;
+        }
+      });
+    }
+
+    // 12. Asteroid User Guide Modal Interactions
+    if (asteroidGuideBtn && userGuideModalBackdrop) {
+      const openUserGuide = () => {
+        userGuideModalBackdrop.classList.add('open');
+      };
+      const closeUserGuide = () => {
+        userGuideModalBackdrop.classList.remove('open');
+      };
+
+      asteroidGuideBtn.addEventListener('click', openUserGuide);
+      if (userGuideCloseBtn) userGuideCloseBtn.addEventListener('click', closeUserGuide);
+      if (userGuideOkBtn) userGuideOkBtn.addEventListener('click', closeUserGuide);
+
+      userGuideModalBackdrop.addEventListener('click', (e) => {
+        if (e.target === userGuideModalBackdrop) closeUserGuide();
+      });
+
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && userGuideModalBackdrop.classList.contains('open')) {
+          closeUserGuide();
         }
       });
     }

@@ -110,8 +110,8 @@ button, a, input, select, .planet-btn, #solar-canvas.pointer-active, :focus {
   top: 0;
   left: 0;
   height: 100vh;
-  width: 250px;
-  max-width: 85vw;
+  width: 276px;
+  max-width: 88vw;
   background: var(--color-bg-drawer);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -119,7 +119,7 @@ button, a, input, select, .planet-btn, #solar-canvas.pointer-active, :focus {
   z-index: 50;
   display: flex;
   flex-direction: column;
-  padding: 1rem 0.85rem;
+  padding: 1rem 0.75rem;
   transform: translateX(-100%);
   transition: transform var(--transition-drawer);
   box-shadow: 10px 0 35px rgba(0, 0, 0, 0.7);
@@ -134,8 +134,8 @@ button, a, input, select, .planet-btn, #solar-canvas.pointer-active, :focus {
     transform: translateX(0);
     z-index: 50; /* Navigation is always visible above everything while scrolling */
     box-shadow: none;
-    width: 240px; /* Spacious, highly legible navigation drawer */
-    padding: 0.85rem 0.65rem;
+    width: 276px; /* Spacious, highly legible navigation drawer */
+    padding: 0.85rem 0.75rem;
   }
 }
 
@@ -253,11 +253,18 @@ button, a, input, select, .planet-btn, #solar-canvas.pointer-active, :focus {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.28rem;
+  gap: 0.32rem;
   overflow-y: auto;
-  padding-right: 0.2rem;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(56, 189, 248, 0.6) #060913;
+  padding-right: 0.3rem;
+  scrollbar-width: none; /* Firefox: completely hide native scrollbar */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* Chrome, Safari, Opera: completely hide native scrollbar */
+.planet-menu::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 /* Dedicated Vertical Astronaut Scroller Rail */
@@ -376,82 +383,109 @@ button, a, input, select, .planet-btn, #solar-canvas.pointer-active, :focus {
   }
 }
 
-/* Webkit Scrollbar: Dark Milky Way track with Floating Astronaut Thumb */
-.planet-menu::-webkit-scrollbar {
-  width: 6px;
-}
-
-.planet-menu::-webkit-scrollbar-track {
-  background: rgba(5, 8, 17, 0.6);
-  border-radius: var(--radius-full);
-}
-
-.planet-menu::-webkit-scrollbar-thumb {
-  background: rgba(56, 189, 248, 0.3);
-  border-radius: var(--radius-full);
-}
-
-.planet-menu::-webkit-scrollbar-thumb:hover {
-  background: rgba(56, 189, 248, 0.55);
-}
-
 .planet-btn {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.65rem;
   width: 100%;
-  min-height: 34px;
-  padding: 0.32rem 0.55rem;
-  background: transparent;
-  border: 1px solid transparent;
+  min-height: 42px;
+  padding: 0.42rem 0.65rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: var(--radius-sm);
   color: var(--color-text-secondary);
   font-family: inherit;
-  font-size: 0.82rem;
-  font-weight: 600;
   text-align: left;
   transition: all var(--transition-fast);
+  cursor: pointer;
 }
 
 .planet-btn:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.15);
   color: #fff;
+  transform: translateX(2px);
 }
 
 .planet-btn.active {
-  background: rgba(56, 189, 248, 0.15);
+  background: rgba(56, 189, 248, 0.16);
   border-color: var(--color-border-active);
   color: #ffffff;
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.28);
 }
 
 .planet-swatch {
-  width: 11px;
-  height: 11px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   flex-shrink: 0;
-  box-shadow: 0 0 6px currentColor;
+  box-shadow: 0 0 7px currentColor;
 }
 
 .planet-meta {
   display: flex;
   flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
 }
 
 .planet-btn-name {
-  font-size: 0.90rem;
+  font-size: 0.88rem;
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 1.25;
+  color: #f1f5f9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.planet-btn.active .planet-btn-name {
+  color: #fff;
 }
 
 .planet-btn-sub {
   font-size: 0.68rem;
   color: var(--color-text-muted);
   font-weight: 400;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .planet-btn.active .planet-btn-sub {
   color: var(--color-accent-blue);
+}
+
+/* Exoplanet Clean Mission Tags */
+.planet-btn-tags {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.planet-tag-host {
+  font-size: 0.66rem;
+  color: #94a3b8;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.planet-tag-dist {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.14);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 0.05rem 0.32rem;
+  border-radius: 4px;
+  flex-shrink: 0;
 }
 
 /* --- Satellite Sub-item Branching (The Moon from Earth) --- */
@@ -1913,6 +1947,379 @@ button, a, input, select, .planet-btn, #solar-canvas.pointer-active, :focus {
   background: rgba(34, 197, 94, 0.15);
   border-color: rgba(34, 197, 94, 0.4);
   color: #4ade80;
+}
+
+/* ==========================================================================
+   Stage 08+: WebGL 3D Globe Personalized Name Overlay & Poster Frame
+   ========================================================================== */
+.globe-viewport-box {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.globe-name-overlay {
+  position: absolute;
+  top: 12px;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  pointer-events: none;
+  z-index: 10;
+  padding: 0 1rem;
+}
+
+.globe-agency-tag {
+  font-family: var(--font-display, sans-serif);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #38bdf8;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+  margin-bottom: 2px;
+}
+
+.globe-name-title {
+  font-family: var(--font-display, sans-serif);
+  font-size: 1.85rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ffffff;
+  line-height: 1.1;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.9), 0 0 20px rgba(56, 189, 248, 0.5);
+}
+
+.globe-mission-tag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-top: 3px;
+}
+
+.globe-footer-overlay {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0 1.2rem;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.globe-footer-world {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.globe-world-badge {
+  font-family: var(--font-display, sans-serif);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.globe-telemetry-badge {
+  font-size: 0.66rem;
+  color: #38bdf8;
+  font-family: var(--font-mono, monospace);
+}
+
+.globe-credit-watermark {
+  font-size: 0.64rem;
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+/* ==========================================================================
+   Blinking Asteroid User Guide Button & Comprehensive User Guide Modal
+   ========================================================================== */
+.asteroid-guide-btn {
+  position: fixed;
+  top: 1rem;
+  right: 1.25rem;
+  z-index: 90;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.42rem 0.85rem;
+  background: rgba(11, 17, 34, 0.85);
+  border: 1.5px solid #38bdf8;
+  border-radius: var(--radius-full);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: asteroidBlinkGlow 2.2s ease-in-out infinite;
+  transition: all var(--transition-fast);
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.4), inset 0 0 8px rgba(56, 189, 248, 0.2);
+}
+
+.asteroid-guide-btn:hover {
+  transform: scale(1.08);
+  border-color: #67e8f9;
+  background: rgba(14, 25, 52, 0.95);
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.8), inset 0 0 12px rgba(56, 189, 248, 0.4);
+}
+
+@keyframes asteroidBlinkGlow {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.45), inset 0 0 6px rgba(56, 189, 248, 0.2);
+    border-color: rgba(56, 189, 248, 0.7);
+  }
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 0 24px rgba(56, 189, 248, 0.9), 0 0 32px rgba(168, 85, 247, 0.5), inset 0 0 10px rgba(56, 189, 248, 0.4);
+    border-color: #67e8f9;
+  }
+}
+
+.asteroid-icon-wrap {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.asteroid-svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 4px #38bdf8);
+  animation: asteroidRocking 4s ease-in-out infinite alternate;
+}
+
+@keyframes asteroidRocking {
+  0% { transform: rotate(-8deg); }
+  100% { transform: rotate(12deg); }
+}
+
+.asteroid-guide-text {
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .asteroid-guide-btn {
+    top: 0.75rem;
+    right: 0.75rem;
+    padding: 0.4rem 0.65rem;
+  }
+}
+
+/* --- User Guide Modal Overlay --- */
+.user-guide-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 7, 16, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.user-guide-modal-backdrop.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.user-guide-card {
+  width: 100%;
+  max-width: 680px;
+  max-height: 90vh;
+  background: linear-gradient(170deg, #0e172e 0%, #080d1e 100%);
+  border: 1.5px solid rgba(56, 189, 248, 0.35);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(56, 189, 248, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: scale(0.94);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.user-guide-modal-backdrop.open .user-guide-card {
+  transform: scale(1);
+}
+
+.user-guide-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 1.5rem 0.8rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.user-guide-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-guide-asteroid-badge {
+  width: 36px;
+  height: 36px;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+}
+
+.user-guide-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+
+.user-guide-subtitle {
+  font-size: 0.76rem;
+  color: var(--color-accent-blue);
+  margin-top: 2px;
+}
+
+.user-guide-close-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  font-size: 1.4rem;
+  line-height: 1;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.user-guide-close-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+  color: #fff;
+  transform: rotate(90deg);
+}
+
+.user-guide-content {
+  padding: 1.2rem 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.guide-step-card {
+  display: flex;
+  gap: 0.85rem;
+  padding: 0.85rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.guide-step-card:hover {
+  background: rgba(56, 189, 248, 0.06);
+  border-color: rgba(56, 189, 248, 0.25);
+  transform: translateX(3px);
+}
+
+.guide-step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0284c7, #38bdf8);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.82rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+}
+
+.guide-step-body {
+  flex: 1;
+}
+
+.guide-step-title {
+  font-size: 0.90rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 0.25rem;
+}
+
+.guide-step-desc {
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.user-guide-footer {
+  padding: 0.9rem 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(6, 10, 22, 0.7);
+}
+
+.user-guide-action-btn {
+  width: 100%;
+  padding: 0.65rem 1.2rem;
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  border: 1px solid #38bdf8;
+  border-radius: var(--radius-sm);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.86rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
+  transition: all var(--transition-fast);
+}
+
+.user-guide-action-btn:hover {
+  background: linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
+  box-shadow: 0 0 24px rgba(56, 189, 248, 0.7);
+  transform: translateY(-1px);
 }
 
 /* --- Accessibility & Focus --- */
