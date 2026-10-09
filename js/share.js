@@ -37,7 +37,7 @@ const ShareManager = (() => {
    * @param {number} maxLength - Character ceiling
    * @returns {string} - Clean, safe string
    */
-  function sanitizeText(raw, maxLength = 30) {
+  function sanitizeText(raw, maxLength = 50) {
     if (!raw || typeof raw !== 'string') return '';
     // 1. Remove script/style tags and their inner contents
     let clean = raw.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
@@ -60,9 +60,9 @@ const ShareManager = (() => {
     const params = new URLSearchParams(searchString || '');
     const validPlanetIds = new Set(planetsList.map((p) => p.id));
 
-    // 1. Name validation (supports longer names up to 30 chars)
+    // 1. Name validation (supports long names up to 50 chars)
     const rawName = params.get('name');
-    const cleanName = sanitizeText(rawName, 30) || DEFAULT_DEFAULTS.name;
+    const cleanName = sanitizeText(rawName, 50) || DEFAULT_DEFAULTS.name;
 
     // 2. Planet validation (whitelist against known planet IDs)
     const rawPlanet = (params.get('planet') || '').toLowerCase().trim();

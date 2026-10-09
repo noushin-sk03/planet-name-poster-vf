@@ -830,22 +830,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ---------------------------------------------------------------------------
   // 3.1 Synchronize Astronaut Scroller Thumb Position Along Milky Way Rail
   // ---------------------------------------------------------------------------
-  function updateAstronautScroller(bodyId) {
-    if (!astronautGuideThumb || !astroTrackRail) return;
-    const activeList = getActiveWorldsList();
-    const totalWorlds = activeList.length;
-    const idx = activeList.findIndex((w) => w.id === bodyId);
-    if (idx < 0) return;
-
+  function syncAstronautToScroll() {
+    if (!astronautGuideThumb || !astroTrackRail || !planetMenuList) return;
+    const maxScroll = planetMenuList.scrollHeight - planetMenuList.clientHeight;
+    const progress = maxScroll > 0 ? (planetMenuList.scrollTop / maxScroll) : 0;
     const railHeight = astroTrackRail.clientHeight || 200;
-    const thumbHeight = astronautGuideThumb.clientHeight || 36;
+    const thumbHeight = 36;
     const availableTravel = Math.max(0, railHeight - thumbHeight);
-    const fraction = totalWorlds > 1 ? idx / (totalWorlds - 1) : 0;
-    const topPx = Math.round(fraction * availableTravel);
+    const topPx = Math.max(0, Math.min(availableTravel, Math.round(progress * availableTravel)));
 
     astronautGuideThumb.style.top = `${topPx}px`;
-    astronautGuideThumb.setAttribute('aria-valuenow', idx);
-    astronautGuideThumb.setAttribute('aria-valuetext', activeList[idx].name);
+    if (planetDrawer) {
+      planetDrawer.style.setProperty('--milkyway-depth', progress.toFixed(3));
+    }
+  }
+
+  function updateAstronautScroller(bodyId) {
+    if (!astronautGuideThumb || !astroTrackRail || !planetMenuList) return;
+    const activeBtn = planetMenuList.querySelector(`.planet-btn[data-body-id="${bodyId}"]`);
+    if (activeBtn) {
+      activeBtn.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+    syncAstronautToScroll();
   }
 
   // ---------------------------------------------------------------------------
@@ -1193,9 +1199,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 1. Name input with live debounced repaint (expanded to 30 characters for longer names)
     let inputDebounce = null;
     nameInput.addEventListener('input', (e) => {
-      const cleanText = e.target.value.replace(/[^\w\s-]/gi, '').slice(0, 30);
+      const cleanText = e.target.value.replace(/[^\w\s-]/gi, '').slice(0, 50);
       state.name = cleanText;
-      charCount.textContent = `${cleanText.length} / 30`;
+      charCount.textContent = `${cleanText.length} / 50`;
 
       if (globeNameDisplay) {
         globeNameDisplay.textContent = cleanText || 'COSMOS';
@@ -1341,12 +1347,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       function handleRailPosition(clientY) {
         const rect = astroTrackRail.getBoundingClientRect();
         if (rect.height <= 0) return;
-        const relY = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+        const thumbH = 36;
+        const availableH = Math.max(1, rect.height - thumbH);
+        const relY = Math.max(0, Math.min(1, (clientY - rect.top - thumbH * 0.5) / availableH));
+
+        if (planetMenuList) {
+          const maxScroll = planetMenuList.scrollHeight - planetMenuList.clientHeight;
+          planetMenuList.scrollTop = relY * maxScroll;
+        }
+
         const activeList = getActiveWorldsList();
         const targetIdx = Math.round(relY * (activeList.length - 1));
         if (activeList[targetIdx] && activeList[targetIdx].id !== state.worldId) {
           selectWorld(activeList[targetIdx].id, { source: 'scroller' });
         }
+        syncAstronautToScroll();
       }
 
       astroTrackRail.addEventListener('pointerdown', (e) => {
@@ -1369,6 +1384,32 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       astroTrackRail.addEventListener('pointercancel', () => {
         isDraggingRail = false;
+      });
+    }
+
+    if (astroUpBtn) {
+      astroUpBtn.addEventListener('click', () => {
+        if (planetMenuList) {
+          planetMenuList.scrollBy({ top: -56, behavior: 'smooth' });
+        }
+        const activeList = getActiveWorldsList();
+        const currentIdx = activeList.findIndex((w) => w.id === state.worldId);
+        if (currentIdx > 0) {
+          selectWorld(activeList[currentIdx - 1].id, { source: 'scroller' });
+        }
+      });
+    }
+
+    if (astroDownBtn) {
+      astroDownBtn.addEventListener('click', () => {
+        if (planetMenuList) {
+          planetMenuList.scrollBy({ top: 56, behavior: 'smooth' });
+        }
+        const activeList = getActiveWorldsList();
+        const currentIdx = activeList.findIndex((w) => w.id === state.worldId);
+        if (currentIdx >= 0 && currentIdx < activeList.length - 1) {
+          selectWorld(activeList[currentIdx + 1].id, { source: 'scroller' });
+        }
       });
     }
 
@@ -1594,9 +1635,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 10. Astronaut Scroll Listener: Dynamic Milky Way depth gradient
     if (planetMenuList && planetDrawer) {
       planetMenuList.addEventListener('scroll', () => {
-        const maxScroll = planetMenuList.scrollHeight - planetMenuList.clientHeight;
-        const progress = maxScroll > 0 ? (planetMenuList.scrollTop / maxScroll) : 0;
-        planetDrawer.style.setProperty('--milkyway-depth', progress.toFixed(3));
+        syncAstronautToScroll();
       }, { passive: true });
     }
 

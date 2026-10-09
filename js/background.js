@@ -457,36 +457,40 @@ const SolarBackground = (() => {
     ctx.scale(dpr, dpr);
 
     if (width >= 820) {
-      // Desktop: Reserve left navigation sidebar (240px) and right telemetry panel (~340px)
-      const leftNavW = 240;
-      const rightReservedW = isPanelMinimized ? 90 : 340;
-      const viewAreaW = Math.max(340, width - leftNavW - rightReservedW);
+      // Desktop: Reserve left navigation sidebar (276px) and right telemetry panel (~340px)
+      const leftNavW = 280;
+      const rightReservedW = isPanelMinimized ? 90 : 360;
+      const viewAreaW = Math.max(300, width - leftNavW - rightReservedW);
 
       // Center the Sun horizontally in the clear, unobstructed space between sidebar and telemetry card
       targetSunCenterX = leftNavW + viewAreaW * 0.50;
-      targetSunCenterY = height * 0.50;
+
+      // Vertical bounds: Account for top hero header (~110px) and bottom footer (~45px)
+      const topReservedH = 110;
+      const bottomReservedH = 50;
+      const viewAreaH = Math.max(220, height - topReservedH - bottomReservedH);
+      targetSunCenterY = topReservedH + viewAreaH * 0.50;
 
       // Pluto outermost orbit scale is 1.09, tilted at -0.32 rad (-18.3 deg).
-      // Maximum horizontal span from Sun center: ~1.045 * baseRadius
-      // Maximum vertical span from Sun center: ~0.565 * baseRadius
-      // Safe margins ensure zero orbits ever touch sidebar (left) or card (right)
-      const maxBaseRadiusX = (viewAreaW * 0.50 - 24) / 1.05;
-      const viewAreaH = Math.max(240, height - 160);
-      const maxBaseRadiusY = (viewAreaH * 0.50 - 20) / 0.57;
+      // Max horizontal span: 1.05 * baseRadius, Max vertical span: 0.57 * baseRadius
+      // Safe margins ensure Pluto's entire orbit and body are 100% visible inside canvas
+      const maxBaseRadiusX = (viewAreaW * 0.50 - 40) / 1.10;
+      const maxBaseRadiusY = (viewAreaH * 0.50 - 30) / 0.60;
 
-      targetBaseRadius = Math.max(140, Math.min(maxBaseRadiusX, maxBaseRadiusY));
+      targetBaseRadius = Math.max(80, Math.min(maxBaseRadiusX, maxBaseRadiusY) * 0.94);
     } else {
       // Mobile / Tablet: Sidebar is a drawer, telemetry card is pinned at bottom
       const bottomReservedH = isPanelMinimized ? 60 : 250;
-      const availableH = Math.max(220, height - bottomReservedH - 70);
+      const topReservedH = 90;
+      const availableH = Math.max(200, height - bottomReservedH - topReservedH);
 
       targetSunCenterX = width * 0.50;
-      targetSunCenterY = 70 + availableH * 0.48;
+      targetSunCenterY = topReservedH + availableH * 0.50;
 
-      const maxBaseRadiusX = (width * 0.50 - 16) / 1.05;
-      const maxBaseRadiusY = (availableH * 0.50 - 15) / 0.57;
+      const maxBaseRadiusX = (width * 0.50 - 25) / 1.10;
+      const maxBaseRadiusY = (availableH * 0.50 - 20) / 0.60;
 
-      targetBaseRadius = Math.max(120, Math.min(maxBaseRadiusX, maxBaseRadiusY));
+      targetBaseRadius = Math.max(70, Math.min(maxBaseRadiusX, maxBaseRadiusY) * 0.94);
     }
 
     if (currentBaseRadius === 0) {

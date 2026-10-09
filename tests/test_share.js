@@ -63,10 +63,10 @@ it('Sanitizes XSS payloads from name parameter', () => {
   assert.strictEqual(state.name.includes('<script>'), false);
 });
 
-it('Clamps name length to 30 characters', () => {
-  const longName = '?name=Supercalifragilisticexpialidocious';
+it('Clamps name length to 50 characters', () => {
+  const longName = '?name=' + 'A'.repeat(80);
   const state = ShareManager.parseUrlParams(longName, mockPlanets);
-  assert.strictEqual(state.name.length, 30);
+  assert.strictEqual(state.name.length, 50);
 });
 
 it('Rejects invalid export size and falls back to portrait', () => {
