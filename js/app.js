@@ -1585,48 +1585,50 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
 
-    // 9. Stage 04 & 07 Export NASA Data (JSON)
+    // 9. Export Planet Data as CSV (opens in Excel / Google Sheets)
     if (exportDataBtn) {
       exportDataBtn.addEventListener('click', () => {
         const allWorlds = getAllWorlds();
         const world = allWorlds.find((w) => w.id === state.worldId);
         if (!world || state.worldId === 'overview') {
-          showToast('⚠️ Select a celestial world first');
+          showToast('⚠️ Select a world first to export its data');
           return;
         }
         const isExo = world.type === 'exoplanet' || Boolean(world.isArtistImpression);
-        const dataPayload = {
-          world: world.name,
-          id: world.id,
-          classification: world.type,
-          hostStar: world.hostname || 'The Sun',
-          orderOrClassification: world.order,
-          surfaceGravity: world.gravity,
-          solarDayLength: world.dayLength,
-          meanTemperature: world.temp,
-          distanceFromHostStar: world.distSun || null,
-          distanceFromEarth: world.distEarth || null,
-          orbitalPeriod: world.orbitPeriod || null,
-          isArtistImpression: Boolean(world.isArtistImpression),
-          userCalculations: {
-            earthWeightKg: state.weight,
-            weightOnWorld: calcWeightVal ? calcWeightVal.textContent : null,
-            birthDate: state.dob,
-            ageInWorldYears: calcAgeVal ? calcAgeVal.textContent : null
-          },
-          source: world.dataSource || (isExo ? 'NASA Exoplanet Archive (IPAC/Caltech)' : 'NASA Planetary Fact Sheet / Goddard Space Flight Center'),
-          verified: true,
-          exportTimestamp: new Date().toISOString()
-        };
 
-        const jsonStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(dataPayload, null, 2));
+        // Build CSV rows
+        const rows = [
+          ['Field', 'Value'],
+          ['World Name', world.name],
+          ['Type', world.type || 'Planet'],
+          ['Host Star', world.hostname || 'The Sun'],
+          ['Surface Gravity (m/s²)', world.gravity ?? ''],
+          ['Day Length (hrs)', world.dayLength ?? ''],
+          ['Mean Temperature (°C)', world.temp ?? ''],
+          ['Distance from Host Star', world.distSun || ''],
+          ['Distance from Earth', world.distEarth || ''],
+          ['Orbital Period', world.orbitPeriod || ''],
+          ['Artist Impression', isExo ? 'Yes' : 'No'],
+          ['', ''],
+          ['--- Your Calculations ---', ''],
+          ['Your Earth Weight (kg)', state.weight || ''],
+          ['Your Weight on this World', calcWeightVal ? calcWeightVal.textContent : ''],
+          ['Your Birth Date', state.dob || ''],
+          ['Your Age on this World', calcAgeVal ? calcAgeVal.textContent : ''],
+          ['', ''],
+          ['Data Source', world.dataSource || (isExo ? 'NASA Exoplanet Archive (IPAC/Caltech)' : 'NASA Planetary Fact Sheet / Goddard Space Flight Center')],
+          ['Export Date', new Date().toLocaleDateString()]
+        ];
+
+        const csvContent = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+        const csvStr = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
         const downloadAnchor = document.createElement('a');
-        downloadAnchor.setAttribute('href', jsonStr);
-        downloadAnchor.setAttribute('download', `NASA_FactSheet_${world.id}.json`);
+        downloadAnchor.setAttribute('href', csvStr);
+        downloadAnchor.setAttribute('download', `${world.name}_FactSheet.csv`);
         document.body.appendChild(downloadAnchor);
         downloadAnchor.click();
         document.body.removeChild(downloadAnchor);
-        showToast(`📄 Exported NASA ${world.name} Fact Sheet (JSON)`);
+        showToast(`📊 Downloaded ${world.name} fact sheet — open in Excel!`);
       });
     }
 
