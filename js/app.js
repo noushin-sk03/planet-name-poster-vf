@@ -1059,6 +1059,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         perfPill.textContent = `${metrics.fps} FPS • DPR ${metrics.dpr}`;
       });
     }
+
+    // Forward any touches/pointer events on the stage section background to SolarBackground
+    const solarStageSection = document.getElementById('solar-stage-section');
+    if (solarStageSection) {
+      solarStageSection.addEventListener('pointerdown', (e) => {
+        if (e.target === solarStageSection && SolarBackground.handlePointerAt) {
+          SolarBackground.handlePointerAt(e.clientX, e.clientY);
+        }
+      });
+      solarStageSection.addEventListener('pointermove', (e) => {
+        if (e.target === solarStageSection && SolarBackground.handleHoverAt) {
+          SolarBackground.handleHoverAt(e.clientX, e.clientY);
+        }
+      });
+    }
   }
 
   // Initialize Poster Canvas

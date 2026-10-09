@@ -59,6 +59,9 @@ const SolarBackground = (() => {
   let onSelectCallback = null;
   let selectedBodyId = 'earth';
   let hoveredBodyId = null;
+  let hoveredHit = null;
+  let pointerX = 0;
+  let pointerY = 0;
 
   // Earth-Moon orbital angle
   let moonAngle = 1.2;
@@ -162,6 +165,9 @@ const SolarBackground = (() => {
     {
       id: 'mercury',
       name: 'Mercury',
+      order: '1st from Sun',
+      distSun: '0.39 AU (57.9M km)',
+      orbitPeriod: '88.0 days',
       color: '#cbd5e1',
       secondaryColor: '#64748b',
       radius: 7,
@@ -174,6 +180,9 @@ const SolarBackground = (() => {
     {
       id: 'venus',
       name: 'Venus',
+      order: '2nd from Sun',
+      distSun: '0.72 AU (108.2M km)',
+      orbitPeriod: '224.7 days',
       color: '#fde047',
       secondaryColor: '#d97706',
       radius: 11,
@@ -186,6 +195,9 @@ const SolarBackground = (() => {
     {
       id: 'earth',
       name: 'Earth',
+      order: '3rd from Sun',
+      distSun: '1.00 AU (149.6M km)',
+      orbitPeriod: '365.25 days',
       color: '#38bdf8',
       secondaryColor: '#15803d',
       radius: 13,
@@ -198,6 +210,9 @@ const SolarBackground = (() => {
     {
       id: 'mars',
       name: 'Mars',
+      order: '4th from Sun',
+      distSun: '1.52 AU (227.9M km)',
+      orbitPeriod: '687.0 days',
       color: '#f87171',
       secondaryColor: '#991b1b',
       radius: 10,
@@ -210,6 +225,9 @@ const SolarBackground = (() => {
     {
       id: 'jupiter',
       name: 'Jupiter',
+      order: '5th from Sun',
+      distSun: '5.20 AU (778.6M km)',
+      orbitPeriod: '11.86 yrs',
       color: '#fb923c',
       secondaryColor: '#9a3412',
       radius: 26,
@@ -223,6 +241,9 @@ const SolarBackground = (() => {
     {
       id: 'saturn',
       name: 'Saturn',
+      order: '6th from Sun',
+      distSun: '9.54 AU (1.43B km)',
+      orbitPeriod: '29.45 yrs',
       color: '#fef08a',
       secondaryColor: '#ca8a04',
       radius: 22,
@@ -237,6 +258,9 @@ const SolarBackground = (() => {
     {
       id: 'uranus',
       name: 'Uranus',
+      order: '7th from Sun',
+      distSun: '19.19 AU (2.87B km)',
+      orbitPeriod: '84.02 yrs',
       color: '#5eead4',
       secondaryColor: '#0f766e',
       radius: 17,
@@ -251,6 +275,9 @@ const SolarBackground = (() => {
     {
       id: 'neptune',
       name: 'Neptune',
+      order: '8th from Sun',
+      distSun: '30.07 AU (4.50B km)',
+      orbitPeriod: '164.79 yrs',
       color: '#60a5fa',
       secondaryColor: '#1e40af',
       radius: 16,
@@ -263,6 +290,9 @@ const SolarBackground = (() => {
     {
       id: 'pluto',
       name: 'Pluto ✨',
+      order: 'Kuiper Belt World',
+      distSun: '39.48 AU (5.91B km)',
+      orbitPeriod: '247.94 yrs',
       color: '#f3e8d2',
       secondaryColor: '#9a6042',
       radius: 7,
@@ -367,13 +397,29 @@ const SolarBackground = (() => {
     // 1. Direct hit on Moon
     const dMoon = Math.hypot(mx - moonBody.projX, my - moonBody.projY);
     if (dMoon <= moonBody.radius + 18) {
-      return moonBody;
+      return {
+        ...moonBody,
+        hitType: 'body',
+        order: "Earth's Moon",
+        distSun: '1.00 AU (149.6M km)',
+        orbitPeriod: '27.3 days',
+        hitX: moonBody.projX,
+        hitY: moonBody.projY
+      };
     }
 
     // 2. Direct hit on Sun
     const dSun = Math.hypot(mx - sunBody.projX, my - sunBody.projY);
     if (dSun <= sunBody.radius + 20) {
-      return sunBody;
+      return {
+        ...sunBody,
+        hitType: 'body',
+        order: 'Central Star',
+        distSun: '0 AU (0 km)',
+        orbitPeriod: '230M yrs',
+        hitX: sunBody.projX,
+        hitY: sunBody.projY
+      };
     }
 
     // 3. Direct hit on Planet bodies
@@ -381,11 +427,16 @@ const SolarBackground = (() => {
       const p = planets[i];
       const dist = Math.hypot(mx - p.projX, my - p.projY);
       if (dist <= p.radius + 22) {
-        return p;
+        return {
+          ...p,
+          hitType: 'body',
+          hitX: p.projX,
+          hitY: p.projY
+        };
       }
     }
 
-    // 4. CLICKING ON AN ORBIT LINE: Detects which elliptical orbit was clicked!
+    // 4. CLICKING / TOUCHING ON AN ORBIT LINE: Detects which elliptical orbit was touched!
     // Un-rotate click coordinates relative to central Sun
     const dx = mx - sunCenterX;
     const dy = my - sunCenterY;
@@ -399,6 +450,7 @@ const SolarBackground = (() => {
     const theta = Math.atan2(ry / 0.43, rx);
     let closestPlanet = null;
     let minDistPx = Infinity;
+    let closestPointOnOrbit = null;
 
     // Measure true screen pixel distance to each planetary orbit track
     planets.forEach((p) => {
@@ -410,12 +462,24 @@ const SolarBackground = (() => {
       if (distPx < minDistPx) {
         minDistPx = distPx;
         closestPlanet = p;
+        // Project closest point on the orbit back into screen coordinates
+        const sx = sunCenterX + (ex0 * Math.cos(tilt) - ey0 * Math.sin(tilt));
+        const sy = sunCenterY + (ex0 * Math.sin(tilt) + ey0 * Math.cos(tilt));
+        closestPointOnOrbit = { x: sx, y: sy };
       }
     });
 
-    // If within 28px of the elliptical orbit path, select that planet!
-    if (closestPlanet && minDistPx <= 28) {
-      return closestPlanet;
+    // If within 30px of an orbit line, detect orbit touch/hover!
+    if (closestPlanet && minDistPx <= 30) {
+      return {
+        ...closestPlanet,
+        hitType: 'orbit',
+        minDistPx,
+        orbitPointX: closestPointOnOrbit ? closestPointOnOrbit.x : mx,
+        orbitPointY: closestPointOnOrbit ? closestPointOnOrbit.y : my,
+        hitX: mx,
+        hitY: my
+      };
     }
 
     return null;
@@ -962,6 +1026,190 @@ const SolarBackground = (() => {
   }
 
   // ---------------------------------------------------------------------------
+  // 13.5 Interactive Orbit & Celestial Body HUD Badge (Touching & Hovering)
+  // ---------------------------------------------------------------------------
+  function drawOrbitHUD(time) {
+    if (!hoveredHit) return;
+
+    ctx.save();
+
+    if (hoveredHit.hitType === 'orbit') {
+      const p = hoveredHit;
+      const ox = p.orbitPointX || p.hitX;
+      const oy = p.orbitPointY || p.hitY;
+
+      // 1. Glowing reticle dot on the orbit path right where user is touching/hovering
+      const pulse = Math.sin(time * 0.008) * 1.8;
+      ctx.beginPath();
+      ctx.arc(ox, oy, 4.5 + pulse, 0, Math.PI * 2);
+      ctx.fillStyle = '#38bdf8';
+      ctx.shadowColor = '#38bdf8';
+      ctx.shadowBlur = 14;
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(ox, oy, 10 + pulse, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.85)';
+      ctx.lineWidth = 1.8;
+      ctx.stroke();
+
+      // 2. Information badge placement with smart viewport clamping
+      const boxW = 250;
+      const boxH = 58;
+      let bx = ox + 18;
+      let by = oy - boxH - 14;
+
+      const leftNavBound = width >= 820 ? 250 : 12;
+      if (bx + boxW > width - 20) {
+        bx = ox - boxW - 18;
+      }
+      if (bx < leftNavBound) {
+        bx = leftNavBound + 8;
+      }
+
+      if (by < 60) {
+        by = oy + 22;
+      }
+      if (by + boxH > height - 25) {
+        by = height - boxH - 25;
+      }
+
+      // Pointer leader line connecting badge to orbit reticle
+      ctx.beginPath();
+      ctx.moveTo(ox, oy);
+      ctx.lineTo(bx + (bx < ox ? boxW : 0), by + boxH * 0.5);
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
+      ctx.lineWidth = 1.2;
+      ctx.setLineDash([3, 3]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Rounded HUD glassmorphic card background
+      ctx.fillStyle = 'rgba(8, 12, 26, 0.94)';
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.75)';
+      ctx.lineWidth = 1.5;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+      ctx.shadowBlur = 18;
+
+      ctx.beginPath();
+      const r = 8;
+      ctx.moveTo(bx + r, by);
+      ctx.lineTo(bx + boxW - r, by);
+      ctx.quadraticCurveTo(bx + boxW, by, bx + boxW, by + r);
+      ctx.lineTo(bx + boxW, by + boxH - r);
+      ctx.quadraticCurveTo(bx + boxW, by + boxH, bx + boxW - r, by + boxH);
+      ctx.lineTo(bx + r, by + boxH);
+      ctx.quadraticCurveTo(bx, by + boxH, bx, by + boxH - r);
+      ctx.lineTo(bx, by + r);
+      ctx.quadraticCurveTo(bx, by, bx + r, by);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Swatch dot
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.arc(bx + 14, by + 16, 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = p.color || '#38bdf8';
+      ctx.fill();
+
+      // Planet Orbit Header
+      ctx.font = '700 12px "Space Grotesk", sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(`${p.name} Orbit`, bx + 24, by + 16);
+
+      // Order badge
+      if (p.order) {
+        ctx.font = '600 10px sans-serif';
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.95)';
+        ctx.textAlign = 'right';
+        ctx.fillText(p.order, bx + boxW - 12, by + 16);
+      }
+
+      // Telemetry detail row
+      ctx.textAlign = 'left';
+      ctx.font = '500 10.5px sans-serif';
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillText(`Dist: ${p.distSun || '—'}  •  Period: ${p.orbitPeriod || '—'}`, bx + 12, by + 34);
+
+      // Action hint
+      ctx.font = '500 9px sans-serif';
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillText('✓ Orbit Touched • Full NASA facts on right card', bx + 12, by + 47);
+    } else if (hoveredHit.hitType === 'body') {
+      const p = hoveredHit;
+      const px = p.hitX;
+      const py = p.hitY;
+
+      // Pulse ring around planet body
+      const pulse = Math.sin(time * 0.007) * 2;
+      ctx.beginPath();
+      ctx.arc(px, py, (p.radius || 12) + 6 + pulse, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.85)';
+      ctx.lineWidth = 1.6;
+      ctx.shadowColor = '#38bdf8';
+      ctx.shadowBlur = 10;
+      ctx.stroke();
+
+      // Body badge
+      const boxW = 210;
+      const boxH = 44;
+      let bx = px + (p.radius || 12) + 12;
+      let by = py - boxH * 0.5;
+
+      if (bx + boxW > width - 15) {
+        bx = px - (p.radius || 12) - boxW - 12;
+      }
+      if (by < 50) by = 50;
+      if (by + boxH > height - 20) by = height - boxH - 20;
+
+      ctx.fillStyle = 'rgba(8, 12, 26, 0.92)';
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.65)';
+      ctx.lineWidth = 1.4;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+      ctx.shadowBlur = 14;
+
+      ctx.beginPath();
+      const r = 6;
+      ctx.moveTo(bx + r, by);
+      ctx.lineTo(bx + boxW - r, by);
+      ctx.quadraticCurveTo(bx + boxW, by, bx + boxW, by + r);
+      ctx.lineTo(bx + boxW, by + boxH - r);
+      ctx.quadraticCurveTo(bx + boxW, by + boxH, bx + boxW - r, by + boxH);
+      ctx.lineTo(bx + r, by + boxH);
+      ctx.quadraticCurveTo(bx, by + boxH, bx, by + boxH - r);
+      ctx.lineTo(bx, by + r);
+      ctx.quadraticCurveTo(bx, by, bx + r, by);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.shadowBlur = 0;
+      ctx.font = '700 11.5px "Space Grotesk", sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(p.name, bx + 10, by + 14);
+
+      if (p.order) {
+        ctx.font = '500 9.5px sans-serif';
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.9)';
+        ctx.textAlign = 'right';
+        ctx.fillText(p.order, bx + boxW - 10, by + 14);
+      }
+
+      ctx.textAlign = 'left';
+      ctx.font = '500 9.5px sans-serif';
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText(`Dist: ${p.distSun || '1.00 AU'} • Period: ${p.orbitPeriod || '—'}`, bx + 10, by + 30);
+    }
+
+    ctx.restore();
+  }
+
+  // ---------------------------------------------------------------------------
   // 14. Main Animation Frame Loop & Real-Time Performance Monitor
   // ---------------------------------------------------------------------------
   let frameCount = 0;
@@ -1043,6 +1291,9 @@ const SolarBackground = (() => {
       drawMoonSystem(earthRef, time);
     }
 
+    // 8. Interactive Orbit & Celestial Body Telemetry HUD (Touching & Hovering)
+    drawOrbitHUD(time);
+
     // Stop continuous loop if reduced motion is preferred to save 100% of GPU
     if (!prefersReducedMotion) {
       animationId = requestAnimationFrame(render);
@@ -1101,46 +1352,79 @@ const SolarBackground = (() => {
       }
     });
 
-    // Mouse move hover detection (detects planet bodies AND orbit lines)
-    canvas.addEventListener('mousemove', (e) => {
-      const rect = canvas.getBoundingClientRect();
-      const mx = e.clientX - rect.left;
-      const my = e.clientY - rect.top;
-
-      const hit = hitTest(mx, my);
-      if (hit) {
-        hoveredBodyId = hit.id;
-        canvas.classList.add('pointer-active');
-        canvas.style.cursor = 'pointer';
-      } else {
-        hoveredBodyId = null;
-        canvas.classList.remove('pointer-active');
-        canvas.style.cursor = 'default';
-      }
-    });
-
-    // Click / Touch selection detection (works on planets, moon, sun, AND orbit lines)
-    function handlePointerSelect(clientX, clientY) {
+    // Helper to evaluate hover & touching across mouse, pen, and touch
+    function updatePointerHover(clientX, clientY) {
       const rect = canvas.getBoundingClientRect();
       const mx = clientX - rect.left;
       const my = clientY - rect.top;
 
       const hit = hitTest(mx, my);
+      if (hit) {
+        hoveredHit = hit;
+        hoveredBodyId = hit.id;
+        pointerX = mx;
+        pointerY = my;
+        canvas.classList.add('pointer-active');
+        canvas.style.cursor = 'pointer';
+      } else {
+        hoveredHit = null;
+        hoveredBodyId = null;
+        canvas.classList.remove('pointer-active');
+        canvas.style.cursor = 'default';
+      }
+      return hit;
+    }
+
+    // Click / Touch selection detection (works on planets, moon, sun, AND orbit lines)
+    function handlePointerSelect(clientX, clientY) {
+      const hit = updatePointerHover(clientX, clientY);
       if (hit && onSelectCallback) {
         selectedBodyId = hit.id;
         onSelectCallback(hit.id);
+        if (prefersReducedMotion) {
+          render(0);
+        }
       }
     }
+
+    // Mouse move hover detection (detects planet bodies AND orbit lines)
+    canvas.addEventListener('mousemove', (e) => {
+      updatePointerHover(e.clientX, e.clientY);
+    });
+
+    // Unified pointer events for desktop and tablets
+    canvas.addEventListener('pointermove', (e) => {
+      updatePointerHover(e.clientX, e.clientY);
+    });
+
+    canvas.addEventListener('pointerdown', (e) => {
+      handlePointerSelect(e.clientX, e.clientY);
+    });
 
     canvas.addEventListener('click', (e) => {
       handlePointerSelect(e.clientX, e.clientY);
     });
 
+    // Touch events for mobile screens: touching/dragging across orbits displays telemetry
     canvas.addEventListener('touchstart', (e) => {
       if (e.touches.length > 0) {
-        handlePointerSelect(e.touches[0].clientX, e.touches[0].clientY);
+        const touch = e.touches[0];
+        handlePointerSelect(touch.clientX, touch.clientY);
       }
     }, { passive: true });
+
+    canvas.addEventListener('touchmove', (e) => {
+      if (e.touches.length > 0) {
+        const touch = e.touches[0];
+        updatePointerHover(touch.clientX, touch.clientY);
+        handlePointerSelect(touch.clientX, touch.clientY);
+      }
+    }, { passive: true });
+
+    canvas.addEventListener('mouseleave', () => {
+      hoveredHit = null;
+      hoveredBodyId = null;
+    });
 
     // Start render loop
     if (prefersReducedMotion) {
@@ -1168,6 +1452,8 @@ const SolarBackground = (() => {
     setPreviewOpen,
     getPlanets: () => planets,
     getPerformanceMetrics: () => ({ fps: measuredFps, frameTimeMs: avgFrameTime, dpr }),
-    onPerformanceUpdate: (cb) => { onFpsUpdateCallback = cb; }
+    onPerformanceUpdate: (cb) => { onFpsUpdateCallback = cb; },
+    handlePointerAt: (clientX, clientY) => { handlePointerSelect(clientX, clientY); },
+    handleHoverAt: (clientX, clientY) => { updatePointerHover(clientX, clientY); }
   };
 })();

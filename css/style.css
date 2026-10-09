@@ -481,6 +481,7 @@ button, a, input, select, .planet-btn, #solar-canvas.pointer-active, :focus {
   width: 100%;
   min-height: 100vh;
   padding: 0;
+  pointer-events: none; /* Allows pointer & touch events to reach #solar-canvas directly */
 }
 
 @media (min-width: 820px) {
@@ -703,6 +704,7 @@ button, a, input, select, .planet-btn, #solar-canvas.pointer-active, :focus {
   z-index: 15;
   position: relative;
   box-sizing: border-box;
+  pointer-events: auto;
 }
 
 /* Studio Header Bar */
