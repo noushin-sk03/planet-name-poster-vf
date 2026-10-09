@@ -286,8 +286,285 @@ document.addEventListener('DOMContentLoaded', async () => {
     pluto: 'Beloved Kuiper Belt dwarf planet with a nitrogen heart glacier (Tombaugh Regio), blue skies, and five orbiting moons.'
   };
 
-  // Application State (Stage 04 & 05: Multi-Format Export, File Types & Custom Dimensions)
+  // ---------------------------------------------------------------------------
+  // 1.2 NASA Exoplanet Archive Worlds (Confirmed Habitable & Extreme Worlds)
+  // ---------------------------------------------------------------------------
+  const EXOPLANETS = [
+    {
+      id: 'trappist_1_e',
+      name: 'TRAPPIST-1 e',
+      hostname: 'TRAPPIST-1',
+      order: 'Habitable Zone World',
+      type: 'exoplanet',
+      isArtistImpression: true,
+      color: '#38bdf8',
+      starColor: '#ef4444',
+      gravity: '8.0 m/s²',
+      dayLength: '6.1 d (Sync)',
+      temp: '-28 °C',
+      distSun: '39.5 ly',
+      distEarth: '39.5 ly',
+      orbitPeriod: '6.10 days',
+      orbitalPeriodYears: 0.0167,
+      radiusEarths: 0.92,
+      massEarths: 0.69,
+      dataSource: 'NASA Exoplanet Archive (IPAC/Caltech)',
+      palette: { primary: '#0284c7', secondary: '#064e3b', accent: '#bae6fd', glow: 'rgba(2, 132, 199, 0.55)' }
+    },
+    {
+      id: 'trappist_1_f',
+      name: 'TRAPPIST-1 f',
+      hostname: 'TRAPPIST-1',
+      order: 'Outer Habitable Zone',
+      type: 'exoplanet',
+      isArtistImpression: true,
+      color: '#818cf8',
+      starColor: '#ef4444',
+      gravity: '9.3 m/s²',
+      dayLength: '9.2 d (Sync)',
+      temp: '-54 °C',
+      distSun: '39.5 ly',
+      distEarth: '39.5 ly',
+      orbitPeriod: '9.21 days',
+      orbitalPeriodYears: 0.0252,
+      radiusEarths: 1.04,
+      massEarths: 1.04,
+      dataSource: 'NASA Exoplanet Archive (IPAC/Caltech)',
+      palette: { primary: '#6366f1', secondary: '#1e1b4b', accent: '#c7d2fe', glow: 'rgba(99, 102, 241, 0.55)' }
+    },
+    {
+      id: 'proxima_cen_b',
+      name: 'Proxima Cen b',
+      hostname: 'Proxima Cen',
+      order: 'Nearest Exoplanet (4.2 ly)',
+      type: 'exoplanet',
+      isArtistImpression: true,
+      color: '#06b6d4',
+      starColor: '#dc2626',
+      gravity: 'unknown',
+      dayLength: '11.2 d (Sync)',
+      temp: '-55 °C',
+      distSun: '4.2 ly',
+      distEarth: '4.2 ly',
+      orbitPeriod: '11.18 days',
+      orbitalPeriodYears: 0.0306,
+      radiusEarths: 'unknown',
+      massEarths: 1.05,
+      dataSource: 'NASA Exoplanet Archive (IPAC/Caltech)',
+      palette: { primary: '#06b6d4', secondary: '#082f49', accent: '#cffafe', glow: 'rgba(6, 182, 212, 0.55)' }
+    },
+    {
+      id: 'kepler_186_f',
+      name: 'Kepler-186 f',
+      hostname: 'Kepler-186',
+      order: '1st Earth-Size HZ World',
+      type: 'exoplanet',
+      isArtistImpression: true,
+      color: '#10b981',
+      starColor: '#f97316',
+      gravity: 'unknown',
+      dayLength: '129.9 days',
+      temp: '-85 °C',
+      distSun: '579.2 ly',
+      distEarth: '579.2 ly',
+      orbitPeriod: '129.94 days',
+      orbitalPeriodYears: 0.3558,
+      radiusEarths: 1.17,
+      massEarths: 'unknown',
+      dataSource: 'NASA Exoplanet Archive (IPAC/Caltech)',
+      palette: { primary: '#059669', secondary: '#064e3b', accent: '#a7f3d0', glow: 'rgba(5, 150, 105, 0.55)' }
+    },
+    {
+      id: 'kepler_452_b',
+      name: 'Kepler-452 b',
+      hostname: 'Kepler-452',
+      order: 'Earth\'s Older Cousin',
+      type: 'exoplanet',
+      isArtistImpression: true,
+      color: '#0ea5e9',
+      starColor: '#fbbf24',
+      gravity: 'unknown',
+      dayLength: '384.8 days',
+      temp: '-8 °C',
+      distSun: '1799.5 ly',
+      distEarth: '1799.5 ly',
+      orbitPeriod: '384.84 days',
+      orbitalPeriodYears: 1.0537,
+      radiusEarths: 1.63,
+      massEarths: 'unknown',
+      dataSource: 'NASA Exoplanet Archive (IPAC/Caltech)',
+      palette: { primary: '#0284c7', secondary: '#064e3b', accent: '#bae6fd', glow: 'rgba(2, 132, 199, 0.55)' }
+    },
+    {
+      id: 'kepler_22_b',
+      name: 'Kepler-22 b',
+      hostname: 'Kepler-22',
+      order: '1st Kepler HZ Candidate',
+      type: 'exoplanet',
+      isArtistImpression: true,
+      color: '#22c55e',
+      starColor: '#eab308',
+      gravity: '20.2 m/s²',
+      dayLength: '289.9 days',
+      temp: '6 °C',
+      distSun: '634.8 ly',
+      distEarth: '634.8 ly',
+      orbitPeriod: '289.86 days',
+      orbitalPeriodYears: 0.7936,
+      radiusEarths: 2.10,
+      massEarths: 9.10,
+      dataSource: 'NASA Exoplanet Archive (IPAC/Caltech)',
+      palette: { primary: '#16a34a', secondary: '#14532d', accent: '#bbf7d0', glow: 'rgba(22, 163, 74, 0.55)' }
+    },
+    {
+      id: 'wasp_76_b',
+      name: 'WASP-76 b',
+      hostname: 'WASP-76',
+      order: 'Iron-Rain Ultra-Hot World',
+      type: 'exoplanet',
+      isArtistImpression: true,
+      color: '#ef4444',
+      starColor: '#fef08a',
+      gravity: '6.5 m/s²',
+      dayLength: '1.81 days',
+      temp: '1955 °C',
+      distSun: '634.2 ly',
+      distEarth: '634.2 ly',
+      orbitPeriod: '1.81 days',
+      orbitalPeriodYears: 0.0050,
+      radiusEarths: 20.78,
+      massEarths: 284.14,
+      dataSource: 'NASA Exoplanet Archive (IPAC/Caltech)',
+      palette: { primary: '#dc2626', secondary: '#7f1d1d', accent: '#fef08a', glow: 'rgba(239, 68, 68, 0.65)' }
+    },
+    {
+      id: 'wasp_12_b',
+      name: 'WASP-12 b',
+      hostname: 'WASP-12',
+      order: 'Tidally Disrupted Giant',
+      type: 'exoplanet',
+      isArtistImpression: true,
+      color: '#f97316',
+      starColor: '#fef08a',
+      gravity: 'unknown',
+      dayLength: '1.09 days',
+      temp: '2210 °C',
+      distSun: '1393.5 ly',
+      distEarth: '1393.5 ly',
+      orbitPeriod: '1.09 days',
+      orbitalPeriodYears: 0.0030,
+      radiusEarths: 22.03,
+      massEarths: 'unknown',
+      dataSource: 'NASA Exoplanet Archive (IPAC/Caltech)',
+      palette: { primary: '#ea580c', secondary: '#431407', accent: '#fde047', glow: 'rgba(234, 88, 12, 0.65)' }
+    },
+    {
+      id: '55_cnc_e',
+      name: '55 Cnc e',
+      hostname: '55 Cnc',
+      order: 'Super-Earth Lava World',
+      type: 'exoplanet',
+      isArtistImpression: true,
+      color: '#f59e0b',
+      starColor: '#f59e0b',
+      gravity: '22.3 m/s²',
+      dayLength: '0.74 days',
+      temp: '1950 °C',
+      distSun: '41.0 ly',
+      distEarth: '41.0 ly',
+      orbitPeriod: '0.74 days',
+      orbitalPeriodYears: 0.0020,
+      radiusEarths: 1.88,
+      massEarths: 7.99,
+      dataSource: 'NASA Exoplanet Archive (IPAC/Caltech)',
+      palette: { primary: '#d97706', secondary: '#78350f', accent: '#fef08a', glow: 'rgba(217, 119, 6, 0.65)' }
+    },
+    {
+      id: 'hd_189733_b',
+      name: 'HD 189733 b',
+      hostname: 'HD 189733',
+      order: 'Silicate Glass Rain World',
+      type: 'exoplanet',
+      isArtistImpression: true,
+      color: '#2563eb',
+      starColor: '#ea580c',
+      gravity: '22.0 m/s²',
+      dayLength: '2.22 days',
+      temp: '930 °C',
+      distSun: '64.5 ly',
+      distEarth: '64.5 ly',
+      orbitPeriod: '2.22 days',
+      orbitalPeriodYears: 0.0061,
+      radiusEarths: 12.67,
+      massEarths: 359.15,
+      dataSource: 'NASA Exoplanet Archive (IPAC/Caltech)',
+      palette: { primary: '#1d4ed8', secondary: '#1e1b4b', accent: '#93c5fd', glow: 'rgba(29, 78, 216, 0.65)' }
+    },
+    {
+      id: 'hd_209458_b',
+      name: 'HD 209458 b',
+      hostname: 'HD 209458',
+      order: 'Osiris / Evaporating Giant',
+      type: 'exoplanet',
+      isArtistImpression: true,
+      color: '#6366f1',
+      starColor: '#fef08a',
+      gravity: '9.4 m/s²',
+      dayLength: '3.52 days',
+      temp: '1130 °C',
+      distSun: '157.5 ly',
+      distEarth: '157.5 ly',
+      orbitPeriod: '3.52 days',
+      orbitalPeriodYears: 0.0097,
+      radiusEarths: 15.58,
+      massEarths: 232.02,
+      dataSource: 'NASA Exoplanet Archive (IPAC/Caltech)',
+      palette: { primary: '#4f46e5', secondary: '#1e1b4b', accent: '#c7d2fe', glow: 'rgba(79, 70, 229, 0.6)' }
+    },
+    {
+      id: 'toi_700_d',
+      name: 'TOI-700 d',
+      hostname: 'TOI-700',
+      order: 'TESS Habitable Earth-Size',
+      type: 'exoplanet',
+      isArtistImpression: true,
+      color: '#0284c7',
+      starColor: '#dc2626',
+      gravity: 'unknown',
+      dayLength: '37.4 days',
+      temp: '-4 °C',
+      distSun: '101.5 ly',
+      distEarth: '101.5 ly',
+      orbitPeriod: '37.42 days',
+      orbitalPeriodYears: 0.1025,
+      radiusEarths: 1.15,
+      massEarths: 'unknown',
+      dataSource: 'NASA Exoplanet Archive (IPAC/Caltech)',
+      palette: { primary: '#0369a1', secondary: '#082f49', accent: '#7dd3fc', glow: 'rgba(3, 105, 161, 0.55)' }
+    }
+  ];
+
+  // ---------------------------------------------------------------------------
+  // 1.3 Exoplanet Synopses Database (100% NASA Exoplanet Archive Discovery Data)
+  // ---------------------------------------------------------------------------
+  const EXOPLANET_SYNOPSES = {
+    trappist_1_e: 'Confirmed Earth-sized planet in the habitable zone of ultra-cool red dwarf TRAPPIST-1. Liquid surface water is physically viable. Artist\'s impression.',
+    trappist_1_f: 'Cooler habitable zone world orbiting TRAPPIST-1. May harbor a global water ocean beneath an ice-rich crust. Artist\'s impression.',
+    proxima_cen_b: 'Closest known exoplanet to Earth (4.2 ly). Orbiting in the habitable zone of red dwarf Proxima Centauri in 11.2 days. Artist\'s impression.',
+    kepler_186_f: 'Historic 1st validated Earth-size planet orbiting in the habitable zone of another star (M1 dwarf Kepler-186). Artist\'s impression.',
+    kepler_452_b: 'Earth\'s older cousin. Super-Earth orbiting a Sun-like G2 star in a 385-day orbit at 1,800 light-years distance. Artist\'s impression.',
+    kepler_22_b: 'First Kepler planet discovered in a star\'s habitable zone. Likely an oceanic warm water-world with a thick atmosphere. Artist\'s impression.',
+    wasp_76_b: 'Scorching ultra-hot gas giant where temperatures exceed 2,200 °C. Iron vaporizes on the day side and rains as liquid metal at night! Artist\'s impression.',
+    wasp_12_b: 'Pitch-black hot Jupiter being gravitationally stretched into an egg shape by extreme tidal forces of its host star. Artist\'s impression.',
+    '55_cnc_e': 'Super-Earth lava world orbiting its host star in just 18 hours. Surface features oceans of molten silicate lava. Artist\'s impression.',
+    hd_189733_b: 'Deep azure hot Jupiter where supersonic winds howl at 8,700 km/h, blowing clouds of molten silicate glass sideways. Artist\'s impression.',
+    hd_209458_b: 'Nicknamed Osiris. First transiting exoplanet detected with an escaping comet-like tail of hydrogen and carbon. Artist\'s impression.',
+    toi_700_d: 'TESS-discovered Earth-sized planet receiving 86% of Earth\'s stellar energy in the conservative habitable zone of TOI-700. Artist\'s impression.'
+  };
+
+  // Application State (Stage 06 & 07: Solar System, Moons & NASA Exoplanet Archive)
   const state = {
+    catalog: 'solar', // 'solar' | 'exo'
     worldId: 'earth',
     mode: 'day',
     name: 'COSMOS',
@@ -299,7 +576,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     weight: null,
     dob: '',
     view: 'studio', // 'studio' | 'orbit'
-    worlds: WORLDS
+    studioMode: '2d', // '2d' | '3d'
+    is3dAutoRotating: true,
+    worlds: WORLDS,
+    exoplanets: EXOPLANETS
   };
 
   // ---------------------------------------------------------------------------
@@ -313,6 +593,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   const studioSectionTitle = document.getElementById('studio-section-title');
   const posterCanvasWrap = document.getElementById('poster-canvas-wrap');
   const downloadBtnLabel = document.getElementById('download-btn-label');
+
+  // Stage 08 WebGL 3D Globe Elements
+  const view2dBtn = document.getElementById('view-2d-btn');
+  const view3dBtn = document.getElementById('view-3d-btn');
+  const globeCanvasWrap = document.getElementById('globe-canvas-wrap');
+  const globeCanvas = document.getElementById('globe-canvas');
+  const terminatorSlider = document.getElementById('terminator-slider');
+  const terminatorAngleVal = document.getElementById('terminator-angle-val');
+  const globeAutorotateBtn = document.getElementById('globe-autorotate-btn');
+  const globeRotateLabel = document.getElementById('globe-rotate-label');
+  const globeExportBtn = document.getElementById('globe-export-btn');
 
   const nameInput = document.getElementById('name-input');
   const charCount = document.getElementById('char-count');
@@ -336,6 +627,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   const exportTypeSelect = document.getElementById('export-type-select');
   const exportQualitySelect = document.getElementById('export-quality-select');
   const qualityFieldGroup = document.getElementById('quality-field-group');
+
+  // Catalog Tab Switcher Elements (Solar System vs NASA Exoplanet Archive)
+  const tabSolarBtn = document.getElementById('tab-solar-btn');
+  const tabExoBtn = document.getElementById('tab-exo-btn');
+
+  function getActiveWorldsList() {
+    return state.catalog === 'exo' ? state.exoplanets : state.worlds;
+  }
+
+  function getAllWorlds() {
+    return [...state.worlds, ...state.exoplanets];
+  }
 
   // Navigation drawer elements
   const drawerToggleBtn = document.getElementById('drawer-toggle');
@@ -386,12 +689,37 @@ document.addEventListener('DOMContentLoaded', async () => {
   const exportDataBtn = document.getElementById('export-data-btn');
 
   // ---------------------------------------------------------------------------
-  // 3. Render Navigation Menu
+  // 3. Render Navigation Menu & Catalog Switching
   // ---------------------------------------------------------------------------
+  function switchCatalog(cat) {
+    if (state.catalog === cat) return;
+    state.catalog = cat;
+
+    if (tabSolarBtn) {
+      tabSolarBtn.classList.toggle('active', cat === 'solar');
+      tabSolarBtn.setAttribute('aria-selected', cat === 'solar' ? 'true' : 'false');
+    }
+    if (tabExoBtn) {
+      tabExoBtn.classList.toggle('active', cat === 'exo');
+      tabExoBtn.setAttribute('aria-selected', cat === 'exo' ? 'true' : 'false');
+    }
+
+    renderPlanetMenu();
+
+    const activeList = getActiveWorldsList();
+    const exists = activeList.some((w) => w.id === state.worldId);
+    if (!exists && activeList.length > 0) {
+      selectWorld(activeList[0].id, { source: 'catalog-switch' });
+    } else {
+      updateAstronautScroller(state.worldId);
+    }
+  }
+
   function renderPlanetMenu() {
     planetMenuList.innerHTML = '';
+    const activeList = getActiveWorldsList();
 
-    state.worlds.forEach((world) => {
+    activeList.forEach((world) => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'planet-btn';
@@ -409,6 +737,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       swatch.className = 'planet-swatch';
       swatch.style.backgroundColor = world.color;
       swatch.style.color = world.color;
+      if (world.type === 'exoplanet' && world.starColor) {
+        swatch.style.boxShadow = `0 0 10px ${world.starColor}`;
+      }
       swatch.setAttribute('aria-hidden', 'true');
 
       // Title & Subtitle metadata
@@ -421,7 +752,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const subSpan = document.createElement('span');
       subSpan.className = 'planet-btn-sub';
-      subSpan.textContent = world.order;
+      subSpan.textContent = (world.type === 'exoplanet' && world.hostname) ? `Host: ${world.hostname} • ${world.distSun || ''}` : world.order;
 
       meta.appendChild(nameSpan);
       meta.appendChild(subSpan);
@@ -475,8 +806,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ---------------------------------------------------------------------------
   function updateAstronautScroller(bodyId) {
     if (!astronautGuideThumb || !astroTrackRail) return;
-    const totalWorlds = state.worlds.length;
-    const idx = state.worlds.findIndex((w) => w.id === bodyId);
+    const activeList = getActiveWorldsList();
+    const totalWorlds = activeList.length;
+    const idx = activeList.findIndex((w) => w.id === bodyId);
     if (idx < 0) return;
 
     const railHeight = astroTrackRail.clientHeight || 200;
@@ -487,21 +819,42 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     astronautGuideThumb.style.top = `${topPx}px`;
     astronautGuideThumb.setAttribute('aria-valuenow', idx);
-    astronautGuideThumb.setAttribute('aria-valuetext', state.worlds[idx].name);
+    astronautGuideThumb.setAttribute('aria-valuetext', activeList[idx].name);
   }
 
   // ---------------------------------------------------------------------------
   // 4. Two-Way Selection & Live Studio Synchronization
   // ---------------------------------------------------------------------------
   function selectWorld(bodyId, options = {}) {
-    const world = state.worlds.find((w) => w.id === bodyId);
+    const allWorlds = getAllWorlds();
+    const world = allWorlds.find((w) => w.id === bodyId);
     if (!world) return;
 
     state.worldId = bodyId;
 
+    // Detect catalog switch if needed
+    const isExo = world.type === 'exoplanet' || Boolean(world.isArtistImpression);
+    const expectedCatalog = isExo ? 'exo' : 'solar';
+    if (state.catalog !== expectedCatalog) {
+      state.catalog = expectedCatalog;
+      if (tabSolarBtn) {
+        tabSolarBtn.classList.toggle('active', expectedCatalog === 'solar');
+        tabSolarBtn.setAttribute('aria-selected', expectedCatalog === 'solar' ? 'true' : 'false');
+      }
+      if (tabExoBtn) {
+        tabExoBtn.classList.toggle('active', expectedCatalog === 'exo');
+        tabExoBtn.setAttribute('aria-selected', expectedCatalog === 'exo' ? 'true' : 'false');
+      }
+      renderPlanetMenu();
+    }
+
     // 1. Notify solar background canvas
-    if (typeof SolarBackground !== 'undefined' && SolarBackground.setSelectedPlanet) {
-      SolarBackground.setSelectedPlanet(bodyId);
+    if (typeof SolarBackground !== 'undefined') {
+      if (isExo && SolarBackground.setExoplanet) {
+        SolarBackground.setExoplanet(world);
+      } else if (SolarBackground.setSelectedPlanet) {
+        SolarBackground.setSelectedPlanet(bodyId);
+      }
     }
 
     // 2. Synchronize Drawer Menu Buttons
@@ -592,20 +945,27 @@ document.addEventListener('DOMContentLoaded', async () => {
       panelPlanetDot.style.boxShadow = `0 0 16px ${world.color}`;
     }
     if (panelPlanetName) panelPlanetName.textContent = world.name;
-    if (panelPlanetOrder) panelPlanetOrder.textContent = world.order;
-    if (panelPlanetType) panelPlanetType.textContent = world.type;
+    if (panelPlanetOrder) {
+      panelPlanetOrder.textContent = (isExo && world.hostname) ? `Host: ${world.hostname}` : world.order;
+    }
+    if (panelPlanetType) {
+      panelPlanetType.textContent = isExo ? 'Exoplanet (Artist\'s Impression)' : world.type;
+    }
 
     if (panelFact1Label) panelFact1Label.textContent = 'Gravity';
-    if (panelGravity) panelGravity.textContent = world.gravity;
-    if (solarGravityVal) solarGravityVal.textContent = world.gravity;
+    const gravDisplay = world.gravity === 'unknown' ? 'Unknown' : (world.gravity || '—');
+    if (panelGravity) panelGravity.textContent = gravDisplay;
+    if (solarGravityVal) solarGravityVal.textContent = gravDisplay;
 
-    if (panelFact2Label) panelFact2Label.textContent = 'Day Length';
-    if (panelDayLength) panelDayLength.textContent = world.dayLength;
-    if (solarDayVal) solarDayVal.textContent = world.dayLength;
+    if (panelFact2Label) panelFact2Label.textContent = isExo ? 'Orbit / Day' : 'Day Length';
+    const dayDisplay = world.dayLength === 'unknown' ? 'Unknown' : (world.dayLength || '—');
+    if (panelDayLength) panelDayLength.textContent = dayDisplay;
+    if (solarDayVal) solarDayVal.textContent = dayDisplay;
 
-    if (panelFact3Label) panelFact3Label.textContent = 'Mean Temp';
-    if (panelTemp) panelTemp.textContent = world.temp;
-    if (solarTempVal) solarTempVal.textContent = world.temp;
+    if (panelFact3Label) panelFact3Label.textContent = isExo ? 'Equilibrium Temp' : 'Mean Temp';
+    const tempDisplay = world.temp === 'unknown' ? 'Unknown' : (world.temp || '—');
+    if (panelTemp) panelTemp.textContent = tempDisplay;
+    if (solarTempVal) solarTempVal.textContent = tempDisplay;
 
     if (panelDistSun) panelDistSun.textContent = world.distSun || '—';
     if (solarDistSunVal) solarDistSunVal.textContent = world.distSun || '—';
@@ -617,10 +977,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (solarOrbitVal) solarOrbitVal.textContent = world.orbitPeriod || '—';
 
     if (solarSynopsisVal) {
-      solarSynopsisVal.textContent = WORLD_SYNOPSES[world.id] || '';
+      const synText = isExo ? (EXOPLANET_SYNOPSES[world.id] || '') : (WORLD_SYNOPSES[world.id] || '');
+      solarSynopsisVal.textContent = synText;
     }
 
-    if (panelCreditSource) panelCreditSource.textContent = 'NASA Planetary Fact Sheet';
+    if (panelCreditSource) {
+      panelCreditSource.textContent = isExo ? 'NASA Exoplanet Archive (IPAC/Caltech)' : 'NASA Planetary Fact Sheet';
+    }
 
     updateAstronautScroller(world.id);
 
@@ -629,6 +992,47 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateBiophysics();
     syncUrlState();
     PosterRenderer.render(state);
+    updateGlobeTexture(world);
+  }
+
+  // ---------------------------------------------------------------------------
+  // 4.1 Stage 08 WebGL 3D Lit Globe Controls
+  // ---------------------------------------------------------------------------
+  function updateGlobeTexture(world) {
+    if (typeof Sphere3DViewer === 'undefined' || !Sphere3DViewer.isSupported()) return;
+    if (typeof TextureManager !== 'undefined' && TextureManager.generateProceduralTexture) {
+      const texCanvas = TextureManager.generateProceduralTexture(world, state.mode);
+      Sphere3DViewer.setTexture(texCanvas, world);
+    }
+  }
+
+  function switchStudioView(viewMode) {
+    state.studioMode = viewMode;
+    if (view2dBtn) {
+      view2dBtn.classList.toggle('active', viewMode === '2d');
+      view2dBtn.setAttribute('aria-selected', viewMode === '2d' ? 'true' : 'false');
+    }
+    if (view3dBtn) {
+      view3dBtn.classList.toggle('active', viewMode === '3d');
+      view3dBtn.setAttribute('aria-selected', viewMode === '3d' ? 'true' : 'false');
+    }
+    if (posterCanvasWrap) {
+      posterCanvasWrap.style.display = viewMode === '2d' ? 'flex' : 'none';
+    }
+    if (globeCanvasWrap) {
+      globeCanvasWrap.style.display = viewMode === '3d' ? 'flex' : 'none';
+    }
+
+    if (typeof Sphere3DViewer !== 'undefined') {
+      if (viewMode === '3d') {
+        const allWorlds = getAllWorlds();
+        const world = allWorlds.find((w) => w.id === state.worldId) || state.worlds[0];
+        updateGlobeTexture(world);
+        Sphere3DViewer.start();
+      } else {
+        Sphere3DViewer.stop();
+      }
+    }
   }
 
   /**
@@ -689,15 +1093,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 6. Biophysics Living Calculator (NASA Orbital & Gravity Formulas)
   // ---------------------------------------------------------------------------
   function updateBiophysics() {
-    const world = state.worlds.find((w) => w.id === state.worldId);
+    const allWorlds = getAllWorlds();
+    const world = allWorlds.find((w) => w.id === state.worldId);
     if (!world || state.worldId === 'overview') {
       if (calcWeightVal) calcWeightVal.textContent = '—';
       if (calcAgeVal) calcAgeVal.textContent = '—';
       return;
     }
 
-    // Weight Calculation
-    if (typeof CelestialCalculator !== 'undefined' && CelestialCalculator.calculateWeightOnPlanet) {
+    // Weight Calculation (Handles unconstrained mass/radius as Unknown)
+    if (world.gravity === 'unknown' || !world.gravity) {
+      if (calcWeightVal) {
+        calcWeightVal.textContent = 'Unknown';
+        calcWeightVal.title = 'Surface gravity is unconstrained by discovery observations (mass/radius unmeasured)';
+      }
+    } else if (typeof CelestialCalculator !== 'undefined' && CelestialCalculator.calculateWeightOnPlanet) {
       const wRes = CelestialCalculator.calculateWeightOnPlanet(state.weight, world.gravity);
       if (calcWeightVal) {
         calcWeightVal.textContent = wRes.formatted;
@@ -706,7 +1116,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Planetary Age Calculation based on Orbital Period
-    if (typeof CelestialCalculator !== 'undefined' && CelestialCalculator.calculateAgeOnPlanet) {
+    let periodInYears = 1.0;
+    if (world.orbitalPeriodYears !== undefined && world.orbitalPeriodYears !== null) {
+      periodInYears = world.orbitalPeriodYears;
+    } else {
       const orbitalPeriods = {
         sun: 0,
         mercury: 0.241,
@@ -718,10 +1131,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         saturn: 29.46,
         uranus: 84.01,
         neptune: 164.8,
-        pluto: 248.0
+        pluto: 248.0,
+        io: 11.86,
+        europa: 11.86,
+        ganymede: 11.86,
+        callisto: 11.86,
+        enceladus: 29.46,
+        titan: 29.46
       };
-      const period = orbitalPeriods[state.worldId] !== undefined ? orbitalPeriods[state.worldId] : 1.0;
-      const ageRes = CelestialCalculator.calculateAgeOnPlanet(state.dob, period);
+      periodInYears = orbitalPeriods[state.worldId] !== undefined ? orbitalPeriods[state.worldId] : 1.0;
+    }
+
+    if (typeof CelestialCalculator !== 'undefined' && CelestialCalculator.calculateAgeOnPlanet) {
+      const ageRes = CelestialCalculator.calculateAgeOnPlanet(state.dob, periodInYears);
       if (calcAgeVal) {
         calcAgeVal.textContent = ageRes.value !== null ? `${ageRes.value.toFixed(1)} yrs` : '—';
       }
@@ -817,6 +1239,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           selectionPanel.classList.remove('hidden-in-studio');
         }
       }
+    });
+
     // 3.0 Telemetry Panel Minimize / Expand Action
     const panelMinimizeBtn = document.getElementById('panel-minimize-btn');
     const panelMinimizeIcon = document.getElementById('panel-minimize-icon');
@@ -838,21 +1262,35 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
 
+    // 3.01 Catalog Switcher Tab Buttons (Solar System vs Exoplanets)
+    if (tabSolarBtn) {
+      tabSolarBtn.addEventListener('click', () => {
+        switchCatalog('solar');
+      });
+    }
+    if (tabExoBtn) {
+      tabExoBtn.addEventListener('click', () => {
+        switchCatalog('exo');
+      });
+    }
+
     // 3.1 Dedicated Astronaut Scroller Controls (Rail Drag, Buttons & Keyboard)
     if (astroUpBtn) {
       astroUpBtn.addEventListener('click', () => {
-        const currentIdx = state.worlds.findIndex((w) => w.id === state.worldId);
+        const activeList = getActiveWorldsList();
+        const currentIdx = activeList.findIndex((w) => w.id === state.worldId);
         if (currentIdx > 0) {
-          selectWorld(state.worlds[currentIdx - 1].id, { source: 'scroller' });
+          selectWorld(activeList[currentIdx - 1].id, { source: 'scroller' });
         }
       });
     }
 
     if (astroDownBtn) {
       astroDownBtn.addEventListener('click', () => {
-        const currentIdx = state.worlds.findIndex((w) => w.id === state.worldId);
-        if (currentIdx < state.worlds.length - 1) {
-          selectWorld(state.worlds[currentIdx + 1].id, { source: 'scroller' });
+        const activeList = getActiveWorldsList();
+        const currentIdx = activeList.findIndex((w) => w.id === state.worldId);
+        if (currentIdx >= 0 && currentIdx < activeList.length - 1) {
+          selectWorld(activeList[currentIdx + 1].id, { source: 'scroller' });
         }
       });
     }
@@ -864,9 +1302,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const rect = astroTrackRail.getBoundingClientRect();
         if (rect.height <= 0) return;
         const relY = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
-        const targetIdx = Math.round(relY * (state.worlds.length - 1));
-        if (state.worlds[targetIdx] && state.worlds[targetIdx].id !== state.worldId) {
-          selectWorld(state.worlds[targetIdx].id, { source: 'scroller' });
+        const activeList = getActiveWorldsList();
+        const targetIdx = Math.round(relY * (activeList.length - 1));
+        if (activeList[targetIdx] && activeList[targetIdx].id !== state.worldId) {
+          selectWorld(activeList[targetIdx].id, { source: 'scroller' });
         }
       }
 
@@ -895,13 +1334,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (astronautGuideThumb) {
       astronautGuideThumb.addEventListener('keydown', (e) => {
-        const currentIdx = state.worlds.findIndex((w) => w.id === state.worldId);
+        const activeList = getActiveWorldsList();
+        const currentIdx = activeList.findIndex((w) => w.id === state.worldId);
         if (e.key === 'ArrowUp' && currentIdx > 0) {
           e.preventDefault();
-          selectWorld(state.worlds[currentIdx - 1].id, { source: 'scroller' });
-        } else if (e.key === 'ArrowDown' && currentIdx < state.worlds.length - 1) {
+          selectWorld(activeList[currentIdx - 1].id, { source: 'scroller' });
+        } else if (e.key === 'ArrowDown' && currentIdx >= 0 && currentIdx < activeList.length - 1) {
           e.preventDefault();
-          selectWorld(state.worlds[currentIdx + 1].id, { source: 'scroller' });
+          selectWorld(activeList[currentIdx + 1].id, { source: 'scroller' });
         }
       });
     }
@@ -1066,32 +1506,36 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
 
-    // 9. Stage 04 Export NASA Data (JSON)
+    // 9. Stage 04 & 07 Export NASA Data (JSON)
     if (exportDataBtn) {
       exportDataBtn.addEventListener('click', () => {
-        const world = state.worlds.find((w) => w.id === state.worldId);
+        const allWorlds = getAllWorlds();
+        const world = allWorlds.find((w) => w.id === state.worldId);
         if (!world || state.worldId === 'overview') {
           showToast('⚠️ Select a celestial world first');
           return;
         }
+        const isExo = world.type === 'exoplanet' || Boolean(world.isArtistImpression);
         const dataPayload = {
           world: world.name,
           id: world.id,
           classification: world.type,
-          solarOrder: world.order,
+          hostStar: world.hostname || 'The Sun',
+          orderOrClassification: world.order,
           surfaceGravity: world.gravity,
           solarDayLength: world.dayLength,
           meanTemperature: world.temp,
-          distanceFromSun: world.distSun || null,
+          distanceFromHostStar: world.distSun || null,
           distanceFromEarth: world.distEarth || null,
           orbitalPeriod: world.orbitPeriod || null,
+          isArtistImpression: Boolean(world.isArtistImpression),
           userCalculations: {
             earthWeightKg: state.weight,
             weightOnWorld: calcWeightVal ? calcWeightVal.textContent : null,
             birthDate: state.dob,
             ageInWorldYears: calcAgeVal ? calcAgeVal.textContent : null
           },
-          source: 'NASA Planetary Fact Sheet / Goddard Space Flight Center',
+          source: world.dataSource || (isExo ? 'NASA Exoplanet Archive (IPAC/Caltech)' : 'NASA Planetary Fact Sheet / Goddard Space Flight Center'),
           verified: true,
           exportTimestamp: new Date().toISOString()
         };
@@ -1114,6 +1558,51 @@ document.addEventListener('DOMContentLoaded', async () => {
         const progress = maxScroll > 0 ? (planetMenuList.scrollTop / maxScroll) : 0;
         planetDrawer.style.setProperty('--milkyway-depth', progress.toFixed(3));
       }, { passive: true });
+    }
+
+    // 11. Stage 08 WebGL 3D Lit Globe Controls (View Toggle, Terminator Slider, Auto-Rotate, Snapshot)
+    if (view2dBtn) {
+      view2dBtn.addEventListener('click', () => switchStudioView('2d'));
+    }
+    if (view3dBtn) {
+      view3dBtn.addEventListener('click', () => switchStudioView('3d'));
+    }
+    if (terminatorSlider) {
+      terminatorSlider.addEventListener('input', (e) => {
+        const deg = parseInt(e.target.value, 10);
+        if (terminatorAngleVal) terminatorAngleVal.textContent = `${deg}°`;
+        if (typeof Sphere3DViewer !== 'undefined') {
+          Sphere3DViewer.setLightAngle(deg);
+        }
+      });
+    }
+    if (globeAutorotateBtn) {
+      globeAutorotateBtn.addEventListener('click', () => {
+        state.is3dAutoRotating = !state.is3dAutoRotating;
+        globeAutorotateBtn.classList.toggle('active', state.is3dAutoRotating);
+        if (globeRotateLabel) {
+          globeRotateLabel.textContent = state.is3dAutoRotating ? '⟳ Auto-Rotate: ON' : '⏸ Auto-Rotate: OFF';
+        }
+        if (typeof Sphere3DViewer !== 'undefined') {
+          Sphere3DViewer.setAutoRotate(state.is3dAutoRotating);
+        }
+      });
+    }
+    if (globeExportBtn) {
+      globeExportBtn.addEventListener('click', () => {
+        if (typeof Sphere3DViewer !== 'undefined') {
+          const dataUrl = Sphere3DViewer.captureViewDataUrl();
+          if (dataUrl) {
+            const anchor = document.createElement('a');
+            anchor.href = dataUrl;
+            anchor.download = `${state.worldId}_3D_Globe.png`;
+            document.body.appendChild(anchor);
+            anchor.click();
+            document.body.removeChild(anchor);
+            showToast(`📷 Snapshot downloaded: ${state.worldId}_3D_Globe.png`);
+          }
+        }
+      });
     }
   }
 
@@ -1188,6 +1677,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Initialize Poster Canvas
   if (posterCanvas && typeof PosterRenderer !== 'undefined') {
     PosterRenderer.init(posterCanvas);
+  }
+
+  // Initialize WebGL 3D Globe (Stage 08 Stretch)
+  if (globeCanvas && typeof Sphere3DViewer !== 'undefined') {
+    const isSupported = Sphere3DViewer.init(globeCanvas);
+    if (isSupported) {
+      Sphere3DViewer.setLightAngle(45);
+    }
   }
 
   // Render navigation menu & bind controls

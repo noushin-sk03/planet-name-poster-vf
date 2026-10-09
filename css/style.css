@@ -182,8 +182,61 @@ button, a, input, select, .planet-btn, #solar-canvas.pointer-active, :focus {
 
 @media (min-width: 820px) {
   .drawer-close-btn {
-    display: none;
+    display: none !important;
   }
+}
+
+/* --- Catalog Segment Tabs: Solar System vs Exoplanets --- */
+.drawer-catalog-tabs {
+  display: flex;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  padding: 0.18rem;
+  gap: 0.2rem;
+  margin-bottom: 0.55rem;
+}
+
+.catalog-tab-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.4rem;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-family: inherit;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.catalog-tab-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.catalog-tab-btn.active {
+  background: rgba(56, 189, 248, 0.18);
+  color: #38bdf8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+}
+
+.tab-badge-count {
+  font-size: 0.62rem;
+  padding: 0.05rem 0.32rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+  color: inherit;
+}
+
+.catalog-tab-btn.active .tab-badge-count {
+  background: rgba(56, 189, 248, 0.3);
+  color: #fff;
 }
 
 /* --- Drawer Body Wrap & Interactive Astronaut Scroller Rail --- */
@@ -1697,6 +1750,169 @@ button, a, input, select, .planet-btn, #solar-canvas.pointer-active, :focus {
   .selection-panel.shrunk .panel-facts-grid {
     gap: 0.2rem;
   }
+}
+
+/* =========================================================================
+   Stage 08 Stretch: WebGL 3D Lit Globe & Viewport Controls
+   ========================================================================= */
+
+.studio-view-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+  background: rgba(15, 23, 42, 0.7);
+  padding: 0.3rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: 100%;
+  max-width: 440px;
+}
+
+.view-toggle-btn {
+  flex: 1;
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: all var(--transition-fast);
+}
+
+.view-toggle-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.view-toggle-btn.active {
+  background: rgba(56, 189, 248, 0.16);
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
+}
+
+.globe-canvas-wrap {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.globe-viewport-box {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-width: 480px;
+  max-height: 480px;
+  background: radial-gradient(circle at center, rgba(15, 23, 42, 0.85) 0%, rgba(3, 7, 18, 0.98) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 0 40px rgba(56, 189, 248, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+#globe-canvas {
+  width: 100%;
+  height: 100%;
+  max-width: 460px;
+  max-height: 460px;
+  display: block;
+}
+
+.globe-controls-overlay {
+  width: 100%;
+  max-width: 480px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.globe-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.globe-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.globe-control-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-accent-blue);
+}
+
+.globe-angle-val {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+  font-family: var(--font-mono, monospace);
+}
+
+.terminator-slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, #0284c7, #f59e0b, #ef4444);
+  outline: none;
+  cursor: pointer;
+}
+
+.globe-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.globe-tool-btn {
+  flex: 1;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-main);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  transition: all var(--transition-fast);
+}
+
+.globe-tool-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.globe-tool-btn.active {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.4);
+  color: #4ade80;
 }
 
 /* --- Accessibility & Focus --- */

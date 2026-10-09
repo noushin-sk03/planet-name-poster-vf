@@ -66,6 +66,12 @@ const SolarBackground = (() => {
   // Earth-Moon orbital angle
   let moonAngle = 1.2;
 
+  // Extrasolar System Simulation State (Stage 07: NASA Exoplanet Archive)
+  let currentExoPlanet = null;
+  let exoPlanetAngle = 0.8;
+  let exoProjX = 0;
+  let exoProjY = 0;
+
   // Galactic drift coordinates (simulates solar system moving through Milky Way at ~230 km/s)
   let galacticDriftX = 0;
   let galacticDriftY = 0;
@@ -516,6 +522,62 @@ const SolarBackground = (() => {
   // 6. Interactive Hit-Testing: Planet Bodies & Full Orbit Line Detection!
   // ---------------------------------------------------------------------------
   function hitTest(mx, my) {
+    // 0. Extrasolar Mode Hit Testing (Host Star, Exoplanet Body & Orbit)
+    if (currentExoPlanet) {
+      // 0a. Host Star
+      const dStar = Math.hypot(mx - sunCenterX, my - sunCenterY);
+      if (dStar <= 36 + 18) {
+        return {
+          id: currentExoPlanet.id,
+          name: currentExoPlanet.hostname,
+          order: 'Host Star',
+          distSun: currentExoPlanet.distSun || '—',
+          orbitPeriod: currentExoPlanet.orbitPeriod || '—',
+          color: currentExoPlanet.starColor || '#fbbf24',
+          hitType: 'body',
+          hitX: sunCenterX,
+          hitY: sunCenterY
+        };
+      }
+      // 0b. Exoplanet Body
+      const dPlanet = Math.hypot(mx - exoProjX, my - exoProjY);
+      if (dPlanet <= 24) {
+        return {
+          ...currentExoPlanet,
+          hitType: 'body',
+          hitX: exoProjX,
+          hitY: exoProjY
+        };
+      }
+      // 0c. Orbit Track
+      const dx = mx - sunCenterX;
+      const dy = my - sunCenterY;
+      const tilt = -0.32;
+      const cosT = Math.cos(tilt);
+      const sinT = Math.sin(tilt);
+      const rx = dx * cosT + dy * sinT;
+      const ry = -dx * sinT + dy * cosT;
+      const a = baseRadius * 0.55;
+      const b = a * 0.43;
+      const theta = Math.atan2(ry / 0.43, rx);
+      const ex0 = a * Math.cos(theta);
+      const ey0 = b * Math.sin(theta);
+      const distPx = Math.hypot(rx - ex0, ry - ey0);
+      if (distPx <= 28) {
+        const sx = sunCenterX + (ex0 * Math.cos(tilt) - ey0 * Math.sin(tilt));
+        const sy = sunCenterY + (ex0 * Math.sin(tilt) + ey0 * Math.cos(tilt));
+        return {
+          ...currentExoPlanet,
+          hitType: 'orbit',
+          orbitPointX: sx,
+          orbitPointY: sy,
+          hitX: sx,
+          hitY: sy
+        };
+      }
+      return null;
+    }
+
     // 1. Direct hit on Moon
     const dMoon = Math.hypot(mx - moonBody.projX, my - moonBody.projY);
     if (dMoon <= moonBody.radius + 18) {
@@ -528,6 +590,8 @@ const SolarBackground = (() => {
         hitX: moonBody.projX,
         hitY: moonBody.projY
       };
+    }
+
     // 1b. Direct hit on Jupiter's Galilean Moons (Io, Europa, Ganymede, Callisto)
     for (let i = 0; i < jovianMoons.length; i++) {
       const m = jovianMoons[i];
@@ -1500,6 +1564,164 @@ const SolarBackground = (() => {
   }
 
   // ---------------------------------------------------------------------------
+  // 13.8 Extrasolar Planetary System Visualization (Stage 07: NASA Exoplanet Archive)
+  // ---------------------------------------------------------------------------
+  function drawExtrasolarSystem(time) {
+    if (!currentExoPlanet) return;
+
+    const tilt = -0.32;
+    const cosT = Math.cos(tilt);
+    const sinT = Math.sin(tilt);
+    const a = baseRadius * 0.55;
+    const b = a * 0.43;
+
+    // 1. Extrasolar Orbit Track
+    ctx.save();
+    ctx.translate(sunCenterX, sunCenterY);
+    ctx.rotate(tilt);
+    ctx.scale(1.0, 0.43);
+
+    const isSelected = selectedBodyId === currentExoPlanet.id;
+    ctx.beginPath();
+    ctx.arc(0, 0, a, 0, Math.PI * 2);
+    ctx.strokeStyle = isSelected ? (currentExoPlanet.color || '#38bdf8') : 'rgba(56, 189, 248, 0.35)';
+    ctx.lineWidth = isSelected ? 2.4 : 1.2;
+    if (isSelected) {
+      ctx.shadowColor = currentExoPlanet.color || '#38bdf8';
+      ctx.shadowBlur = 14;
+    }
+    ctx.stroke();
+    ctx.restore();
+
+    // 2. Central Host Star (Spectral Photosphere & Corona)
+    ctx.save();
+    const starColor = currentExoPlanet.starColor || '#fbbf24';
+    const starRadius = 32;
+
+    // Pulsating coronal magnetic flare
+    const pulse = Math.sin(time * 0.003) * 3;
+    const coronaGrad = ctx.createRadialGradient(
+      sunCenterX, sunCenterY, starRadius * 0.3,
+      sunCenterX, sunCenterY, starRadius + 24 + pulse
+    );
+    coronaGrad.addColorStop(0, starColor);
+    coronaGrad.addColorStop(0.55, starColor);
+    coronaGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+    ctx.fillStyle = coronaGrad;
+    ctx.beginPath();
+    ctx.arc(sunCenterX, sunCenterY, starRadius + 24 + pulse, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Star core
+    const starGrad = ctx.createRadialGradient(
+      sunCenterX - 6, sunCenterY - 6, 2,
+      sunCenterX, sunCenterY, starRadius
+    );
+    starGrad.addColorStop(0, '#ffffff');
+    starGrad.addColorStop(0.45, starColor);
+    starGrad.addColorStop(1, '#451a03');
+
+    ctx.fillStyle = starGrad;
+    ctx.beginPath();
+    ctx.arc(sunCenterX, sunCenterY, starRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Star Name Label
+    ctx.font = '600 11px "Space Grotesk", sans-serif';
+    ctx.fillStyle = '#fef08a';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText(currentExoPlanet.hostname, sunCenterX, sunCenterY + starRadius + 8);
+    ctx.restore();
+
+    // 3. Exoplanet Orbital Motion
+    if (!prefersReducedMotion) {
+      exoPlanetAngle += 0.0035;
+    }
+    const unrotX = a * Math.cos(exoPlanetAngle);
+    const unrotY = b * Math.sin(exoPlanetAngle);
+    exoProjX = sunCenterX + (unrotX * cosT - unrotY * sinT);
+    exoProjY = sunCenterY + (unrotX * sinT + unrotY * cosT);
+
+    // Planet body rendering with authentic Sun-facing lighting
+    ctx.save();
+    const pRadius = 14;
+
+    // Selection / hover glow
+    if (isSelected || (hoveredHit && hoveredHit.id === currentExoPlanet.id)) {
+      ctx.beginPath();
+      ctx.arc(exoProjX, exoProjY, pRadius + 6, 0, Math.PI * 2);
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1.8;
+      ctx.shadowColor = '#38bdf8';
+      ctx.shadowBlur = 10;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+
+    // Direction vector toward host star for accurate spherical shading
+    const toSunX = sunCenterX - exoProjX;
+    const toSunY = sunCenterY - exoProjY;
+    const len = Math.hypot(toSunX, toSunY) || 1;
+    const nx = toSunX / len;
+    const ny = toSunY / len;
+
+    const pGrad = ctx.createRadialGradient(
+      exoProjX + nx * (pRadius * 0.45),
+      exoProjY + ny * (pRadius * 0.45),
+      1,
+      exoProjX, exoProjY, pRadius
+    );
+    pGrad.addColorStop(0, '#ffffff');
+    pGrad.addColorStop(0.35, currentExoPlanet.color || '#38bdf8');
+    pGrad.addColorStop(0.85, currentExoPlanet.palette ? currentExoPlanet.palette.secondary : '#0284c7');
+    pGrad.addColorStop(1, '#020617');
+
+    ctx.fillStyle = pGrad;
+    ctx.beginPath();
+    ctx.arc(exoProjX, exoProjY, pRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Planet Label
+    ctx.font = '700 11.5px "Space Grotesk", sans-serif';
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(currentExoPlanet.name, exoProjX + pRadius + 8, exoProjY);
+
+    ctx.font = '500 9px sans-serif';
+    ctx.fillStyle = 'rgba(56, 189, 248, 0.9)';
+    ctx.fillText("Artist's Impression", exoProjX + pRadius + 8, exoProjY + 13);
+    ctx.restore();
+
+    // 4. Extrasolar System Top Banner
+    ctx.save();
+    const bannerW = Math.min(width - 60, 480);
+    const bannerH = 28;
+    const bx = sunCenterX - bannerW * 0.5;
+    const by = 26;
+    ctx.fillStyle = 'rgba(8, 12, 26, 0.88)';
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    if (ctx.roundRect) {
+      ctx.roundRect(bx, by, bannerW, bannerH, 6);
+    } else {
+      ctx.rect(bx, by, bannerW, bannerH);
+    }
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = '600 10.5px "Space Grotesk", sans-serif';
+    ctx.fillStyle = '#38bdf8';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`🌌 EXTRASOLAR SYSTEM • HOST STAR: ${currentExoPlanet.hostname.toUpperCase()} • ARTIST'S IMPRESSION`, sunCenterX, by + bannerH * 0.5);
+    ctx.restore();
+  }
+
+  // ---------------------------------------------------------------------------
   // 14. Main Animation Frame Loop & Real-Time Performance Monitor
   // ---------------------------------------------------------------------------
   let frameCount = 0;
@@ -1549,44 +1771,50 @@ const SolarBackground = (() => {
     // 2. Shooting stars
     drawShootingStars();
 
-    // 3. Orbit tracks (with orbit-hover glow)
-    drawOrbitLines();
+    if (currentExoPlanet) {
+      // Extrasolar planetary visualization mode
+      drawExtrasolarSystem(time);
+    } else {
+      // Solar System exploration mode
+      // 3. Orbit tracks (with orbit-hover glow)
+      drawOrbitLines();
 
-    // 4. Asteroid Belt simulation
-    drawAsteroids();
+      // 4. Asteroid Belt simulation
+      drawAsteroids();
 
-    // 5. Central Sun
-    drawSun(time);
+      // 5. Central Sun
+      drawSun(time);
 
-    // 6. Planets
-    let earthRef = null;
-    let jupiterRef = null;
-    let saturnRef = null;
-    planets.forEach((p) => {
-      if (!prefersReducedMotion) {
-        p.angle += p.speed;
+      // 6. Planets
+      let earthRef = null;
+      let jupiterRef = null;
+      let saturnRef = null;
+      planets.forEach((p) => {
+        if (!prefersReducedMotion) {
+          p.angle += p.speed;
+        }
+
+        const pos = projectOrbit(p.orbitScale, p.angle);
+        p.projX = pos.x;
+        p.projY = pos.y;
+
+        if (p.id === 'earth') earthRef = p;
+        if (p.id === 'jupiter') jupiterRef = p;
+        if (p.id === 'saturn') saturnRef = p;
+
+        drawPlanet(p, time);
+      });
+
+      // 7. Celestial Satellite Sub-Systems (Stage 06: Moons of the Solar System)
+      if (earthRef) {
+        drawMoonSystem(earthRef, time);
       }
-
-      const pos = projectOrbit(p.orbitScale, p.angle);
-      p.projX = pos.x;
-      p.projY = pos.y;
-
-      if (p.id === 'earth') earthRef = p;
-      if (p.id === 'jupiter') jupiterRef = p;
-      if (p.id === 'saturn') saturnRef = p;
-
-      drawPlanet(p, time);
-    });
-
-    // 7. Celestial Satellite Sub-Systems (Stage 06: Moons of the Solar System)
-    if (earthRef) {
-      drawMoonSystem(earthRef, time);
-    }
-    if (jupiterRef) {
-      drawJovianSystem(jupiterRef, time);
-    }
-    if (saturnRef) {
-      drawSaturnSystem(saturnRef, time);
+      if (jupiterRef) {
+        drawJovianSystem(jupiterRef, time);
+      }
+      if (saturnRef) {
+        drawSaturnSystem(saturnRef, time);
+      }
     }
 
     // 8. Interactive Orbit & Celestial Body Telemetry HUD (Touching & Hovering)
@@ -1733,7 +1961,16 @@ const SolarBackground = (() => {
   }
 
   function setSelectedPlanet(bodyId) {
+    currentExoPlanet = null;
     selectedBodyId = bodyId;
+    if (prefersReducedMotion) {
+      render(0);
+    }
+  }
+
+  function setExoplanet(exoWorld) {
+    currentExoPlanet = exoWorld;
+    selectedBodyId = exoWorld ? exoWorld.id : 'earth';
     if (prefersReducedMotion) {
       render(0);
     }
@@ -1752,6 +1989,7 @@ const SolarBackground = (() => {
   return {
     init,
     setSelectedPlanet,
+    setExoplanet,
     setPreviewOpen,
     togglePanelMinimize,
     getPlanets: () => planets,

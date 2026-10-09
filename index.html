@@ -46,6 +46,18 @@
       >&times;</button>
     </div>
 
+    <!-- Catalog Tabs: Solar System vs Confirmed NASA Exoplanets -->
+    <div class="drawer-catalog-tabs" role="tablist" aria-label="Celestial catalog switcher">
+      <button type="button" id="tab-solar-btn" class="catalog-tab-btn active" role="tab" aria-selected="true" aria-controls="planet-menu">
+        <span>🪐 Solar System</span>
+        <span class="tab-badge-count">18</span>
+      </button>
+      <button type="button" id="tab-exo-btn" class="catalog-tab-btn" role="tab" aria-selected="false" aria-controls="planet-menu">
+        <span>🌌 Exoplanets</span>
+        <span class="tab-badge-count">12</span>
+      </button>
+    </div>
+
     <!-- Planet Buttons List with Interactive Astronaut Scroller Rail -->
     <div class="drawer-body-wrap">
       <nav class="planet-menu" id="planet-menu" role="menu" aria-label="Planet selector list">
@@ -91,7 +103,7 @@
     <section class="solar-stage-section" id="solar-stage-section" aria-label="Interactive Solar System Exploration">
       <header class="hero-header" id="hero-header">
         <div class="hero-badges-row">
-          <span class="hero-pill">Stage 06 &bull; Moons &amp; Satellite Subsystems</span>
+          <span class="hero-pill">Stage 08 &bull; WebGL 3D Lit Globe &amp; NASA Exoplanet Archive</span>
           <span id="perf-pill" class="perf-pill" aria-label="Real-time performance frame rate" title="Live measured frame rate and device pixel ratio">60.0 FPS &bull; DPR 1.5</span>
         </div>
         <h1 class="hero-title" id="hero-title">Choose your planet</h1>
@@ -137,10 +149,44 @@
       <!-- Studio Two-Column Grid: Large Preview Canvas + Full Workshop Controls -->
       <div class="studio-layout-grid">
         
-        <!-- Left / Center: Large High-Resolution Canvas Preview -->
+        <!-- Left / Center: Studio Canvas Column with 2D Poster vs 3D Lit Globe Toggle -->
         <div class="studio-canvas-column">
+          <div class="studio-view-toggle" role="tablist" aria-label="Studio View Switcher">
+            <button type="button" id="view-2d-btn" class="view-toggle-btn active" role="tab" aria-selected="true" aria-controls="poster-canvas-wrap">
+              <span>🖼️ Poster Preview</span>
+            </button>
+            <button type="button" id="view-3d-btn" class="view-toggle-btn" role="tab" aria-selected="false" aria-controls="globe-canvas-wrap">
+              <span>🌐 WebGL 3D Lit Globe</span>
+            </button>
+          </div>
+
+          <!-- 2D High-Resolution Canvas Preview -->
           <div class="poster-canvas-wrap aspect-portrait" id="poster-canvas-wrap">
             <canvas id="poster-canvas" aria-label="Personalized planet name poster live preview"></canvas>
+          </div>
+
+          <!-- Stage 08 Stretch: Interactive 3D Planetary Sphere with Moving Day/Night Terminator -->
+          <div class="globe-canvas-wrap" id="globe-canvas-wrap" style="display: none;">
+            <div class="globe-viewport-box">
+              <canvas id="globe-canvas" width="600" height="600" aria-label="Interactive 3D Lit Planetary Globe with Day/Night Terminator"></canvas>
+            </div>
+            <div class="globe-controls-overlay">
+              <div class="globe-control-group">
+                <div class="globe-label-row">
+                  <span class="globe-control-title">☀️ Sun Angle &amp; Terminator</span>
+                  <span class="globe-angle-val" id="terminator-angle-val">45°</span>
+                </div>
+                <input type="range" id="terminator-slider" class="terminator-slider" min="0" max="360" value="45" aria-label="Adjust solar illumination terminator angle">
+              </div>
+              <div class="globe-actions-row">
+                <button type="button" id="globe-autorotate-btn" class="globe-tool-btn active" title="Toggle automatic axial rotation">
+                  <span id="globe-rotate-label">⟳ Auto-Rotate: ON</span>
+                </button>
+                <button type="button" id="globe-export-btn" class="globe-tool-btn" title="Download snapshot of 3D globe">
+                  <span>📷 Snapshot Globe</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -434,12 +480,14 @@
   <!-- Stage 04 Visual Toast Notification -->
   <div id="toast-notification" class="toast-notification" role="status" aria-live="polite"></div>
 
-  <!-- Scripts: Calculator, Share, Skies Engine, Background Canvas, Poster Canvas, App Controller -->
-  <script src="js/calculator.js?v=15.0"></script>
-  <script src="js/share.js?v=15.0"></script>
-  <script src="js/skies.js?v=15.0"></script>
-  <script src="js/background.js?v=15.0"></script>
-  <script src="js/poster.js?v=15.0"></script>
-  <script src="js/app.js?v=15.0"></script>
+  <!-- Scripts: Calculator, Share, Skies Engine, Background Canvas, Poster Canvas, Textures, WebGL 3D Globe, App Controller -->
+  <script src="js/calculator.js?v=16.0"></script>
+  <script src="js/share.js?v=16.0"></script>
+  <script src="js/skies.js?v=16.0"></script>
+  <script src="js/textures.js?v=16.0"></script>
+  <script src="js/sphere3d.js?v=16.0"></script>
+  <script src="js/background.js?v=16.0"></script>
+  <script src="js/poster.js?v=16.0"></script>
+  <script src="js/app.js?v=16.0"></script>
 </body>
 </html>

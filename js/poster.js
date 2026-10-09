@@ -399,7 +399,19 @@ const PosterRenderer = (() => {
     const textY = isLandscape ? h * 0.46 : h * 0.48;
 
     // Atmospheric Glow under text (especially pronounced at night)
-    const palette = (TEXT_PALETTES[worldId] && TEXT_PALETTES[worldId][mode]) || TEXT_PALETTES.earth[mode];
+    let palette = (TEXT_PALETTES[worldId] && TEXT_PALETTES[worldId][mode]);
+    if (!palette) {
+      const allWorlds = (state.worlds && state.exoplanets) ? [...state.worlds, ...state.exoplanets] : (state.worlds || []);
+      const foundWorld = allWorlds.find((wObj) => wObj.id === worldId);
+      if (foundWorld && foundWorld.palette) {
+        const p = foundWorld.palette;
+        palette = mode === 'day'
+          ? { stops: ['#ffffff', p.accent || '#bae6fd', p.primary || '#0284c7', p.secondary || '#082f49'], rim: p.accent || 'rgba(255,255,255,0.85)', glow: p.glow || 'rgba(56,189,248,0.7)' }
+          : { stops: [p.accent || '#bae6fd', p.primary || '#0284c7', p.secondary || '#082f49', '#020617'], rim: p.primary || 'rgba(56,189,248,0.6)', glow: p.glow || 'rgba(14,165,233,0.5)' };
+      } else {
+        palette = TEXT_PALETTES.earth[mode];
+      }
+    }
 
     targetCtx.shadowColor = palette.glow;
     targetCtx.shadowBlur = (mode === 'night' ? 32 : 18) * scaleFont;
@@ -471,7 +483,9 @@ const PosterRenderer = (() => {
     targetCtx.font = `500 ${Math.round(10 * scaleFont)}px "Inter", sans-serif`;
     targetCtx.fillStyle = 'rgba(255, 255, 255, 0.45)';
     targetCtx.letterSpacing = '0.05em';
-    const creditText = `DATA & IMAGERY VERIFIED FROM NASA GODDARD PLANETARY FACT SHEETS • ${w} × ${h}`;
+    const isExoWorld = state.catalog === 'exo' || (state.exoplanets && state.exoplanets.some((e) => e.id === worldId));
+    const creditSource = isExoWorld ? 'NASA EXOPLANET ARCHIVE (IPAC/CALTECH)' : 'NASA GODDARD PLANETARY FACT SHEETS';
+    const creditText = `DATA & IMAGERY VERIFIED FROM ${creditSource} • ${w} × ${h}`;
     targetCtx.fillText(creditText, w / 2, h - Math.max(22, safeZone * 0.7));
     targetCtx.restore();
   }

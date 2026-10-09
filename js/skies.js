@@ -670,6 +670,471 @@ const SkiesManager = (() => {
         horizon: { show: true, type: 'dunes', color: '#451a03', secondaryColor: '#1c0702', heightRatio: 0.28 },
         notes: 'Deep amber twilight where Saturn dimly glows through the dense organic nitrogen veil.'
       }
+    },
+
+    // =========================================================================
+    // NASA EXOPLANET ARCHIVE WORLDS (Confirmed Discoveries • Procedural Models)
+    // =========================================================================
+
+    // -------------------------------------------------------------------------
+    // TRAPPIST-1 e (Habitable Zone Earth-Size Planet • 40.7 ly)
+    // -------------------------------------------------------------------------
+    trappist_1_e: {
+      name: 'TRAPPIST-1 e',
+      font: '"Cinzel", Georgia, serif',
+      fontLetterSpacing: '0.06em',
+      day: {
+        type: 'artist-impression',
+        badge: "Artist's Impression (Procedural Model)",
+        gradient: [
+          { stop: 0, color: '#450a0a' },
+          { stop: 0.4, color: '#7f1d1d' },
+          { stop: 0.75, color: '#991b1b' },
+          { stop: 1, color: '#f87171' }
+        ],
+        sun: { show: true, x: 0.5, y: 0.28, radius: 52, coreColor: '#ef4444', glowColor: 'rgba(239, 68, 68, 0.7)' },
+        companion: { show: true, name: 'TRAPPIST-1 f', x: 0.78, y: 0.22, radius: 14, color: '#38bdf8', glowColor: 'rgba(56, 189, 248, 0.4)' },
+        stars: { show: false },
+        haze: { color: 'rgba(239, 68, 68, 0.35)', intensity: 0.55 },
+        horizon: { show: true, type: 'ocean', color: '#7f1d1d', secondaryColor: '#1e0505', heightRatio: 0.28 },
+        notes: 'Habitable zone Earth-sized world orbiting cool red dwarf TRAPPIST-1 with liquid water potential.'
+      },
+      night: {
+        type: 'artist-impression',
+        badge: "Artist's Impression (Procedural Model)",
+        gradient: [
+          { stop: 0, color: '#020108' },
+          { stop: 0.6, color: '#090412' },
+          { stop: 1, color: '#170624' }
+        ],
+        sun: { show: false },
+        companion: { show: true, name: 'TRAPPIST-1 d', x: 0.28, y: 0.26, radius: 12, color: '#fca5a5', glowColor: 'rgba(252, 165, 165, 0.35)' },
+        stars: { show: true, count: 240, alpha: 0.95 },
+        haze: { color: 'rgba(153, 27, 27, 0.15)', intensity: 0.25 },
+        horizon: { show: true, type: 'ocean', color: '#180404', secondaryColor: '#080101', heightRatio: 0.28 },
+        notes: 'Perpetual twilight nightside on tidally locked terrestrial world with close sibling planets hanging in the sky.'
+      }
+    },
+
+    // -------------------------------------------------------------------------
+    // TRAPPIST-1 f (Water-Rich Habitable World • 40.7 ly)
+    // -------------------------------------------------------------------------
+    trappist_1_f: {
+      name: 'TRAPPIST-1 f',
+      font: '"Outfit", sans-serif',
+      fontLetterSpacing: '0.05em',
+      day: {
+        type: 'artist-impression',
+        badge: "Artist's Impression (Procedural Model)",
+        gradient: [
+          { stop: 0, color: '#0f172a' },
+          { stop: 0.4, color: '#1e1b4b' },
+          { stop: 0.75, color: '#312e81' },
+          { stop: 1, color: '#818cf8' }
+        ],
+        sun: { show: true, x: 0.5, y: 0.28, radius: 42, coreColor: '#dc2626', glowColor: 'rgba(220, 38, 38, 0.6)' },
+        companion: { show: true, name: 'TRAPPIST-1 e', x: 0.25, y: 0.26, radius: 16, color: '#0ea5e9', glowColor: 'rgba(14, 165, 233, 0.4)' },
+        stars: { show: false },
+        haze: { color: 'rgba(99, 102, 241, 0.3)', intensity: 0.45 },
+        horizon: { show: true, type: 'methane-ice', color: '#0284c7', secondaryColor: '#082f49', heightRatio: 0.28 },
+        notes: 'Volatile-rich habitable candidate covered in global water and surface ice sheets.'
+      },
+      night: {
+        type: 'artist-impression',
+        badge: "Artist's Impression (Procedural Model)",
+        gradient: [
+          { stop: 0, color: '#010206' },
+          { stop: 0.7, color: '#050714' },
+          { stop: 1, color: '#0b112c' }
+        ],
+        sun: { show: false },
+        stars: { show: true, count: 260, alpha: 0.95 },
+        haze: { color: 'transparent', intensity: 0 },
+        horizon: { show: true, type: 'methane-ice', color: '#0f172a', secondaryColor: '#020617', heightRatio: 0.28 },
+        notes: 'Starlit ice plains reflecting radiant red dwarf aurora and companion planets.'
+      }
+    },
+
+    // -------------------------------------------------------------------------
+    // PROXIMA CENTAURI b (Nearest Exoplanet to Earth • 4.2 ly)
+    // -------------------------------------------------------------------------
+    proxima_cen_b: {
+      name: 'Proxima Cen b',
+      font: '"Space Grotesk", sans-serif',
+      fontLetterSpacing: '0.04em',
+      day: {
+        type: 'artist-impression',
+        badge: "Artist's Impression (Procedural Model)",
+        gradient: [
+          { stop: 0, color: '#431407' },
+          { stop: 0.45, color: '#7c2d12' },
+          { stop: 0.8, color: '#c2410c' },
+          { stop: 1, color: '#fdba74' }
+        ],
+        sun: { show: true, x: 0.42, y: 0.28, radius: 36, coreColor: '#ef4444', glowColor: 'rgba(239, 68, 68, 0.65)' },
+        companion: { show: true, name: 'Alpha Cen AB', x: 0.84, y: 0.20, radius: 7, color: '#fef08a', glowColor: 'rgba(254, 240, 138, 0.8)' },
+        stars: { show: false },
+        haze: { color: 'rgba(194, 65, 12, 0.4)', intensity: 0.5 },
+        horizon: { show: true, type: 'volcanic', color: '#9a3412', secondaryColor: '#431407', heightRatio: 0.3 },
+        notes: 'Closest exoplanet to Earth at 4.2 light-years, orbiting in red dwarf habitable zone with Alpha Centauri AB binary shining in sky.'
+      },
+      night: {
+        type: 'artist-impression',
+        badge: "Artist's Impression (Procedural Model)",
+        gradient: [
+          { stop: 0, color: '#020104' },
+          { stop: 0.6, color: '#06020a' },
+          { stop: 1, color: '#0f0516' }
+        ],
+        sun: { show: false },
+        companion: { show: true, name: 'Alpha Cen AB', x: 0.84, y: 0.20, radius: 7, color: '#fef08a', glowColor: 'rgba(254, 240, 138, 0.8)' },
+        stars: { show: true, count: 280, alpha: 0.95 },
+        haze: { color: 'transparent', intensity: 0 },
+        horizon: { show: true, type: 'volcanic', color: '#1c0802', secondaryColor: '#0a0301', heightRatio: 0.3 },
+        notes: 'Alpha Centauri A & B sparkling as brilliant double morning stars over dark rugged basalt ridges.'
+      }
+    },
+
+    // -------------------------------------------------------------------------
+    // KEPLER-186 f (First Validated Earth-Size Habitable World • 579 ly)
+    // -------------------------------------------------------------------------
+    kepler_186_f: {
+      name: 'Kepler-186 f',
+      font: '"Cinzel", Georgia, serif',
+      fontLetterSpacing: '0.06em',
+      day: {
+        type: 'artist-impression',
+        badge: "Artist's Impression (Procedural Model)",
+        gradient: [
+          { stop: 0, color: '#311042' },
+          { stop: 0.4, color: '#581c87' },
+          { stop: 0.75, color: '#7e22ce' },
+          { stop: 1, color: '#d8b4fe' }
+        ],
+        sun: { show: true, x: 0.5, y: 0.28, radius: 28, coreColor: '#f97316', glowColor: 'rgba(249, 115, 22, 0.6)' },
+        stars: { show: false },
+        haze: { color: 'rgba(126, 34, 206, 0.35)', intensity: 0.45 },
+        horizon: { show: true, type: 'dunes', color: '#6b21a8', secondaryColor: '#3b0764', heightRatio: 0.28 },
+        notes: 'Historic 1st validated Earth-size planet orbiting in the habitable zone of an M-dwarf star.'
+      },
+      night: {
+        type: 'artist-impression',
+        badge: "Artist's Impression (Procedural Model)",
+        gradient: [
+          { stop: 0, color: '#030108' },
+          { stop: 0.6, color: '#090314' },
+          { stop: 1, color: '#140728' }
+        ],
+        sun: { show: false },
+        stars: { show: true, count: 250, alpha: 0.9 },
+        haze: { color: 'rgba(88, 28, 135, 0.15)', intensity: 0.2 },
+        horizon: { show: true, type: 'dunes', color: '#1f0933', secondaryColor: '#0a0212', heightRatio: 0.28 },
+        notes: 'Muted bronze-purple twilight fading into clear crystalline starfields.'
+      }
+    },
+
+    // -------------------------------------------------------------------------
+    // KEPLER-452 b (Earth's Older Cousin • 1799.5 ly)
+    // -------------------------------------------------------------------------
+    kepler_452_b: {
+      name: 'Kepler-452 b',
+      font: '"Playfair Display", Georgia, serif',
+      fontLetterSpacing: '0.05em',
+      day: {
+        type: 'artist-impression',
+        badge: "Artist's Impression (Procedural Model)",
+        gradient: [
+          { stop: 0, color: '#0369a1' },
+          { stop: 0.45, color: '#0284c7' },
+          { stop: 0.8, color: '#7dd3fc' },
+          { stop: 1, color: '#fef08a' }
+        ],
+        sun: { show: true, x: 0.5, y: 0.28, radius: 26, coreColor: '#ffffff', glowColor: 'rgba(254, 240, 138, 0.8)' },
+        stars: { show: false },
+        haze: { color: 'rgba(125, 211, 252, 0.4)', intensity: 0.4 },
+        horizon: { show: true, type: 'ocean', color: '#0369a1', secondaryColor: '#082f49', heightRatio: 0.26 },
+        notes: 'Earth\'s older cousin, orbiting Sun-like G2 star in a 385-day orbit at 1,800 light-years.'
+      },
+      night: {
+        type: 'artist-impression',
+        badge: "Artist's Impression (Procedural Model)",
+        gradient: [
+          { stop: 0, color: '#020617' },
+          { stop: 0.55, color: '#080d1a' },
+          { stop: 1, color: '#0e1726' }
+        ],
+        sun: { show: false },
+        stars: { show: true, count: 270, alpha: 0.92, milkyWay: true },
+        haze: { color: 'rgba(14, 23, 38, 0.25)', intensity: 0.2 },
+        horizon: { show: true, type: 'ocean', color: '#031124', secondaryColor: '#020612', heightRatio: 0.26 },
+        notes: 'Deep starfield across ocean horizon under stellar radiance similar to our home solar system.'
+      }
+    },
+
+    // -------------------------------------------------------------------------
+    // KEPLER-22 b (First Kepler Habitable Zone Candidate • 634.8 ly)
+    // -------------------------------------------------------------------------
+    kepler_22_b: {
+      name: 'Kepler-22 b',
+      font: '"Outfit", sans-serif',
+      fontLetterSpacing: '0.04em',
+      day: {
+        type: 'artist-impression',
+        badge: "Artist's Impression (Procedural Model)",
+        gradient: [
+          { stop: 0, color: '#064e3b' },
+          { stop: 0.4, color: '#0d9488' },
+          { stop: 0.8, color: '#2dd4bf' },
+          { stop: 1, color: '#ccfbf1' }
+        ],
+        sun: { show: true, x: 0.5, y: 0.28, radius: 24, coreColor: '#ffffff', glowColor: 'rgba(254, 240, 138, 0.7)' },
+        stars: { show: false },
+        haze: { color: 'rgba(45, 212, 191, 0.35)', intensity: 0.45 },
+        horizon: { show: true, type: 'ocean', color: '#0f766e', secondaryColor: '#115e59', heightRatio: 0.26 },
+        notes: 'First Kepler planet discovered in a star\'s habitable zone; likely a warm ocean world.'
+      },
+      night: {
+        type: 'artist-impression',
+        badge: "Artist's Impression (Procedural Model)",
+        gradient: [
+          { stop: 0, color: '#021817' },
+          { stop: 0.6, color: '#042f2e' },
+          { stop: 1, color: '#064e3b' }
+        ],
+        sun: { show: false },
+        stars: { show: true, count: 260, alpha: 0.9 },
+        haze: { color: 'rgba(13, 148, 136, 0.15)', intensity: 0.2 },
+        horizon: { show: true, type: 'ocean', color: '#022421', secondaryColor: '#011312', heightRatio: 0.26 },
+        notes: 'Bioluminescent warm oceanic swells reflecting celestial constellations.'
+      }
+    },
+
+    // -------------------------------------------------------------------------
+    // WASP-76 b (Iron-Rain Ultra-Hot World • 634.2 ly)
+    // -------------------------------------------------------------------------
+    wasp_76_b: {
+      name: 'WASP-76 b',
+      font: '"Syne", sans-serif',
+      fontLetterSpacing: '0.05em',
+      day: {
+        type: 'artist-impression',
+        badge: "Artist's Impression (Procedural Model)",
+        gradient: [
+          { stop: 0, color: '#450a0a' },
+          { stop: 0.35, color: '#991b1b' },
+          { stop: 0.7, color: '#dc2626' },
+          { stop: 1, color: '#fef08a' }
+        ],
+        sun: { show: true, x: 0.5, y: 0.28, radius: 76, coreColor: '#ffffff', glowColor: 'rgba(254, 240, 138, 0.95)' },
+        stars: { show: false },
+        haze: { color: 'rgba(220, 38, 38, 0.6)', intensity: 0.75 },
+        horizon: { show: true, type: 'plasma', color: '#7f1d1d', secondaryColor: '#450a0a', heightRatio: 0.34 },
+        notes: 'Scorching ultra-hot gas giant exceeding 2,200 °C where iron vaporizes in the daytime atmosphere.'
+      },
+      night: {
+        type: 'artist-impression',
+        badge: "Artist's Impression (Procedural Model)",
+        gradient: [
+          { stop: 0, color: '#1a0404' },
+          { stop: 0.55, color: '#330808' },
+          { stop: 1, color: '#570d0d' }
+        ],
+        sun: { show: false },
+        stars: { show: true, count: 80, alpha: 0.4 },
+        haze: { color: 'rgba(185, 28, 28, 0.35)', intensity: 0.5 },
+        horizon: { show: true, type: 'plasma', color: '#2b0707', secondaryColor: '#120202', heightRatio: 0.34 },
+        notes: 'Nightside cooling causes iron vapor to condense and rain down as liquid iron droplets.'
+      }
+    },
+
+    // -------------------------------------------------------------------------
+    // WASP-12 b (Tidally Disrupted Egg-Shaped Giant • 1393.5 ly)
+    // -------------------------------------------------------------------------
+    wasp_12_b: {
+      name: 'WASP-12 b',
+      font: '"Space Grotesk", sans-serif',
+      fontLetterSpacing: '0.04em',
+      day: {
+        type: 'artist-impression',
+        badge: "Artist's Impression (Procedural Model)",
+        gradient: [
+          { stop: 0, color: '#0a0401' },
+          { stop: 0.4, color: '#270e03' },
+          { stop: 0.75, color: '#7c2d12' },
+          { stop: 1, color: '#ea580c' }
+        ],
+        sun: { show: true, x: 0.5, y: 0.28, radius: 86, coreColor: '#ffffff', glowColor: 'rgba(251, 191, 36, 0.9)' },
+        stars: { show: false },
+        haze: { color: 'rgba(234, 88, 12, 0.5)', intensity: 0.7 },
+        horizon: { show: true, type: 'gas-bands', color: '#431407', secondaryColor: '#1a0702', heightRatio: 0.34 },
+        notes: 'Pitch-black hot Jupiter gravitationally stretched into an egg shape by extreme tidal forces.'
+      },
+      night: {
+        type: 'artist-impression',
+        badge: "Artist's Impression (Procedural Model)",
+        gradient: [
+          { stop: 0, color: '#050201' },
+          { stop: 0.6, color: '#130502' },
+          { stop: 1, color: '#260a04' }
+        ],
+        sun: { show: false },
+        stars: { show: true, count: 110, alpha: 0.5 },
+        haze: { color: 'rgba(154, 52, 18, 0.25)', intensity: 0.4 },
+        horizon: { show: true, type: 'gas-bands', color: '#1c0702', secondaryColor: '#0a0201', heightRatio: 0.34 },
+        notes: 'Extreme infrared thermal radiation with planetary material spilling toward the host star.'
+      }
+    },
+
+    // -------------------------------------------------------------------------
+    // 55 CANCRI e (Super-Earth Lava World • 41.0 ly)
+    // -------------------------------------------------------------------------
+    '55_cnc_e': {
+      name: '55 Cnc e',
+      font: '"Syne", sans-serif',
+      fontLetterSpacing: '0.05em',
+      day: {
+        type: 'artist-impression',
+        badge: "Artist's Impression (Procedural Model)",
+        gradient: [
+          { stop: 0, color: '#451a03' },
+          { stop: 0.35, color: '#92400e' },
+          { stop: 0.7, color: '#d97706' },
+          { stop: 1, color: '#fef08a' }
+        ],
+        sun: { show: true, x: 0.5, y: 0.28, radius: 66, coreColor: '#ffffff', glowColor: 'rgba(254, 240, 138, 0.85)' },
+        stars: { show: false },
+        haze: { color: 'rgba(217, 119, 6, 0.55)', intensity: 0.65 },
+        horizon: { show: true, type: 'volcanic', color: '#b45309', secondaryColor: '#451a03', heightRatio: 0.3 },
+        notes: 'Super-Earth orbiting its host star in just 18 hours with surface oceans of molten silicate lava.'
+      },
+      night: {
+        type: 'artist-impression',
+        badge: "Artist's Impression (Procedural Model)",
+        gradient: [
+          { stop: 0, color: '#120502' },
+          { stop: 0.6, color: '#240a04' },
+          { stop: 1, color: '#421408' }
+        ],
+        sun: { show: false },
+        stars: { show: true, count: 160, alpha: 0.7 },
+        haze: { color: 'rgba(180, 83, 9, 0.3)', intensity: 0.4 },
+        horizon: { show: true, type: 'volcanic', color: '#2e0e05', secondaryColor: '#120502', heightRatio: 0.3 },
+        notes: 'Incandescent glowing lava fissures crisscrossing superheated basalt lithosphere.'
+      }
+    },
+
+    // -------------------------------------------------------------------------
+    // HD 189733 b (Supersonic Silicate Glass Rain World • 64.5 ly)
+    // -------------------------------------------------------------------------
+    hd_189733_b: {
+      name: 'HD 189733 b',
+      font: '"Space Grotesk", sans-serif',
+      fontLetterSpacing: '0.04em',
+      day: {
+        type: 'artist-impression',
+        badge: "Artist's Impression (Procedural Model)",
+        gradient: [
+          { stop: 0, color: '#172554' },
+          { stop: 0.35, color: '#1e40af' },
+          { stop: 0.7, color: '#2563eb' },
+          { stop: 1, color: '#93c5fd' }
+        ],
+        sun: { show: true, x: 0.5, y: 0.28, radius: 40, coreColor: '#ffffff', glowColor: 'rgba(251, 191, 36, 0.75)' },
+        stars: { show: false },
+        haze: { color: 'rgba(37, 99, 235, 0.45)', intensity: 0.6 },
+        horizon: { show: true, type: 'supersonic-clouds', color: '#1d4ed8', secondaryColor: '#1e3a8a', heightRatio: 0.32 },
+        notes: 'Deep azure hot Jupiter where 8,700 km/h winds blow clouds of molten silicate glass sideways.'
+      },
+      night: {
+        type: 'artist-impression',
+        badge: "Artist's Impression (Procedural Model)",
+        gradient: [
+          { stop: 0, color: '#020617' },
+          { stop: 0.6, color: '#081129' },
+          { stop: 1, color: '#10214a' }
+        ],
+        sun: { show: false },
+        stars: { show: true, count: 190, alpha: 0.75 },
+        haze: { color: 'rgba(29, 78, 216, 0.2)', intensity: 0.3 },
+        horizon: { show: true, type: 'supersonic-clouds', color: '#0d1d42', secondaryColor: '#050c1f', heightRatio: 0.32 },
+        notes: 'Howling indigo abyss with supersonic glass hail tearing through the nocturnal atmosphere.'
+      }
+    },
+
+    // -------------------------------------------------------------------------
+    // HD 209458 b (Osiris / Evaporating Atmosphere Giant • 157.5 ly)
+    // -------------------------------------------------------------------------
+    hd_209458_b: {
+      name: 'HD 209458 b',
+      font: '"Cinzel", Georgia, serif',
+      fontLetterSpacing: '0.06em',
+      day: {
+        type: 'artist-impression',
+        badge: "Artist's Impression (Procedural Model)",
+        gradient: [
+          { stop: 0, color: '#1e1b4b' },
+          { stop: 0.35, color: '#312e81' },
+          { stop: 0.7, color: '#4f46e5' },
+          { stop: 1, color: '#c7d2fe' }
+        ],
+        sun: { show: true, x: 0.5, y: 0.28, radius: 44, coreColor: '#ffffff', glowColor: 'rgba(254, 240, 138, 0.75)' },
+        stars: { show: false },
+        haze: { color: 'rgba(79, 70, 229, 0.45)', intensity: 0.55 },
+        horizon: { show: true, type: 'gas-bands', color: '#3730a3', secondaryColor: '#1e1b4b', heightRatio: 0.32 },
+        notes: 'Nicknamed Osiris, the first transiting exoplanet detected with an escaping comet-like tail.'
+      },
+      night: {
+        type: 'artist-impression',
+        badge: "Artist's Impression (Procedural Model)",
+        gradient: [
+          { stop: 0, color: '#050414' },
+          { stop: 0.6, color: '#0e0b29' },
+          { stop: 1, color: '#1c1547' }
+        ],
+        sun: { show: false },
+        stars: { show: true, count: 210, alpha: 0.8 },
+        haze: { color: 'rgba(67, 56, 202, 0.2)', intensity: 0.3 },
+        horizon: { show: true, type: 'gas-bands', color: '#130e33', secondaryColor: '#070514', heightRatio: 0.32 },
+        notes: 'Escaping hydrogen and carbon plume fluorescing softly in deep space starlight.'
+      }
+    },
+
+    // -------------------------------------------------------------------------
+    // TOI-700 d (TESS Habitable Earth-Size Planet • 101.5 ly)
+    // -------------------------------------------------------------------------
+    toi_700_d: {
+      name: 'TOI-700 d',
+      font: '"Cinzel", Georgia, serif',
+      fontLetterSpacing: '0.06em',
+      day: {
+        type: 'artist-impression',
+        badge: "Artist's Impression (Procedural Model)",
+        gradient: [
+          { stop: 0, color: '#0c4a6e' },
+          { stop: 0.4, color: '#0284c7' },
+          { stop: 0.75, color: '#38bdf8' },
+          { stop: 1, color: '#bae6fd' }
+        ],
+        sun: { show: true, x: 0.5, y: 0.28, radius: 28, coreColor: '#dc2626', glowColor: 'rgba(220, 38, 38, 0.6)' },
+        stars: { show: false },
+        haze: { color: 'rgba(56, 189, 248, 0.35)', intensity: 0.4 },
+        horizon: { show: true, type: 'ocean', color: '#0369a1', secondaryColor: '#075985', heightRatio: 0.26 },
+        notes: 'TESS-discovered Earth-sized planet receiving 86% of Earth\'s energy in its star\'s habitable zone.'
+      },
+      night: {
+        type: 'artist-impression',
+        badge: "Artist's Impression (Procedural Model)",
+        gradient: [
+          { stop: 0, color: '#020617' },
+          { stop: 0.55, color: '#051229' },
+          { stop: 1, color: '#0a1e3f' }
+        ],
+        sun: { show: false },
+        stars: { show: true, count: 260, alpha: 0.95, milkyWay: true },
+        haze: { color: 'rgba(3, 105, 161, 0.15)', intensity: 0.2 },
+        horizon: { show: true, type: 'ocean', color: '#031226', secondaryColor: '#010814', heightRatio: 0.26 },
+        notes: 'Southern sky starfields reflecting over calm waters of an alien Earth-sized world.'
+      }
     }
   };
 

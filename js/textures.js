@@ -468,3 +468,7 @@ const TextureManager = (() => {
     getPlanetTexture
   };
 })();
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = TextureManager;
+}
