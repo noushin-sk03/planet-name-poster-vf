@@ -1066,6 +1066,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       globeCanvasWrap.style.display = viewMode === '3d' ? 'flex' : 'none';
     }
 
+    // Show Illumination Mode toggle only for 2D poster, hide it in WebGL view
+    const modeWrap = document.querySelector('.control-mode-wrap');
+    if (modeWrap) {
+      modeWrap.style.display = viewMode === '2d' ? '' : 'none';
+    }
+
     if (typeof Sphere3DViewer !== 'undefined') {
       if (viewMode === '3d') {
         const allWorlds = getAllWorlds();
