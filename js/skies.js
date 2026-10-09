@@ -441,6 +441,235 @@ const SkiesManager = (() => {
         horizon: { show: true, type: 'nitrogen-ice', color: '#1e293b', secondaryColor: '#090d16', heightRatio: 0.28 },
         notes: 'Tidally locked Charon hangs fixed in the sky, casting faint silver Charonshine across frozen nitrogen plains.'
       }
+    },
+
+    // -------------------------------------------------------------------------
+    // IO (Jupiter's Volcanic Moon I)
+    // -------------------------------------------------------------------------
+    io: {
+      name: 'Io',
+      font: '"Cinzel", Georgia, serif',
+      fontLetterSpacing: '0.06em',
+      day: {
+        type: 'photographic-basis',
+        badge: 'Volcanic Calderas (NASA Galileo & Juno Data)',
+        gradient: [
+          { stop: 0, color: '#1c1917' },
+          { stop: 0.5, color: '#292524' },
+          { stop: 1, color: '#451a03' }
+        ],
+        sun: { show: true, x: 0.25, y: 0.22, radius: 24, coreColor: '#ffffff', glowColor: 'rgba(253, 224, 71, 0.6)' },
+        companion: { show: true, name: 'Jupiter', x: 0.72, y: 0.32, radius: 56, color: '#fb923c', glowColor: 'rgba(251, 146, 60, 0.45)' },
+        stars: { show: true, count: 180, alpha: 0.7 },
+        haze: { color: 'rgba(234, 179, 8, 0.15)', intensity: 0.3 },
+        horizon: { show: true, type: 'volcanic', color: '#b45309', secondaryColor: '#451a03', heightRatio: 0.3 },
+        notes: 'Airless sulfur sky dominated by giant banded Jupiter, with sulfur dioxide frost and active volcanic calderas.'
+      },
+      night: {
+        type: 'photographic-basis',
+        badge: 'Jovianshine Twilight (NASA Galileo Data)',
+        gradient: [
+          { stop: 0, color: '#09080d' },
+          { stop: 1, color: '#170c06' }
+        ],
+        sun: { show: false },
+        companion: { show: true, name: 'Jupiter', x: 0.72, y: 0.32, radius: 56, color: '#fb923c', glowColor: 'rgba(251, 146, 60, 0.55)' },
+        stars: { show: true, count: 240, alpha: 0.9, milkyWay: true },
+        haze: { color: 'transparent', intensity: 0 },
+        horizon: { show: true, type: 'volcanic', color: '#451a03', secondaryColor: '#1c1917', heightRatio: 0.3 },
+        notes: 'Giant Jupiter bathes the dark volcanic sulfur plains in brilliant golden Jovianshine.'
+      }
+    },
+
+    // -------------------------------------------------------------------------
+    // EUROPA (Jupiter's Ocean Ice Moon II)
+    // -------------------------------------------------------------------------
+    europa: {
+      name: 'Europa',
+      font: '"Playfair Display", Georgia, serif',
+      fontLetterSpacing: '0.05em',
+      day: {
+        type: 'photographic-basis',
+        badge: 'Ice Shell Lithosphere (NASA Galileo / Clipper)',
+        gradient: [
+          { stop: 0, color: '#020617' },
+          { stop: 0.6, color: '#08142c' },
+          { stop: 1, color: '#0c2340' }
+        ],
+        sun: { show: true, x: 0.28, y: 0.24, radius: 22, coreColor: '#ffffff', glowColor: 'rgba(186, 230, 253, 0.65)' },
+        companion: { show: true, name: 'Jupiter', x: 0.70, y: 0.30, radius: 52, color: '#fb923c', glowColor: 'rgba(251, 146, 60, 0.4)' },
+        stars: { show: true, count: 200, alpha: 0.8 },
+        haze: { color: 'rgba(56, 189, 248, 0.1)', intensity: 0.2 },
+        horizon: { show: true, type: 'ocean', color: '#38bdf8', secondaryColor: '#0369a1', heightRatio: 0.26 },
+        notes: 'Deep airless sky over cracked water-ice plains and reddish lineae, with giant Jupiter hanging permanently in the sky.'
+      },
+      night: {
+        type: 'photographic-basis',
+        badge: 'Jovianshine Ice Plains (NASA Galileo Data)',
+        gradient: [
+          { stop: 0, color: '#020306' },
+          { stop: 1, color: '#030814' }
+        ],
+        sun: { show: false },
+        companion: { show: true, name: 'Jupiter', x: 0.70, y: 0.30, radius: 52, color: '#fb923c', glowColor: 'rgba(251, 146, 60, 0.5)' },
+        stars: { show: true, count: 260, alpha: 0.95, milkyWay: true },
+        haze: { color: 'transparent', intensity: 0 },
+        horizon: { show: true, type: 'ocean', color: '#075985', secondaryColor: '#020617', heightRatio: 0.26 },
+        notes: 'Starlight and brilliant Jovianshine glinting off fractured chaos ice blocks.'
+      }
+    },
+
+    // -------------------------------------------------------------------------
+    // GANYMEDE (Jupiter's Magnetic Giant Moon III)
+    // -------------------------------------------------------------------------
+    ganymede: {
+      name: 'Ganymede',
+      font: '"Space Grotesk", sans-serif',
+      fontLetterSpacing: '0.04em',
+      day: {
+        type: 'photographic-basis',
+        badge: 'Magnetic Grooved Terrain (NASA Juno Data)',
+        gradient: [
+          { stop: 0, color: '#020617' },
+          { stop: 0.7, color: '#0a0f1d' },
+          { stop: 1, color: '#131b2e' }
+        ],
+        sun: { show: true, x: 0.26, y: 0.22, radius: 22, coreColor: '#ffffff', glowColor: 'rgba(203, 213, 225, 0.5)' },
+        companion: { show: true, name: 'Jupiter', x: 0.74, y: 0.34, radius: 46, color: '#fb923c', glowColor: 'rgba(251, 146, 60, 0.35)' },
+        stars: { show: true, count: 210, alpha: 0.8 },
+        haze: { color: 'rgba(148, 163, 184, 0.08)', intensity: 0.15 },
+        horizon: { show: true, type: 'regolith', color: '#64748b', secondaryColor: '#334155', heightRatio: 0.28 },
+        notes: 'Ancient grooved tectonic ice ridges and dark silicate fields under starlight and giant Jupiter.'
+      },
+      night: {
+        type: 'photographic-basis',
+        badge: 'Magnetic Aurora Nocturne (NASA Juno Data)',
+        gradient: [
+          { stop: 0, color: '#010204' },
+          { stop: 1, color: '#060a14' }
+        ],
+        sun: { show: false },
+        companion: { show: true, name: 'Jupiter', x: 0.74, y: 0.34, radius: 46, color: '#fb923c', glowColor: 'rgba(251, 146, 60, 0.45)' },
+        stars: { show: true, count: 270, alpha: 0.95, milkyWay: true },
+        haze: { color: 'transparent', intensity: 0 },
+        horizon: { show: true, type: 'regolith', color: '#1e293b', secondaryColor: '#0f172a', heightRatio: 0.28 },
+        notes: 'Faint auroral curtains from Ganymede intrinsic magnetic dynamo shimmering in the tenuous oxygen exosphere.'
+      }
+    },
+
+    // -------------------------------------------------------------------------
+    // CALLISTO (Jupiter's Cratered Ice Moon IV)
+    // -------------------------------------------------------------------------
+    callisto: {
+      name: 'Callisto',
+      font: '"Cinzel", Georgia, serif',
+      fontLetterSpacing: '0.06em',
+      day: {
+        type: 'photographic-basis',
+        badge: 'Valhalla Impact Basin (NASA Galileo Data)',
+        gradient: [
+          { stop: 0, color: '#000000' },
+          { stop: 0.7, color: '#05070c' },
+          { stop: 1, color: '#0b0f19' }
+        ],
+        sun: { show: true, x: 0.3, y: 0.22, radius: 22, coreColor: '#ffffff', glowColor: 'rgba(255, 255, 255, 0.5)' },
+        companion: { show: true, name: 'Jupiter', x: 0.75, y: 0.36, radius: 38, color: '#fb923c', glowColor: 'rgba(251, 146, 60, 0.3)' },
+        stars: { show: true, count: 240, alpha: 0.85 },
+        haze: { color: 'transparent', intensity: 0 },
+        horizon: { show: true, type: 'craters', color: '#475569', secondaryColor: '#1e293b', heightRatio: 0.28 },
+        notes: 'Most heavily cratered surface in the solar system, with multi-ring Valhalla basin under deep-space starfield.'
+      },
+      night: {
+        type: 'photographic-basis',
+        badge: 'Airless Starlight (NASA Galileo Data)',
+        gradient: [
+          { stop: 0, color: '#000000' },
+          { stop: 1, color: '#020306' }
+        ],
+        sun: { show: false },
+        companion: { show: true, name: 'Jupiter', x: 0.75, y: 0.36, radius: 38, color: '#fb923c', glowColor: 'rgba(251, 146, 60, 0.4)' },
+        stars: { show: true, count: 290, alpha: 0.95, milkyWay: true },
+        haze: { color: 'transparent', intensity: 0 },
+        horizon: { show: true, type: 'craters', color: '#1e293b', secondaryColor: '#090d16', heightRatio: 0.28 },
+        notes: 'Pristine, ancient 4-billion-year-old cratered ice-rock landscape under cold starlight.'
+      }
+    },
+
+    // -------------------------------------------------------------------------
+    // ENCELADUS (Saturn's Cryovolcanic Ocean Moon)
+    // -------------------------------------------------------------------------
+    enceladus: {
+      name: 'Enceladus',
+      font: '"Outfit", sans-serif',
+      fontLetterSpacing: '0.04em',
+      day: {
+        type: 'photographic-basis',
+        badge: 'Cryovolcanic Geysers (NASA Cassini Data)',
+        gradient: [
+          { stop: 0, color: '#020617' },
+          { stop: 0.5, color: '#071830' },
+          { stop: 1, color: '#0e2b4f' }
+        ],
+        sun: { show: true, x: 0.25, y: 0.24, radius: 18, coreColor: '#ffffff', glowColor: 'rgba(224, 242, 254, 0.7)' },
+        companion: { show: true, name: 'Saturn', x: 0.72, y: 0.32, radius: 46, color: '#fef08a', glowColor: 'rgba(254, 240, 138, 0.45)' },
+        stars: { show: true, count: 220, alpha: 0.8 },
+        haze: { color: 'rgba(56, 189, 248, 0.12)', intensity: 0.25 },
+        horizon: { show: true, type: 'methane-ice', color: '#e0f2fe', secondaryColor: '#0284c7', heightRatio: 0.26 },
+        notes: 'Giant ringed Saturn dominates the sky over 99% albedo water-ice crust, with active geysers venting into space.'
+      },
+      night: {
+        type: 'photographic-basis',
+        badge: 'Saturnshine Nocturne (NASA Cassini Data)',
+        gradient: [
+          { stop: 0, color: '#010204' },
+          { stop: 1, color: '#030814' }
+        ],
+        sun: { show: false },
+        companion: { show: true, name: 'Saturn', x: 0.72, y: 0.32, radius: 46, color: '#fef08a', glowColor: 'rgba(254, 240, 138, 0.55)' },
+        stars: { show: true, count: 270, alpha: 0.95, milkyWay: true },
+        haze: { color: 'transparent', intensity: 0 },
+        horizon: { show: true, type: 'methane-ice', color: '#0369a1', secondaryColor: '#020617', heightRatio: 0.26 },
+        notes: 'Ethereal pale-yellow Saturnshine illuminating the south polar tiger-stripe fissures.'
+      }
+    },
+
+    // -------------------------------------------------------------------------
+    // TITAN (Saturn's Methane Haze Moon VI)
+    // -------------------------------------------------------------------------
+    titan: {
+      name: 'Titan',
+      font: '"Syne", sans-serif',
+      fontLetterSpacing: '0.04em',
+      day: {
+        type: 'photographic-basis',
+        badge: 'Methane Atmosphere (NASA Cassini & Huygens)',
+        gradient: [
+          { stop: 0, color: '#f59e0b' },
+          { stop: 0.4, color: '#d97706' },
+          { stop: 0.8, color: '#92400e' },
+          { stop: 1, color: '#451a03' }
+        ],
+        sun: { show: true, x: 0.5, y: 0.3, radius: 38, isDiffused: true, coreColor: '#fef08a', glowColor: 'rgba(245, 158, 11, 0.65)' },
+        stars: { show: false },
+        haze: { color: 'rgba(217, 119, 6, 0.45)', intensity: 0.8 },
+        horizon: { show: true, type: 'dunes', color: '#78350f', secondaryColor: '#451a03', heightRatio: 0.28 },
+        notes: 'Dense nitrogen-methane photochemical smog scatters golden sunlight over liquid hydrocarbon seas (Kraken Mare).'
+      },
+      night: {
+        type: 'photographic-basis',
+        badge: 'Dense Nitrogen Night (NASA Cassini Data)',
+        gradient: [
+          { stop: 0, color: '#271004' },
+          { stop: 0.6, color: '#1a0b03' },
+          { stop: 1, color: '#0a0401' }
+        ],
+        sun: { show: false },
+        companion: { show: true, name: 'Saturn', x: 0.7, y: 0.32, radius: 40, color: '#ca8a04', glowColor: 'rgba(202, 138, 4, 0.25)' },
+        stars: { show: true, count: 60, alpha: 0.3 },
+        haze: { color: 'rgba(120, 53, 15, 0.25)', intensity: 0.5 },
+        horizon: { show: true, type: 'dunes', color: '#451a03', secondaryColor: '#1c0702', heightRatio: 0.28 },
+        notes: 'Deep amber twilight where Saturn dimly glows through the dense organic nitrogen veil.'
+      }
     }
   };
 

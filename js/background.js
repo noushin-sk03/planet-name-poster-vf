@@ -154,12 +154,115 @@ const SolarBackground = (() => {
   const moonBody = {
     id: 'moon',
     name: 'The Moon',
+    parent: 'earth',
     color: '#e2e8f0',
     secondaryColor: '#64748b',
     radius: 6,
     projX: 0,
     projY: 0
   };
+
+  const jovianMoons = [
+    {
+      id: 'io',
+      name: 'Io',
+      parent: 'jupiter',
+      order: "Jupiter's Moon I",
+      color: '#facc15',
+      secondaryColor: '#b45309',
+      radius: 4.2,
+      orbitR: 38,
+      speed: 0.016,
+      angle: 0.8,
+      distSun: '5.20 AU (778.6M km)',
+      orbitPeriod: '42.5 hrs (1.77 d)',
+      projX: 0,
+      projY: 0
+    },
+    {
+      id: 'europa',
+      name: 'Europa',
+      parent: 'jupiter',
+      order: "Jupiter's Moon II",
+      color: '#93c5fd',
+      secondaryColor: '#1e3a8a',
+      radius: 3.8,
+      orbitR: 50,
+      speed: 0.011,
+      angle: 2.1,
+      distSun: '5.20 AU (778.6M km)',
+      orbitPeriod: '85.2 hrs (3.55 d)',
+      projX: 0,
+      projY: 0
+    },
+    {
+      id: 'ganymede',
+      name: 'Ganymede',
+      parent: 'jupiter',
+      order: "Jupiter's Moon III",
+      color: '#cbd5e1',
+      secondaryColor: '#475569',
+      radius: 5.2,
+      orbitR: 64,
+      speed: 0.0075,
+      angle: 3.6,
+      distSun: '5.20 AU (778.6M km)',
+      orbitPeriod: '171.7 hrs (7.15 d)',
+      projX: 0,
+      projY: 0
+    },
+    {
+      id: 'callisto',
+      name: 'Callisto',
+      parent: 'jupiter',
+      order: "Jupiter's Moon IV",
+      color: '#94a3b8',
+      secondaryColor: '#334155',
+      radius: 4.6,
+      orbitR: 78,
+      speed: 0.0048,
+      angle: 5.0,
+      distSun: '5.20 AU (778.6M km)',
+      orbitPeriod: '400.5 hrs (16.69 d)',
+      projX: 0,
+      projY: 0
+    }
+  ];
+
+  const saturnMoons = [
+    {
+      id: 'enceladus',
+      name: 'Enceladus',
+      parent: 'saturn',
+      order: "Saturn's Moon II",
+      color: '#e0f2fe',
+      secondaryColor: '#0284c7',
+      radius: 3.2,
+      orbitR: 44,
+      speed: 0.014,
+      angle: 1.2,
+      distSun: '9.54 AU (1.43B km)',
+      orbitPeriod: '32.9 hrs (1.37 d)',
+      projX: 0,
+      projY: 0
+    },
+    {
+      id: 'titan',
+      name: 'Titan',
+      parent: 'saturn',
+      order: "Saturn's Moon VI",
+      color: '#fbbf24',
+      secondaryColor: '#92400e',
+      radius: 5.2,
+      orbitR: 60,
+      speed: 0.0065,
+      angle: 3.8,
+      distSun: '9.54 AU (1.43B km)',
+      orbitPeriod: '382.7 hrs (15.95 d)',
+      projX: 0,
+      projY: 0
+    }
+  ];
 
   const planets = [
     {
@@ -330,8 +433,10 @@ const SolarBackground = (() => {
   }
 
   // ---------------------------------------------------------------------------
-  // 5. Viewport Layout & Coordinate System
+  // 5. Viewport Layout & Coordinate System (100% Unobstructed Full Solar View)
   // ---------------------------------------------------------------------------
+  let isPanelMinimized = false;
+
   function updateLayout() {
     if (!canvas) return;
 
@@ -345,20 +450,37 @@ const SolarBackground = (() => {
     canvas.height = Math.floor(height * dpr);
     ctx.scale(dpr, dpr);
 
-    const leftNavW = width >= 820 ? 240 : 0;
-    const availableW = width - leftNavW;
-
     if (width >= 820) {
-      // Grand, expansive desktop solar system simulation
-      targetSunCenterX = leftNavW + availableW * 0.50;
-      targetSunCenterY = height * 0.52;
-      // Majestic baseRadius filling the viewport comfortably
-      targetBaseRadius = Math.min(availableW * 0.44, height * 0.70);
+      // Desktop: Reserve left navigation sidebar (240px) and right telemetry panel (~340px)
+      const leftNavW = 240;
+      const rightReservedW = isPanelMinimized ? 90 : 340;
+      const viewAreaW = Math.max(340, width - leftNavW - rightReservedW);
+
+      // Center the Sun horizontally in the clear, unobstructed space between sidebar and telemetry card
+      targetSunCenterX = leftNavW + viewAreaW * 0.50;
+      targetSunCenterY = height * 0.50;
+
+      // Pluto outermost orbit scale is 1.09, tilted at -0.32 rad (-18.3 deg).
+      // Maximum horizontal span from Sun center: ~1.045 * baseRadius
+      // Maximum vertical span from Sun center: ~0.565 * baseRadius
+      // Safe margins ensure zero orbits ever touch sidebar (left) or card (right)
+      const maxBaseRadiusX = (viewAreaW * 0.50 - 24) / 1.05;
+      const viewAreaH = Math.max(240, height - 160);
+      const maxBaseRadiusY = (viewAreaH * 0.50 - 20) / 0.57;
+
+      targetBaseRadius = Math.max(140, Math.min(maxBaseRadiusX, maxBaseRadiusY));
     } else {
-      // Mobile full view
+      // Mobile / Tablet: Sidebar is a drawer, telemetry card is pinned at bottom
+      const bottomReservedH = isPanelMinimized ? 60 : 250;
+      const availableH = Math.max(220, height - bottomReservedH - 70);
+
       targetSunCenterX = width * 0.50;
-      targetSunCenterY = height * 0.52;
-      targetBaseRadius = Math.min(width * 0.46, height * 0.55);
+      targetSunCenterY = 70 + availableH * 0.48;
+
+      const maxBaseRadiusX = (width * 0.50 - 16) / 1.05;
+      const maxBaseRadiusY = (availableH * 0.50 - 15) / 0.57;
+
+      targetBaseRadius = Math.max(120, Math.min(maxBaseRadiusX, maxBaseRadiusY));
     }
 
     if (currentBaseRadius === 0) {
@@ -406,6 +528,32 @@ const SolarBackground = (() => {
         hitX: moonBody.projX,
         hitY: moonBody.projY
       };
+    // 1b. Direct hit on Jupiter's Galilean Moons (Io, Europa, Ganymede, Callisto)
+    for (let i = 0; i < jovianMoons.length; i++) {
+      const m = jovianMoons[i];
+      const d = Math.hypot(mx - m.projX, my - m.projY);
+      if (d <= m.radius + 15) {
+        return {
+          ...m,
+          hitType: 'body',
+          hitX: m.projX,
+          hitY: m.projY
+        };
+      }
+    }
+
+    // 1c. Direct hit on Saturn's Moons (Titan, Enceladus)
+    for (let i = 0; i < saturnMoons.length; i++) {
+      const m = saturnMoons[i];
+      const d = Math.hypot(mx - m.projX, my - m.projY);
+      if (d <= m.radius + 15) {
+        return {
+          ...m,
+          hitType: 'body',
+          hitX: m.projX,
+          hitY: m.projY
+        };
+      }
     }
 
     // 2. Direct hit on Sun
@@ -797,6 +945,148 @@ const SolarBackground = (() => {
     ctx.fill();
 
     ctx.restore();
+  }
+
+  // ---------------------------------------------------------------------------
+  // 11.2 Drawing Routines: Jupiter Galilean Satellites (Io, Europa, Ganymede, Callisto)
+  // ---------------------------------------------------------------------------
+  function drawJovianSystem(jupiter, time) {
+    jovianMoons.forEach((m) => {
+      if (!prefersReducedMotion) {
+        m.angle += m.speed;
+      }
+      m.projX = jupiter.projX + Math.cos(m.angle) * m.orbitR;
+      m.projY = jupiter.projY + Math.sin(m.angle) * (m.orbitR * 0.44);
+
+      const isSelected = selectedBodyId === m.id;
+      const isHovered = hoveredBodyId === m.id;
+
+      ctx.save();
+      // Orbit track
+      ctx.beginPath();
+      for (let t = 0; t <= Math.PI * 2; t += 0.2) {
+        const ox = jupiter.projX + Math.cos(t) * m.orbitR;
+        const oy = jupiter.projY + Math.sin(t) * (m.orbitR * 0.44);
+        if (t === 0) ctx.moveTo(ox, oy);
+        else ctx.lineTo(ox, oy);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = isSelected ? 'rgba(56, 189, 248, 0.6)' : (isHovered ? 'rgba(255, 255, 255, 0.25)' : 'rgba(255, 255, 255, 0.06)');
+      ctx.lineWidth = isSelected ? 1.4 : 0.7;
+      ctx.stroke();
+
+      // Halo on select/hover
+      if (isSelected || isHovered) {
+        const pulse = Math.sin(time * 0.006) * 1.8;
+        const haloR = m.radius + 6 + pulse;
+        ctx.beginPath();
+        ctx.arc(m.projX, m.projY, haloR, 0, Math.PI * 2);
+        ctx.strokeStyle = isSelected ? '#38bdf8' : '#ffffff';
+        ctx.lineWidth = 1.4;
+        ctx.shadowColor = isSelected ? '#38bdf8' : '#ffffff';
+        ctx.shadowBlur = 10;
+        ctx.stroke();
+
+        ctx.font = '600 10px "Space Grotesk", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+        ctx.shadowBlur = 4;
+        ctx.fillText(m.name.toUpperCase(), m.projX, m.projY - haloR - 2);
+      }
+
+      // Moon Sphere
+      const toSunX = sunCenterX - m.projX;
+      const toSunY = sunCenterY - m.projY;
+      const sDist = Math.hypot(toSunX, toSunY) || 1;
+      const hx = m.projX + (toSunX / sDist) * (m.radius * 0.4);
+      const hy = m.projY + (toSunY / sDist) * (m.radius * 0.4);
+
+      const grad = ctx.createRadialGradient(hx, hy, 0.5, m.projX, m.projY, m.radius);
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(0.4, m.color);
+      grad.addColorStop(1, m.secondaryColor);
+
+      ctx.fillStyle = grad;
+      ctx.shadowBlur = isSelected ? 8 : 2;
+      ctx.shadowColor = m.color;
+      ctx.beginPath();
+      ctx.arc(m.projX, m.projY, m.radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // 11.3 Drawing Routines: Saturnian Satellites (Titan, Enceladus)
+  // ---------------------------------------------------------------------------
+  function drawSaturnSystem(saturn, time) {
+    saturnMoons.forEach((m) => {
+      if (!prefersReducedMotion) {
+        m.angle += m.speed;
+      }
+      m.projX = saturn.projX + Math.cos(m.angle) * m.orbitR;
+      m.projY = saturn.projY + Math.sin(m.angle) * (m.orbitR * 0.44);
+
+      const isSelected = selectedBodyId === m.id;
+      const isHovered = hoveredBodyId === m.id;
+
+      ctx.save();
+      // Orbit track
+      ctx.beginPath();
+      for (let t = 0; t <= Math.PI * 2; t += 0.2) {
+        const ox = saturn.projX + Math.cos(t) * m.orbitR;
+        const oy = saturn.projY + Math.sin(t) * (m.orbitR * 0.44);
+        if (t === 0) ctx.moveTo(ox, oy);
+        else ctx.lineTo(ox, oy);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = isSelected ? 'rgba(56, 189, 248, 0.6)' : (isHovered ? 'rgba(255, 255, 255, 0.25)' : 'rgba(255, 255, 255, 0.06)');
+      ctx.lineWidth = isSelected ? 1.4 : 0.7;
+      ctx.stroke();
+
+      // Halo on select/hover
+      if (isSelected || isHovered) {
+        const pulse = Math.sin(time * 0.006) * 1.8;
+        const haloR = m.radius + 6 + pulse;
+        ctx.beginPath();
+        ctx.arc(m.projX, m.projY, haloR, 0, Math.PI * 2);
+        ctx.strokeStyle = isSelected ? '#38bdf8' : '#ffffff';
+        ctx.lineWidth = 1.4;
+        ctx.shadowColor = isSelected ? '#38bdf8' : '#ffffff';
+        ctx.shadowBlur = 10;
+        ctx.stroke();
+
+        ctx.font = '600 10px "Space Grotesk", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+        ctx.shadowBlur = 4;
+        ctx.fillText(m.name.toUpperCase(), m.projX, m.projY - haloR - 2);
+      }
+
+      // Moon Sphere
+      const toSunX = sunCenterX - m.projX;
+      const toSunY = sunCenterY - m.projY;
+      const sDist = Math.hypot(toSunX, toSunY) || 1;
+      const hx = m.projX + (toSunX / sDist) * (m.radius * 0.4);
+      const hy = m.projY + (toSunY / sDist) * (m.radius * 0.4);
+
+      const grad = ctx.createRadialGradient(hx, hy, 0.5, m.projX, m.projY, m.radius);
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(0.4, m.color);
+      grad.addColorStop(1, m.secondaryColor);
+
+      ctx.fillStyle = grad;
+      ctx.shadowBlur = isSelected ? 8 : 2;
+      ctx.shadowColor = m.color;
+      ctx.beginPath();
+      ctx.arc(m.projX, m.projY, m.radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    });
   }
 
   // ---------------------------------------------------------------------------
@@ -1270,6 +1560,8 @@ const SolarBackground = (() => {
 
     // 6. Planets
     let earthRef = null;
+    let jupiterRef = null;
+    let saturnRef = null;
     planets.forEach((p) => {
       if (!prefersReducedMotion) {
         p.angle += p.speed;
@@ -1279,16 +1571,22 @@ const SolarBackground = (() => {
       p.projX = pos.x;
       p.projY = pos.y;
 
-      if (p.id === 'earth') {
-        earthRef = p;
-      }
+      if (p.id === 'earth') earthRef = p;
+      if (p.id === 'jupiter') jupiterRef = p;
+      if (p.id === 'saturn') saturnRef = p;
 
       drawPlanet(p, time);
     });
 
-    // 7. Earth's Moon sub-system
+    // 7. Celestial Satellite Sub-Systems (Stage 06: Moons of the Solar System)
     if (earthRef) {
       drawMoonSystem(earthRef, time);
+    }
+    if (jupiterRef) {
+      drawJovianSystem(jupiterRef, time);
+    }
+    if (saturnRef) {
+      drawSaturnSystem(saturnRef, time);
     }
 
     // 8. Interactive Orbit & Celestial Body Telemetry HUD (Touching & Hovering)
@@ -1446,10 +1744,16 @@ const SolarBackground = (() => {
     updateLayout();
   }
 
+  function togglePanelMinimize(minimized) {
+    isPanelMinimized = Boolean(minimized);
+    updateLayout();
+  }
+
   return {
     init,
     setSelectedPlanet,
     setPreviewOpen,
+    togglePanelMinimize,
     getPlanets: () => planets,
     getPerformanceMetrics: () => ({ fps: measuredFps, frameTimeMs: avgFrameTime, dpr }),
     onPerformanceUpdate: (cb) => { onFpsUpdateCallback = cb; },

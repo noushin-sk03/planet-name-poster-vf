@@ -125,6 +125,62 @@ document.addEventListener('DOMContentLoaded', async () => {
       orbitPeriod: '11.86 yrs'
     },
     {
+      id: 'io',
+      name: 'Io',
+      parent: 'jupiter',
+      order: "Jupiter's Moon I",
+      type: 'Volcanic Satellite',
+      color: '#facc15',
+      gravity: '1.8 m/s²',
+      dayLength: '42.5 hrs',
+      temp: '-130 °C',
+      distSun: '5.20 AU',
+      distEarth: '4.20 AU avg',
+      orbitPeriod: '11.86 yrs'
+    },
+    {
+      id: 'europa',
+      name: 'Europa',
+      parent: 'jupiter',
+      order: "Jupiter's Moon II",
+      type: 'Ocean Ice World',
+      color: '#93c5fd',
+      gravity: '1.3 m/s²',
+      dayLength: '85.2 hrs',
+      temp: '-160 °C',
+      distSun: '5.20 AU',
+      distEarth: '4.20 AU avg',
+      orbitPeriod: '11.86 yrs'
+    },
+    {
+      id: 'ganymede',
+      name: 'Ganymede',
+      parent: 'jupiter',
+      order: "Jupiter's Moon III",
+      type: 'Largest Solar Moon',
+      color: '#cbd5e1',
+      gravity: '1.4 m/s²',
+      dayLength: '171.7 hrs',
+      temp: '-163 °C',
+      distSun: '5.20 AU',
+      distEarth: '4.20 AU avg',
+      orbitPeriod: '11.86 yrs'
+    },
+    {
+      id: 'callisto',
+      name: 'Callisto',
+      parent: 'jupiter',
+      order: "Jupiter's Moon IV",
+      type: 'Cratered Ice World',
+      color: '#94a3b8',
+      gravity: '1.2 m/s²',
+      dayLength: '400.5 hrs',
+      temp: '-139 °C',
+      distSun: '5.20 AU',
+      distEarth: '4.20 AU avg',
+      orbitPeriod: '11.86 yrs'
+    },
+    {
       id: 'saturn',
       name: 'Saturn',
       order: '6th from Sun',
@@ -133,6 +189,34 @@ document.addEventListener('DOMContentLoaded', async () => {
       gravity: '10.4 m/s²',
       dayLength: '10.7 hrs',
       temp: '-140 °C',
+      distSun: '9.54 AU',
+      distEarth: '8.54 AU avg',
+      orbitPeriod: '29.45 yrs'
+    },
+    {
+      id: 'enceladus',
+      name: 'Enceladus',
+      parent: 'saturn',
+      order: "Saturn's Moon II",
+      type: 'Cryovolcanic World',
+      color: '#e0f2fe',
+      gravity: '0.11 m/s²',
+      dayLength: '32.9 hrs',
+      temp: '-198 °C',
+      distSun: '9.54 AU',
+      distEarth: '8.54 AU avg',
+      orbitPeriod: '29.45 yrs'
+    },
+    {
+      id: 'titan',
+      name: 'Titan',
+      parent: 'saturn',
+      order: "Saturn's Moon VI",
+      type: 'Haze & Methane Seas',
+      color: '#fbbf24',
+      gravity: '1.4 m/s²',
+      dayLength: '382.7 hrs',
+      temp: '-179 °C',
       distSun: '9.54 AU',
       distEarth: '8.54 AU avg',
       orbitPeriod: '29.45 yrs'
@@ -190,7 +274,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     moon: 'Earth\'s faithful natural satellite. Stabilizes Earth\'s axial tilt and tides; destination of NASA Apollo and Artemis missions.',
     mars: 'The Red Planet. Home to Olympus Mons, Valles Marineris, polar ice caps, and ancient river valley networks.',
     jupiter: 'King of the planets. Giant gas world with Great Red Spot, massive magnetic shield, and 95 known moons.',
+    io: 'Tidally locked to Jupiter (1 rotation = 42.5 hrs). Most volcanically active body in solar system with 400+ active silicate/sulfur calderas.',
+    europa: 'Tidally locked to Jupiter. Smooth water-ice lithosphere with reddish tectonic lineae harboring a global subsurface saltwater ocean.',
+    ganymede: 'Tidally locked to Jupiter. Largest moon in solar system (larger than Mercury); only moon with an intrinsic magnetic dynamo.',
+    callisto: 'Tidally locked to Jupiter. Ancient, heavily cratered surface featuring enormous multi-ring impact basins like Valhalla.',
     saturn: 'Jewel of the solar system. Famous for its dazzling icy ring system, low density, and dynamic moons Titan and Enceladus.',
+    enceladus: 'Tidally locked to Saturn. Dazzling 99% albedo water-ice shell with south polar tiger-stripe geysers erupting vapor into space.',
+    titan: 'Tidally locked to Saturn. Dense nitrogen-methane atmosphere hides surface in amber haze; hosts liquid methane/ethane seas (Kraken Mare).',
     uranus: 'Tilted ice giant rotating on its side at 98 degrees. Possesses 13 faint rings, cyan methane haze, and 28 moons.',
     neptune: 'Distant sapphire ice giant swept by supersonic winds up to 2,100 km/h and featuring dynamic dark storm systems.',
     pluto: 'Beloved Kuiper Belt dwarf planet with a nitrogen heart glacier (Tombaugh Regio), blue skies, and five orbiting moons.'
@@ -336,8 +426,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       meta.appendChild(nameSpan);
       meta.appendChild(subSpan);
 
-      // If world is The Moon, render as a satellite branching with elbow arrow from Earth
-      if (world.id === 'moon') {
+      // If world is a Moon, render as a satellite branching with elbow arrow from parent planet
+      if (world.parent || world.id === 'moon') {
         btn.classList.add('satellite-btn');
         const connector = document.createElement('span');
         connector.className = 'satellite-branch-connector';
@@ -727,7 +817,26 @@ document.addEventListener('DOMContentLoaded', async () => {
           selectionPanel.classList.remove('hidden-in-studio');
         }
       }
-    }, { passive: true });
+    // 3.0 Telemetry Panel Minimize / Expand Action
+    const panelMinimizeBtn = document.getElementById('panel-minimize-btn');
+    const panelMinimizeIcon = document.getElementById('panel-minimize-icon');
+    let isPanelMinimized = false;
+
+    if (panelMinimizeBtn && selectionPanel) {
+      panelMinimizeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        isPanelMinimized = !isPanelMinimized;
+        selectionPanel.classList.toggle('minimized', isPanelMinimized);
+        if (panelMinimizeIcon) {
+          panelMinimizeIcon.textContent = isPanelMinimized ? '+' : '─';
+        }
+        panelMinimizeBtn.setAttribute('aria-expanded', !isPanelMinimized);
+        panelMinimizeBtn.setAttribute('title', isPanelMinimized ? 'Expand telemetry card' : 'Minimize telemetry card');
+        if (window.SolarBackground && typeof SolarBackground.togglePanelMinimize === 'function') {
+          SolarBackground.togglePanelMinimize(isPanelMinimized);
+        }
+      });
+    }
 
     // 3.1 Dedicated Astronaut Scroller Controls (Rail Drag, Buttons & Keyboard)
     if (astroUpBtn) {
