@@ -80,13 +80,15 @@ const SolarBackground = (() => {
   // 1. Procedural Starfield & Nebulae
   // ---------------------------------------------------------------------------
   const stars = [];
-  const STAR_COUNT = 240;
+  // Fewer stars on small screens = smoother animation on phones and tablets
+  const isMobileDevice = window.innerWidth < 768 || /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+  const STAR_COUNT = isMobileDevice ? 100 : 240;
 
   function initStarfield() {
     stars.length = 0;
     for (let i = 0; i < STAR_COUNT; i++) {
       const roll = Math.random();
-      let starColor = '#ffffff';
+      let starColor = '#ffffff'
       if (roll > 0.85) starColor = '#93c5fd'; // Ice blue
       else if (roll > 0.70) starColor = '#fef08a'; // Pale yellow
       else if (roll > 0.58) starColor = '#fed7aa'; // Amber
@@ -108,7 +110,8 @@ const SolarBackground = (() => {
   // 2. Animated Asteroid Belt (Between Mars at 0.50 and Jupiter at 0.63)
   // ---------------------------------------------------------------------------
   const asteroidBelt = [];
-  const ASTEROID_COUNT = 220;
+  // Fewer asteroids on mobile for better frame rate
+  const ASTEROID_COUNT = isMobileDevice ? 80 : 220;
 
   function initAsteroidBelt() {
     asteroidBelt.length = 0;
@@ -446,9 +449,8 @@ const SolarBackground = (() => {
   function updateLayout() {
     if (!canvas) return;
 
-    // Explicit DPR cap: 1.5 on mobile (< 768px), 2.0 on desktop.
-    // Prevents fill-rate bottlenecks and preserves 60 FPS on high-density mobile screens.
-    dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.5 : 2);
+    // DPR cap: phones get 1.0 (huge perf win), tablets 1.5, desktop up to 2.0
+    dpr = Math.min(window.devicePixelRatio || 1, isMobileDevice ? 1.0 : (window.innerWidth < 1024 ? 1.5 : 2));
     width = window.innerWidth;
     height = window.innerHeight;
 
@@ -1725,11 +1727,24 @@ const SolarBackground = (() => {
   let measuredFps = '60.0';
   let avgFrameTime = '16.6';
   let onFpsUpdateCallback = null;
+  // On mobile, target ~30fps instead of 60fps to keep animation smooth without draining battery
+  const TARGET_FRAME_MS = isMobileDevice ? 1000 / 30 : 0;
+  let lastFrameTime = 0;
 
   function render(time) {
     if (isPaused) return;
 
-    // Track rolling 60 FPS performance metrics
+    // Mobile frame throttle: skip frames to stay at ~30fps
+    if (TARGET_FRAME_MS > 0) {
+      const elapsed = time - lastFrameTime;
+      if (elapsed < TARGET_FRAME_MS) {
+        animationId = requestAnimationFrame(render);
+        return;
+      }
+      lastFrameTime = time - (elapsed % TARGET_FRAME_MS);
+    }
+
+    // Track rolling FPS performance metrics
     frameCount++;
     const now = performance.now();
     if (now - lastFpsUpdateTime >= 1000) {

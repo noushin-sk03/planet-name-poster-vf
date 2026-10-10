@@ -1,109 +1,84 @@
-# Planet Name Poster & NASA Celestial Studio 🪐
+# 🪐 Planet Name Poster
 
-> Transform your name into a bold typographic celestial poster with verified NASA textures, explore 30 celestial worlds with full orbit selection, generate 3D lit globes with interactive day/night terminators, and export high-resolution wallpapers and print designs.
->
-> **-Made by NSK with AI**
->
-> 🔗 **Repository**: [https://github.com/noushin-sk03/planet-name-poster](https://github.com/noushin-sk03/planet-name-poster)
+Ever wondered what your name looks like on Mars? Or how old you'd be on Jupiter? This little web app lets you find out.
 
----
+Pick any planet (or moon, or exoplanet), type your name, and it instantly generates a beautiful space poster with your name written across the world you chose. You can also spin a 3D globe, download your poster, or even check your weight and age on another planet. It's free, it works in your browser, and no app download is needed.
 
-## 🌌 Overview
-
-**Planet Name Poster & NASA Celestial Studio** is an educational, zero-dependency space simulation and poster studio built with standard modern HTML5, CSS3, Canvas 2D, and WebGL APIs.
-
-* **Interactive Solar System Simulation**: Real-time orbital mechanics simulating celestial bodies orbiting the Sun, an Asteroid Belt, deep space nebulae, and galactic parallax drift traveling through the Milky Way at ~230 km/s.
-* **Direct Planet & Orbit Selection**: Click any planet, moon, or click directly on any elliptical orbit track in the simulation to inspect full NASA telemetry.
-* **30 Celestial Worlds Across 2 Catalogs**:
-  * **🪐 Solar System & Moons (18 worlds)**: The Sun, 8 Planets, and 7 major natural satellites (Earth's Moon, Io, Europa, Ganymede, Callisto, Titan, Enceladus).
-  * **🌌 NASA Exoplanet Archive (12 worlds)**: Confirmed alien worlds including TRAPPIST-1 e/f, Proxima Centauri b, Kepler-186 f, Kepler-452 b, WASP-76 b, and 55 Cancri e, with honest *"Artist's Impression"* badges.
-* **Blinking Asteroid User Guide**: Eye-catching pulsating asteroid icon in the top right corner opening a friendly, step-by-step cosmic guide for all users.
-* **Typographic Texture Compositing**: Names up to 30 characters rasterized into an alpha mask and composited with high-resolution celestial surface imagery using Canvas 2D Porter-Duff blend modes (`source-in` and `source-atop`).
-* **🌐 WebGL 3D Lit Globe with Name Generator**: Analytical raytraced fragment shader rendering a 3D sphere with an interactive Sun Angle slider (moving day/night terminator boundary), auto-rotation, and personalized NASA name generation on the 3D globe with high-res poster snapshot downloads.
-* **Day & Night Illumination**: Day mode renders authentic daytime surface illumination; Night mode darkens the surface and renders Rayleigh atmospheric backlighting and starry night skies.
-* **Multi-Format Export & Wallpapers**: High-resolution downloads categorized under Social (Portrait, Square, Story, X Post, Link Preview, Pinterest), Wallpapers (PC Wallpaper 1920×1080, 4K Desktop 3840×2160, Ultrawide 2560×1080, Tablet 2048×1536, Phone Wallpaper 1170×2532), Print (A4 300 DPI), and Custom Dimensions.
-* **Living on Another World Biophysics**: Calculates weight on each world ($F = m \cdot \frac{g_{\text{world}}}{g_{\text{earth}}}$) and age in local planetary orbital years based on birthdate.
-* **Stateful Sharing & Data Export**: Shareable URLs that sync the exact configuration with zero backend using HTML5 `history.replaceState`, plus single-click JSON export of verified NASA Fact Sheets.
+**Made by NSK with AI 🤍**
 
 ---
 
-## 🚀 How to Run Locally
+## What can you do with it?
 
-Because this project is built entirely with plain vanilla web technologies, there are **no build steps, no package installations, and no frameworks required**.
+- **Choose your world** — Browse the solar system, pick any of the 8 planets, Earth's Moon, moons of Jupiter and Saturn, or even distant confirmed exoplanets from NASA's database.
 
-### Option 1: Python HTTP Server (Recommended)
-Open a terminal in the project directory and run:
+- **Generate your name poster** — Type any name (up to 50 characters) and watch it appear in bold NASA-style typography across your chosen world.
+
+- **Switch between Day & Night** — See what the planet looks like in daylight vs. a dark starlit night. The poster changes completely.
+
+- **Spin a 3D globe** — Switch to the WebGL 3D view and see your planet rotating as a realistic lit sphere. Your name appears right on the globe.
+
+- **Download your poster** — Save it as a high-res image in multiple sizes: phone wallpaper, social media post, PC wallpaper, 4K desktop, print-ready, and more.
+
+- **See your stats on another world** — Enter your weight and birthday. It'll tell you how much you'd weigh there and how old you'd be in that planet's years.
+
+- **Download planet data** — Export a fact sheet for your chosen world to Excel. Great for school projects!
+
+- **Share your poster** — Copy a link that opens the exact same poster for whoever you send it to.
+
+---
+
+## Worlds you can explore
+
+**Solar System (18 worlds)**
+The Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto — plus the Moon, Io, Europa, Ganymede, Callisto, Titan, and Enceladus.
+
+**Exoplanets from NASA (12 worlds)**
+Real confirmed alien planets including TRAPPIST-1 e, TRAPPIST-1 f, Proxima Centauri b, Kepler-186 f, Kepler-452 b, WASP-76 b, 55 Cancri e, and more. All shown with an "Artist's Impression" label since nobody has actually seen them up close.
+
+---
+
+## How to use it
+
+Just open the link and you're good to go. No sign-up, no login, nothing to install. Works on phones, tablets, and computers.
+
+1. Click any planet in the solar system view to select it
+2. Scroll down to the studio panel
+3. Type your name
+4. Hit "Download" to save your poster
+
+That's it. The user guide button (the blinking ☄️ icon in the top right) walks you through everything step by step if you get stuck.
+
+---
+
+## Facts & accuracy
+
+All planet data comes from NASA's official sources:
+- [NASA Planetary Fact Sheet](https://nssdc.gsfc.nasa.gov/planetary/factsheet/)
+- [NASA Exoplanet Archive](https://exoplanetarchive.ipac.caltech.edu/)
+
+Every number — gravity, temperature, day length, orbital period, distance — has been verified against NASA's published data. Exoplanet visuals are clearly marked as artistic impressions because we don't have real photos of them yet.
+
+---
+
+## Running it yourself
+
+This is a plain HTML/CSS/JavaScript project. No frameworks, no build steps, no installs.
+
+**Quick start:**
 ```bash
 python -m http.server 8080
 ```
-Then visit `http://localhost:8080` in your web browser.
+Then open `http://localhost:8080` in your browser.
 
-### Option 2: Direct File Open
-You can also directly double-click `index.html` in your file explorer to open it in Chrome, Edge, Safari, or Firefox without any web server.
-
----
-
-## 🧪 Automated Unit & Integration Tests
-
-The project includes **123 automated unit and integration tests** covering biophysical math, tidal locking, orbital mechanics, poster formatting, XSS URL safety, and WebGL raytracing maths:
-
-```bash
-# Run all test suites
-node tests/test_calculator.js      # 16 tests: Biophysical formulas & orbital years
-node tests/test_poster_formats.js   #  5 tests: Resolution aspect ratios & safe zones
-node tests/test_share.js           #  9 tests: URL parameter encoding & XSS sanitization
-node tests/test_moons.js           # 12 tests: Natural satellite micro-gravity & parents
-node tests/test_exoplanets.js      # 66 tests: 12 NASA exoplanets, badges & archive citations
-node tests/test_stage8_globe.js    # 15 tests: WebGL raytraced fragment shader & terminator
-node tests/verify_ui.js            # UI integration verification
-```
+Or just double-click `index.html` directly.
 
 ---
 
-## 📁 File Structure
+## A note on the 3D globe
 
-```text
-planet-name-poster/
-├── index.html              # Semantic HTML5 layout with Solar System, Studio, and 3D Globe
-├── preview.png             # Lightweight Open Graph social card preview
-├── css/
-│   └── style.css           # Mobile-first stylesheet with design tokens, responsive cards, and animations
-├── js/
-│   ├── app.js              # Main application coordinator, event binding, and drawer sync
-│   ├── background.js       # Interactive 60 FPS Solar System & Extrasolar orbital canvas engine
-│   ├── calculator.js       # Pure biophysical gravity, weight, age, and diurnal functions
-│   ├── poster.js           # 2D NASA typography & poster layout engine with multi-format export
-│   ├── skies.js            # Procedural sky models for Solar System, Moons, and 12 Exoplanets
-│   ├── sphere3d.js         # WebGL analytical raytraced 3D lit globe with moving terminator
-│   ├── textures.js         # Procedural equirectangular surface texture synthesizer
-│   └── share.js            # URL state parsing, serialization, and XSS sanitization
-├── tests/
-│   ├── test_calculator.js  # Biophysics unit tests
-│   ├── test_poster_formats.js # Export resolutions and safe-zones
-│   ├── test_share.js       # URL sharing and security tests
-│   ├── test_moons.js       # Natural satellite tests
-│   ├── test_exoplanets.js  # NASA Exoplanet Archive tests
-│   ├── test_stage8_globe.js # WebGL 3D shader tests
-│   └── verify_ui.js        # UI integration validation
-├── README.md               # Project documentation
-└── .gitignore              # Git exclusion rules
-```
+The 3D planet globe isn't a pre-made 3D model — it's drawn in real time using a WebGL shader that traces rays of light mathematically. This means it works on any browser that supports WebGL, with no heavy files to download.
 
 ---
 
-## 🌐 WebGL 3D Lit Globe Shader Mathematics
-
-In `js/sphere3d.js`, instead of subdividing a polygon mesh into tens of thousands of triangles, the 3D globe uses an **analytical ray-sphere intersection fragment shader**:
-* **Surface Normal**: $N = (x, y, \sqrt{1 - x^2 - y^2})$
-* **Sunlight Vector**: $L = (\cos\theta, 0.25, \sin\theta)$
-* **Diffuse Illumination**: $I = \max(0, N \cdot L)$
-* **Terminator Line**: $\text{smoothstep}(-0.12, 0.12, N \cdot L)$ creates an authentic atmospheric twilight boundary.
-* **Fresnel Atmospheric Glow**: $\text{pow}(1.0 - N_z, 2.5)$ renders subtle Rayleigh edge scattering.
-
----
-
-## 📜 Credits & Licensing
-
-* **Data**: NASA Planetary Fact Sheet, Planetary Satellite Fact Sheet, and NASA Exoplanet Archive (Public Domain).
-* **Artistic Disclaimer**: All exoplanet visualizations and models are honest **Artist's Impressions (Procedural Models)** based on transit and radial velocity archive data.
-* **Watermark**: `-Made by NSK with AI`.
+*-Made by NSK with AI*
