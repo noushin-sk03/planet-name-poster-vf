@@ -1,4 +1,4 @@
-﻿/**
+/**
  * textures.js - Planetary Texture & Font Asset Manager
  * ----------------------------------------------------
  * Responsibilities:
@@ -83,6 +83,15 @@ const TextureManager = (() => {
    * @param {string} mode - 'day' or 'night'
    * @returns {HTMLCanvasElement} - Offscreen canvas ready to be used as a texture
    */
+  // Detect mobile once at module level for texture quality decisions
+  const _isMobileTex = (typeof window !== 'undefined') &&
+    (window.innerWidth < 768 || /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent));
+  // Mobile: 512x256 (4x fewer pixels), Desktop: 1024x512
+  const TEX_W = _isMobileTex ? 512 : 1024;
+  const TEX_H = _isMobileTex ? 256 : 512;
+  // Mobile: 3 FBM octaves (faster), Desktop: 5 (richer detail)
+  const BASE_OCT = _isMobileTex ? 3 : 5;
+
   function generateProceduralTexture(planet, mode = 'day', forceRefresh = false) {
     const cacheKey = `${planet.id}_${mode}`;
     if (!forceRefresh && proceduralCache.has(cacheKey)) {
@@ -90,8 +99,8 @@ const TextureManager = (() => {
     }
 
     const canvas = document.createElement('canvas');
-    canvas.width = 1024;
-    canvas.height = 512;
+    canvas.width = TEX_W;
+    canvas.height = TEX_H;
     const ctx = canvas.getContext('2d');
     const w = canvas.width;
     const h = canvas.height;
@@ -111,7 +120,7 @@ const TextureManager = (() => {
            + hash(xi,yi+1)*(1-su)*sv   + hash(xi+1,yi+1)*su*sv;
     };
     // Fractional Brownian Motion â€” layered noise for organic look
-    const fbm = (x, y, oct=5, gain=0.5, lac=2.1) => {
+    const fbm = (x, y, oct=BASE_OCT, gain=0.5, lac=2.1) => {
       let v=0, amp=0.5, freq=1, max=0;
       for (let i=0;i<oct;i++){v+=vnoise(x*freq,y*freq)*amp;max+=amp;amp*=gain;freq*=lac;}
       return v/max;

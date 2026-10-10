@@ -57,6 +57,7 @@ body {
   height: 100%;
   z-index: 1;
   display: block;
+  will-change: transform; /* GPU layer — prevents repaints from other DOM changes */
 }
 
 /* --- Cosmic Explorer Rocket Cursor --- */
@@ -1864,6 +1865,7 @@ button, a, input, select, .planet-btn, #solar-canvas.pointer-active, :focus {
   max-width: 460px;
   max-height: 460px;
   display: block;
+  will-change: transform; /* GPU compositing for smooth WebGL rendering */
 }
 
 .globe-controls-overlay {
