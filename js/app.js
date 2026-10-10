@@ -83,7 +83,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       temp: '15 °C',
       distSun: '1.00 AU',
       distEarth: '0 km (Home)',
-      orbitPeriod: '365.25 days'
+      orbitPeriod: '365.25 days',
+      texture: 'textures/solar_system/earth_day.jpg'   // real 2K Blue Marble (Three.js CC)
     },
     {
       id: 'moon',
@@ -96,7 +97,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       temp: '-20 °C',
       distSun: '1.00 AU',
       distEarth: '384,400 km',
-      orbitPeriod: '27.3 days'
+      orbitPeriod: '27.3 days',
+      texture: 'textures/solar_system/moon.jpg'        // real 1K lunar map (Three.js CC)
+
     },
     {
       id: 'mars',
@@ -1033,6 +1036,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (globeTelemetryBadge) {
       globeTelemetryBadge.textContent = `${world.distSun || ''} • ${world.gravity ? world.gravity + ' m/s²' : 'Unknown'}`;
     }
+    // "artist's impression" shown for all planets — real or procedural texture
+    // (for planets with real textures, it clarifies they aren't photos)
+    const impressionTag = document.getElementById('globe-impression-tag');
+    if (impressionTag) {
+      impressionTag.style.display = (world.type === 'exoplanet') ? 'inline' : 'none';
+    }
 
     updateGlobeTexture(world);
   }
@@ -1040,12 +1049,43 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ---------------------------------------------------------------------------
   // 4.1 Stage 08 WebGL 3D Lit Globe Controls
   // ---------------------------------------------------------------------------
+  // Accessor for the WebGL globe viewport (used for crossfade transitions)
+  const _globeViewport = () => document.querySelector('.globe-viewport-box');
+
   function updateGlobeTexture(world, forceRefresh = false) {
     if (typeof Sphere3DViewer === 'undefined' || !Sphere3DViewer.isSupported()) return;
-    if (typeof TextureManager !== 'undefined' && TextureManager.generateProceduralTexture) {
-      const texCanvas = TextureManager.generateProceduralTexture(world, state.mode, forceRefresh);
-      Sphere3DViewer.setTexture(texCanvas, world);
+    if (typeof TextureManager === 'undefined') return;
+
+    const viewport = _globeViewport();
+
+    // ── Crossfade transition: fade out → swap → fade in ────────────────────
+    const applyTexture = (texSource) => {
+      Sphere3DViewer.setTexture(texSource, world);
+      if (viewport) {
+        viewport.style.transition = 'opacity 0.28s ease-in';
+        viewport.style.opacity   = '1';
+      }
+    };
+
+    // Start fade-out
+    if (viewport) {
+      viewport.style.transition = 'opacity 0.18s ease-out';
+      viewport.style.opacity   = '0';
     }
+
+    // After fade completes: load texture and fade back in
+    setTimeout(() => {
+      if (world.texture) {
+        // Real image file first, procedural on error
+        TextureManager.getPlanetTexture(world, state.mode)
+          .then(applyTexture)
+          .catch(() => {
+            applyTexture(TextureManager.generateProceduralTexture(world, state.mode, forceRefresh));
+          });
+      } else {
+        applyTexture(TextureManager.generateProceduralTexture(world, state.mode, forceRefresh));
+      }
+    }, 180);
   }
 
   function switchStudioView(viewMode) {
