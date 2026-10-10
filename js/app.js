@@ -44,7 +44,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       temp: '5,500 °C',
       distSun: '0 AU (0 km)',
       distEarth: '1.00 AU',
-      orbitPeriod: '230M yrs'
+      orbitPeriod: '230M yrs',
+      texture: 'textures/solar_system/sun.jpg'
     },
     {
       id: 'mercury',
@@ -57,7 +58,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       temp: '167 °C',
       distSun: '0.39 AU',
       distEarth: '0.61 AU avg',
-      orbitPeriod: '88.0 days'
+      orbitPeriod: '88.0 days',
+      texture: 'textures/solar_system/mercury.jpg'
     },
     {
       id: 'venus',
@@ -70,7 +72,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       temp: '464 °C',
       distSun: '0.72 AU',
       distEarth: '0.28 AU min',
-      orbitPeriod: '224.7 days'
+      orbitPeriod: '224.7 days',
+      texture: 'textures/solar_system/venus.jpg'
     },
     {
       id: 'earth',
@@ -84,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       distSun: '1.00 AU',
       distEarth: '0 km (Home)',
       orbitPeriod: '365.25 days',
-      texture: 'textures/solar_system/earth_day.jpg'   // real 2K Blue Marble (Three.js CC)
+      texture: 'textures/solar_system/earth_day.jpg'
     },
     {
       id: 'moon',
@@ -98,8 +101,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       distSun: '1.00 AU',
       distEarth: '384,400 km',
       orbitPeriod: '27.3 days',
-      texture: 'textures/solar_system/moon.jpg'        // real 1K lunar map (Three.js CC)
-
+      texture: 'textures/solar_system/moon.jpg'
     },
     {
       id: 'mars',
@@ -112,7 +114,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       temp: '-65 °C',
       distSun: '1.52 AU',
       distEarth: '0.52 AU min',
-      orbitPeriod: '687.0 days'
+      orbitPeriod: '687.0 days',
+      texture: 'textures/solar_system/mars.jpg'
     },
     {
       id: 'jupiter',
@@ -125,7 +128,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       temp: '-110 °C',
       distSun: '5.20 AU',
       distEarth: '4.20 AU avg',
-      orbitPeriod: '11.86 yrs'
+      orbitPeriod: '11.86 yrs',
+      texture: 'textures/solar_system/jupiter.jpg'
     },
     {
       id: 'io',
@@ -139,7 +143,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       temp: '-130 °C',
       distSun: '5.20 AU',
       distEarth: '4.20 AU avg',
-      orbitPeriod: '11.86 yrs'
+      orbitPeriod: '11.86 yrs',
+      texture: 'textures/solar_system/io.jpg'
     },
     {
       id: 'europa',
@@ -153,7 +158,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       temp: '-160 °C',
       distSun: '5.20 AU',
       distEarth: '4.20 AU avg',
-      orbitPeriod: '11.86 yrs'
+      orbitPeriod: '11.86 yrs',
+      texture: 'textures/solar_system/europa.jpg'
     },
     {
       id: 'ganymede',
@@ -167,7 +173,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       temp: '-163 °C',
       distSun: '5.20 AU',
       distEarth: '4.20 AU avg',
-      orbitPeriod: '11.86 yrs'
+      orbitPeriod: '11.86 yrs',
+      texture: 'textures/solar_system/ganymede.jpg'
     },
     {
       id: 'callisto',
@@ -181,7 +188,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       temp: '-139 °C',
       distSun: '5.20 AU',
       distEarth: '4.20 AU avg',
-      orbitPeriod: '11.86 yrs'
+      orbitPeriod: '11.86 yrs',
+      texture: 'textures/solar_system/callisto.jpg'
     },
     {
       id: 'saturn',
@@ -194,7 +202,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       temp: '-140 °C',
       distSun: '9.54 AU',
       distEarth: '8.54 AU avg',
-      orbitPeriod: '29.45 yrs'
+      orbitPeriod: '29.45 yrs',
+      texture: 'textures/solar_system/saturn.jpg'
     },
     {
       id: 'enceladus',
@@ -208,7 +217,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       temp: '-198 °C',
       distSun: '9.54 AU',
       distEarth: '8.54 AU avg',
-      orbitPeriod: '29.45 yrs'
+      orbitPeriod: '29.45 yrs',
+      texture: 'textures/solar_system/enceladus.jpg'
     },
     {
       id: 'titan',
@@ -222,7 +232,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       temp: '-179 °C',
       distSun: '9.54 AU',
       distEarth: '8.54 AU avg',
-      orbitPeriod: '29.45 yrs'
+      orbitPeriod: '29.45 yrs',
+      texture: 'textures/solar_system/titan.jpg'
     },
     {
       id: 'uranus',
@@ -235,7 +246,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       temp: '-195 °C',
       distSun: '19.19 AU',
       distEarth: '18.21 AU avg',
-      orbitPeriod: '84.02 yrs'
+      orbitPeriod: '84.02 yrs',
+      texture: 'textures/solar_system/uranus.jpg'
     },
     {
       id: 'neptune',
@@ -248,7 +260,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       temp: '-200 °C',
       distSun: '30.07 AU',
       distEarth: '29.07 AU avg',
-      orbitPeriod: '164.79 yrs'
+      orbitPeriod: '164.79 yrs',
+      texture: 'textures/solar_system/neptune.jpg'
     },
     {
       id: 'pluto',
@@ -261,7 +274,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       temp: '-225 °C',
       distSun: '39.48 AU',
       distEarth: '38.48 AU avg',
-      orbitPeriod: '247.94 yrs'
+      orbitPeriod: '247.94 yrs',
+      texture: 'textures/solar_system/pluto.jpg'
     }
   ];
 
@@ -312,7 +326,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       radiusEarths: 0.92,
       massEarths: 0.69,
       dataSource: 'NASA Exoplanet Archive (IPAC/Caltech)',
-      palette: { primary: '#0284c7', secondary: '#064e3b', accent: '#bae6fd', glow: 'rgba(2, 132, 199, 0.55)' }
+      palette: { primary: '#0284c7', secondary: '#064e3b', accent: '#bae6fd', glow: 'rgba(2, 132, 199, 0.55)' },
+      texture: 'textures/exoplanets/trappist_1_e.jpg'
     },
     {
       id: 'trappist_1_f',
@@ -333,7 +348,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       radiusEarths: 1.04,
       massEarths: 1.04,
       dataSource: 'NASA Exoplanet Archive (IPAC/Caltech)',
-      palette: { primary: '#6366f1', secondary: '#1e1b4b', accent: '#c7d2fe', glow: 'rgba(99, 102, 241, 0.55)' }
+      palette: { primary: '#6366f1', secondary: '#1e1b4b', accent: '#c7d2fe', glow: 'rgba(99, 102, 241, 0.55)' },
+      texture: 'textures/exoplanets/trappist_1_f.jpg'
     },
     {
       id: 'proxima_cen_b',
@@ -354,7 +370,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       radiusEarths: 'unknown',
       massEarths: 1.05,
       dataSource: 'NASA Exoplanet Archive (IPAC/Caltech)',
-      palette: { primary: '#06b6d4', secondary: '#082f49', accent: '#cffafe', glow: 'rgba(6, 182, 212, 0.55)' }
+      palette: { primary: '#06b6d4', secondary: '#082f49', accent: '#cffafe', glow: 'rgba(6, 182, 212, 0.55)' },
+      texture: 'textures/exoplanets/proxima_cen_b.jpg'
     },
     {
       id: 'kepler_186_f',
@@ -375,7 +392,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       radiusEarths: 1.17,
       massEarths: 'unknown',
       dataSource: 'NASA Exoplanet Archive (IPAC/Caltech)',
-      palette: { primary: '#059669', secondary: '#064e3b', accent: '#a7f3d0', glow: 'rgba(5, 150, 105, 0.55)' }
+      palette: { primary: '#059669', secondary: '#064e3b', accent: '#a7f3d0', glow: 'rgba(5, 150, 105, 0.55)' },
+      texture: 'textures/exoplanets/kepler_186_f.jpg'
     },
     {
       id: 'kepler_452_b',
@@ -396,7 +414,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       radiusEarths: 1.63,
       massEarths: 'unknown',
       dataSource: 'NASA Exoplanet Archive (IPAC/Caltech)',
-      palette: { primary: '#0284c7', secondary: '#064e3b', accent: '#bae6fd', glow: 'rgba(2, 132, 199, 0.55)' }
+      palette: { primary: '#0284c7', secondary: '#064e3b', accent: '#bae6fd', glow: 'rgba(2, 132, 199, 0.55)' },
+      texture: 'textures/exoplanets/kepler_452_b.jpg'
     },
     {
       id: 'kepler_22_b',
@@ -417,7 +436,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       radiusEarths: 2.10,
       massEarths: 9.10,
       dataSource: 'NASA Exoplanet Archive (IPAC/Caltech)',
-      palette: { primary: '#16a34a', secondary: '#14532d', accent: '#bbf7d0', glow: 'rgba(22, 163, 74, 0.55)' }
+      palette: { primary: '#16a34a', secondary: '#14532d', accent: '#bbf7d0', glow: 'rgba(22, 163, 74, 0.55)' },
+      texture: 'textures/exoplanets/kepler_22_b.jpg'
     },
     {
       id: 'wasp_76_b',
@@ -438,7 +458,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       radiusEarths: 20.78,
       massEarths: 284.14,
       dataSource: 'NASA Exoplanet Archive (IPAC/Caltech)',
-      palette: { primary: '#dc2626', secondary: '#7f1d1d', accent: '#fef08a', glow: 'rgba(239, 68, 68, 0.65)' }
+      palette: { primary: '#dc2626', secondary: '#7f1d1d', accent: '#fef08a', glow: 'rgba(239, 68, 68, 0.65)' },
+      texture: 'textures/exoplanets/wasp_76_b.jpg'
     },
     {
       id: 'wasp_12_b',
@@ -459,7 +480,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       radiusEarths: 22.03,
       massEarths: 'unknown',
       dataSource: 'NASA Exoplanet Archive (IPAC/Caltech)',
-      palette: { primary: '#ea580c', secondary: '#431407', accent: '#fde047', glow: 'rgba(234, 88, 12, 0.65)' }
+      palette: { primary: '#ea580c', secondary: '#431407', accent: '#fde047', glow: 'rgba(234, 88, 12, 0.65)' },
+      texture: 'textures/exoplanets/wasp_12_b.jpg'
     },
     {
       id: '55_cnc_e',
@@ -480,7 +502,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       radiusEarths: 1.88,
       massEarths: 7.99,
       dataSource: 'NASA Exoplanet Archive (IPAC/Caltech)',
-      palette: { primary: '#d97706', secondary: '#78350f', accent: '#fef08a', glow: 'rgba(217, 119, 6, 0.65)' }
+      palette: { primary: '#d97706', secondary: '#78350f', accent: '#fef08a', glow: 'rgba(217, 119, 6, 0.65)' },
+      texture: 'textures/exoplanets/55_cnc_e.jpg'
     },
     {
       id: 'hd_189733_b',
@@ -501,7 +524,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       radiusEarths: 12.67,
       massEarths: 359.15,
       dataSource: 'NASA Exoplanet Archive (IPAC/Caltech)',
-      palette: { primary: '#1d4ed8', secondary: '#1e1b4b', accent: '#93c5fd', glow: 'rgba(29, 78, 216, 0.65)' }
+      palette: { primary: '#1d4ed8', secondary: '#1e1b4b', accent: '#93c5fd', glow: 'rgba(29, 78, 216, 0.65)' },
+      texture: 'textures/exoplanets/hd_189733_b.jpg'
     },
     {
       id: 'hd_209458_b',
@@ -522,7 +546,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       radiusEarths: 15.58,
       massEarths: 232.02,
       dataSource: 'NASA Exoplanet Archive (IPAC/Caltech)',
-      palette: { primary: '#4f46e5', secondary: '#1e1b4b', accent: '#c7d2fe', glow: 'rgba(79, 70, 229, 0.6)' }
+      palette: { primary: '#4f46e5', secondary: '#1e1b4b', accent: '#c7d2fe', glow: 'rgba(79, 70, 229, 0.6)' },
+      texture: 'textures/exoplanets/hd_209458_b.jpg'
     },
     {
       id: 'toi_700_d',
@@ -543,7 +568,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       radiusEarths: 1.15,
       massEarths: 'unknown',
       dataSource: 'NASA Exoplanet Archive (IPAC/Caltech)',
-      palette: { primary: '#0369a1', secondary: '#082f49', accent: '#7dd3fc', glow: 'rgba(3, 105, 161, 0.55)' }
+      palette: { primary: '#0369a1', secondary: '#082f49', accent: '#7dd3fc', glow: 'rgba(3, 105, 161, 0.55)' },
+      texture: 'textures/exoplanets/toi_700_d.jpg'
     }
   ];
 
