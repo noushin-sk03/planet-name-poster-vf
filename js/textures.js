@@ -83,14 +83,13 @@ const TextureManager = (() => {
    * @param {string} mode - 'day' or 'night'
    * @returns {HTMLCanvasElement} - Offscreen canvas ready to be used as a texture
    */
-  // Detect mobile once at module level for texture quality decisions
-  const _isMobileTex = (typeof window !== 'undefined') &&
-    (window.innerWidth < 768 || /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent));
-  // Mobile: 512x256 (4x fewer pixels), Desktop: 1024x512
-  const TEX_W = _isMobileTex ? 512 : 1024;
-  const TEX_H = _isMobileTex ? 256 : 512;
-  // Mobile: 3 FBM octaves (faster), Desktop: 5 (richer detail)
-  const BASE_OCT = _isMobileTex ? 3 : 5;
+  // Globe canvas is max 480px wide — 512×256 texture is plenty (no visible quality loss).
+  // 1024×512 was 4× extra work with zero visual benefit on a sphere.
+  const TEX_W = 512;
+  const TEX_H = 256;
+  // 3 octaves: fast and still organically detailed. 5 was overkill.
+  const BASE_OCT = 3;
+
 
   function generateProceduralTexture(planet, mode = 'day', forceRefresh = false) {
     const cacheKey = `${planet.id}_${mode}`;

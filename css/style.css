@@ -1964,18 +1964,20 @@ button, a, input, select, .planet-btn, #solar-canvas.pointer-active, :focus {
 
 .globe-name-overlay {
   position: absolute;
-  top: 50%;
+  top: 0;
   left: 0;
   right: 0;
-  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   text-align: center;
   pointer-events: none;
   z-index: 10;
-  padding: 0 1.5rem;
+  padding: 1.1rem 1.5rem 0.5rem;
+  /* subtle dark gradient so text is readable against bright planet edges */
+  background: linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, transparent 100%);
+  border-radius: inherit;
 }
 
 .globe-agency-tag {
@@ -1991,7 +1993,7 @@ button, a, input, select, .planet-btn, #solar-canvas.pointer-active, :focus {
 
 .globe-name-title {
   font-family: var(--font-display, sans-serif);
-  font-size: 2.8rem;
+  font-size: 2.2rem;
   font-weight: 900;
   letter-spacing: 0.14em;
   text-transform: uppercase;

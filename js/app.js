@@ -1058,34 +1058,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const viewport = _globeViewport();
 
-    // ── Crossfade transition: fade out → swap → fade in ────────────────────
-    const applyTexture = (texSource) => {
-      Sphere3DViewer.setTexture(texSource, world);
+    // Pre-generate or fetch texture FIRST so the swap is instant at the dim point
+    const doSwap = (texSource) => {
+      // Dim down smoothly (never fully black — stays at 20% so planet is visible)
       if (viewport) {
-        viewport.style.transition = 'opacity 0.28s ease-in';
-        viewport.style.opacity   = '1';
+        viewport.style.transition = 'opacity 0.10s ease-out';
+        viewport.style.opacity   = '0.2';
       }
+      // Swap texture at the dim point, then fade back to full
+      setTimeout(() => {
+        Sphere3DViewer.setTexture(texSource, world);
+        if (viewport) {
+          viewport.style.transition = 'opacity 0.22s ease-in';
+          viewport.style.opacity   = '1';
+        }
+      }, 100);
     };
 
-    // Start fade-out
-    if (viewport) {
-      viewport.style.transition = 'opacity 0.18s ease-out';
-      viewport.style.opacity   = '0';
+    if (world.texture) {
+      TextureManager.getPlanetTexture(world, state.mode)
+        .then(doSwap)
+        .catch(() => doSwap(TextureManager.generateProceduralTexture(world, state.mode, forceRefresh)));
+    } else {
+      doSwap(TextureManager.generateProceduralTexture(world, state.mode, forceRefresh));
     }
-
-    // After fade completes: load texture and fade back in
-    setTimeout(() => {
-      if (world.texture) {
-        // Real image file first, procedural on error
-        TextureManager.getPlanetTexture(world, state.mode)
-          .then(applyTexture)
-          .catch(() => {
-            applyTexture(TextureManager.generateProceduralTexture(world, state.mode, forceRefresh));
-          });
-      } else {
-        applyTexture(TextureManager.generateProceduralTexture(world, state.mode, forceRefresh));
-      }
-    }, 180);
   }
 
   function switchStudioView(viewMode) {
