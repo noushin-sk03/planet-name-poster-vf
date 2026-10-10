@@ -1,4 +1,4 @@
-/**
+﻿/**
  * textures.js - Planetary Texture & Font Asset Manager
  * ----------------------------------------------------
  * Responsibilities:
@@ -96,434 +96,509 @@ const TextureManager = (() => {
     const w = canvas.width;
     const h = canvas.height;
 
-    // Helper: seeded "random" based on position so textures are stable (not random each call)
-    const rng = (seed) => {
-      let s = Math.sin(seed) * 43758.5453;
-      return s - Math.floor(s);
+    // â”€â”€ Noise helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // Seeded hash â€” stable across calls
+    const hash = (x, y) => {
+      let n = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
+      return n - Math.floor(n);
+    };
+    // Bilinear value noise [0..1]
+    const vnoise = (x, y) => {
+      const xi = Math.floor(x), yi = Math.floor(y);
+      const u = x - xi, v = y - yi;
+      const su = u*u*(3-2*u), sv = v*v*(3-2*v);
+      return hash(xi,yi)*(1-su)*(1-sv) + hash(xi+1,yi)*su*(1-sv)
+           + hash(xi,yi+1)*(1-su)*sv   + hash(xi+1,yi+1)*su*sv;
+    };
+    // Fractional Brownian Motion â€” layered noise for organic look
+    const fbm = (x, y, oct=5, gain=0.5, lac=2.1) => {
+      let v=0, amp=0.5, freq=1, max=0;
+      for (let i=0;i<oct;i++){v+=vnoise(x*freq,y*freq)*amp;max+=amp;amp*=gain;freq*=lac;}
+      return v/max;
+    };
+    // Lerp between two [r,g,b] colours
+    const lerpRGB = (a, b, t) => [
+      a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t
+    ];
+    // Fill canvas pixel by pixel using a callback(px,py) â†’ [r,g,b,a]
+    const fillPixels = (cb) => {
+      const img = ctx.createImageData(w, h);
+      const d = img.data;
+      for (let py=0; py<h; py++) {
+        for (let px=0; px<w; px++) {
+          const [r,g,b,a=255] = cb(px/w, py/h);
+          const i = (py*w+px)*4;
+          d[i]=r; d[i+1]=g; d[i+2]=b; d[i+3]=a;
+        }
+      }
+      ctx.putImageData(img, 0, 0);
     };
 
-    // Use planet color/secondaryColor as palette, with fallback
-    const primary   = planet.color        || planet.palette?.primary   || '#888888';
-    const secondary = planet.secondaryColor || planet.palette?.secondary || '#444444';
-    const accent    = planet.palette?.accent || '#cccccc';
+    const id = planet.id || '';
 
-    // ── Base fill ────────────────────────────────────────────────────────────
-    const baseGrad = ctx.createLinearGradient(0, 0, 0, h);
-    baseGrad.addColorStop(0,   secondary);
-    baseGrad.addColorStop(0.5, primary);
-    baseGrad.addColorStop(1,   secondary);
-    ctx.fillStyle = baseGrad;
-    ctx.fillRect(0, 0, w, h);
+    switch(id) {
 
-    // ── Per-planet surface features ──────────────────────────────────────────
-    switch (planet.id) {
-
-      // ── SUN ──────────────────────────────────────────────────────────────
+      // â”€â”€ SUN â”€ orange-yellow granulation, dark sunspots â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       case 'sun': {
-        const sunGrad = ctx.createRadialGradient(w/2, h/2, 10, w/2, h/2, w*0.6);
-        sunGrad.addColorStop(0,   '#fffde7');
-        sunGrad.addColorStop(0.3, '#fdd835');
-        sunGrad.addColorStop(0.7, '#fb8c00');
-        sunGrad.addColorStop(1,   '#bf360c');
-        ctx.fillStyle = sunGrad;
-        ctx.globalAlpha = 0.9;
-        ctx.fillRect(0, 0, w, h);
-        // Granulation cells
-        for (let i = 0; i < 120; i++) {
-          const cx = rng(i*7) * w;
-          const cy = rng(i*13) * h;
-          const r  = 10 + rng(i*3) * 30;
-          ctx.globalAlpha = 0.08 + rng(i*5) * 0.12;
-          ctx.fillStyle = rng(i) > 0.5 ? '#fff9c4' : '#e65100';
-          ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
-        }
+        fillPixels((x,y) => {
+          const gran = fbm(x*18, y*18, 6, 0.45);
+          const hot  = fbm(x*6+3, y*6+1, 4, 0.5);
+          const t    = gran*0.7 + hot*0.3;
+          const spot = fbm(x*9+7, y*9+5, 3, 0.6);
+          if (spot > 0.72) return [40,20,5,255];   // sunspot
+          return lerpRGB([230,110,10],[255,210,60], t).concat(255);
+        });
         break;
       }
 
-      // ── MERCURY — brownish grey, heavily cratered, NO polar ice ──────────
+      // â”€â”€ MERCURY â”€ light grey, heavily cratered â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       case 'mercury': {
-        // Darker brownish base over the gradient
-        ctx.fillStyle = '#5d4e37';
-        ctx.globalAlpha = 0.35;
-        ctx.fillRect(0, 0, w, h);
-        // Caloris Basin (huge impact feature)
-        ctx.globalAlpha = 0.5;
-        const calorisGrad = ctx.createRadialGradient(w*0.28, h*0.42, 5, w*0.28, h*0.42, 110);
-        calorisGrad.addColorStop(0, '#8b7355');
-        calorisGrad.addColorStop(1, 'transparent');
-        ctx.fillStyle = calorisGrad;
-        ctx.beginPath(); ctx.arc(w*0.28, h*0.42, 110, 0, Math.PI*2); ctx.fill();
-        // Many craters — small and medium
-        for (let i = 0; i < 80; i++) {
-          const cx = rng(i*11) * w;
-          const cy = rng(i*17) * h;
-          const r  = 3 + rng(i*7) * 18;
-          ctx.fillStyle = '#3e2f1f';
-          ctx.globalAlpha = 0.5;
-          ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
-          ctx.strokeStyle = '#a08060';
-          ctx.lineWidth = 1.2;
-          ctx.globalAlpha = 0.4;
-          ctx.stroke();
-        }
-        break;
-      }
-
-      // ── VENUS — thick swirling yellow-orange cloud decks ─────────────────
-      case 'venus': {
-        ctx.fillStyle = '#f6e58d';
-        ctx.globalAlpha = 0.25;
-        ctx.fillRect(0, 0, w, h);
-        for (let y = 0; y < h; y += 28) {
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.bezierCurveTo(w*0.25, y+22, w*0.75, y-22, w, y);
-          ctx.lineWidth = 16;
-          ctx.strokeStyle = rng(y) > 0.5 ? '#e2a300' : '#c9870a';
-          ctx.globalAlpha = 0.18 + rng(y*3) * 0.15;
-          ctx.stroke();
-        }
-        // Bright polar vortex
-        const vGrad = ctx.createRadialGradient(w*0.5, 0, 5, w*0.5, 0, 100);
-        vGrad.addColorStop(0, '#fff9c4');
-        vGrad.addColorStop(1, 'transparent');
-        ctx.fillStyle = vGrad; ctx.globalAlpha = 0.4;
-        ctx.beginPath(); ctx.arc(w*0.5, 0, 100, 0, Math.PI*2); ctx.fill();
-        break;
-      }
-
-      // ── EARTH ─────────────────────────────────────────────────────────────
-      case 'earth': {
-        if (mode === 'night') {
-          ctx.fillStyle = '#050d1a'; ctx.globalAlpha = 1; ctx.fillRect(0, 0, w, h);
-          for (let i = 0; i < 400; i++) {
-            const cx = rng(i*7) * w;
-            const cy = 80 + rng(i*13) * (h-160);
-            const r  = 0.8 + rng(i*3) * 2.5;
-            ctx.fillStyle = rng(i) > 0.3 ? '#fef08a' : '#fbbf24';
-            ctx.globalAlpha = 0.35 + rng(i*5) * 0.6;
-            ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
-          }
-        } else {
-          // Continents
-          ctx.fillStyle = '#2d6a4f'; ctx.globalAlpha = 0.6;
-          for (let i = 0; i < 14; i++) {
-            ctx.beginPath();
-            ctx.ellipse(rng(i*7)*w, 100+rng(i*13)*(h-200), 60+rng(i*3)*55, 35+rng(i*5)*38, rng(i), 0, Math.PI*2);
-            ctx.fill();
-          }
-          // Clouds
-          ctx.fillStyle = '#fff'; ctx.globalAlpha = 0.3;
-          for (let i = 0; i < 8; i++) {
-            ctx.beginPath();
-            ctx.ellipse(rng(i*11)*w, rng(i*17)*h, 100+rng(i)*60, 14+rng(i*3)*10, rng(i*7)*0.5, 0, Math.PI*2);
-            ctx.fill();
-          }
-        }
-        break;
-      }
-
-      // ── MARS — rusty red, dark basaltic plains, polar ice caps ───────────
-      case 'mars': {
-        // Dark volcanic plains (Syrtis Major, Hellas Basin)
-        ctx.fillStyle = '#5c1a00'; ctx.globalAlpha = 0.45;
-        for (let i = 0; i < 12; i++) {
-          ctx.beginPath();
-          ctx.ellipse(rng(i*7)*w, 80+rng(i*13)*(h-160), 90+rng(i*3)*80, 40+rng(i*5)*35, rng(i)*0.6, 0, Math.PI*2);
-          ctx.fill();
-        }
-        // Dust storm horizontal striations
-        ctx.fillStyle = '#e07040'; ctx.globalAlpha = 0.18;
-        for (let y = 40; y < h-40; y += 36) { ctx.fillRect(0, y, w, 7); }
-        // White polar ice caps
-        ctx.fillStyle = '#ffffff'; ctx.globalAlpha = 0.7;
-        ctx.beginPath(); ctx.ellipse(w*0.5, 20, w*0.22, 28, 0, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.ellipse(w*0.5, h-20, w*0.16, 20, 0, 0, Math.PI*2); ctx.fill();
-        break;
-      }
-
-      // ── JUPITER — vivid tan/orange/brown bands + Great Red Spot ──────────
-      case 'jupiter': {
-        const jColors = ['#c8a97a','#8b5e3c','#e8c49a','#6b3a2a','#d4a574','#4a2518'];
-        for (let i = 0; i < 28; i++) {
-          const y = (h / 28) * i;
-          const bh = (h / 28) * (0.7 + Math.sin(i * 1.7) * 0.3);
-          ctx.fillStyle = jColors[i % jColors.length];
-          ctx.globalAlpha = 0.55 + (i % 3 === 0 ? 0.2 : 0);
-          ctx.beginPath(); ctx.moveTo(0, y);
-          for (let x = 0; x <= w; x += 80) {
-            ctx.lineTo(x, y + Math.sin((x/w)*Math.PI*4+i)*5);
-          }
-          ctx.lineTo(w, y+bh); ctx.lineTo(0, y+bh); ctx.closePath(); ctx.fill();
-        }
-        // Great Red Spot
-        ctx.globalAlpha = 0.9;
-        const grs = ctx.createRadialGradient(w*0.63, h*0.62, 4, w*0.63, h*0.62, 65);
-        grs.addColorStop(0, '#c0392b'); grs.addColorStop(0.6, '#922b21'); grs.addColorStop(1, 'transparent');
-        ctx.fillStyle = grs;
-        ctx.beginPath(); ctx.ellipse(w*0.63, h*0.62, 72, 44, -0.1, 0, Math.PI*2); ctx.fill();
-        break;
-      }
-
-      // ── SATURN — golden/cream bands, more muted than Jupiter ─────────────
-      case 'saturn': {
-        const sColors = ['#f5e6c8','#c9a96e','#e8d5a3','#a07840','#d4b982','#8b6530'];
-        for (let i = 0; i < 18; i++) {
-          const y = (h / 18) * i;
-          const bh = (h / 18) * (0.8 + Math.sin(i * 2.1) * 0.2);
-          ctx.fillStyle = sColors[i % sColors.length];
-          ctx.globalAlpha = 0.45 + (i % 4 === 0 ? 0.2 : 0);
-          ctx.fillRect(0, y, w, bh);
-        }
-        // Subtle oval storms
-        ctx.globalAlpha = 0.35;
-        ctx.fillStyle = '#c8a050';
-        ctx.beginPath(); ctx.ellipse(w*0.4, h*0.38, 40, 22, 0.2, 0, Math.PI*2); ctx.fill();
-        break;
-      }
-
-      // ── URANUS — pale blue-green, nearly featureless, faint banding ──────
-      case 'uranus': {
-        // Nearly uniform teal-blue with subtle gradient
-        const uGrad = ctx.createLinearGradient(0, 0, 0, h);
-        uGrad.addColorStop(0, '#7fffd4'); uGrad.addColorStop(0.4, '#40e0d0');
-        uGrad.addColorStop(0.6, '#20b2aa'); uGrad.addColorStop(1, '#008b8b');
-        ctx.fillStyle = uGrad; ctx.globalAlpha = 0.85; ctx.fillRect(0, 0, w, h);
-        // Very faint cloud bands (Uranus is mostly featureless)
-        ctx.fillStyle = '#b2f5e9'; ctx.globalAlpha = 0.08;
-        for (let i = 0; i < 6; i++) { ctx.fillRect(0, (h/6)*i, w, h/12); }
-        // Faint polar brightening
-        const upGrad = ctx.createRadialGradient(w/2, 0, 0, w/2, 0, h*0.4);
-        upGrad.addColorStop(0, 'rgba(255,255,255,0.2)'); upGrad.addColorStop(1, 'transparent');
-        ctx.fillStyle = upGrad; ctx.globalAlpha = 0.5;
-        ctx.beginPath(); ctx.arc(w/2, 0, h*0.4, 0, Math.PI*2); ctx.fill();
-        break;
-      }
-
-      // ── NEPTUNE — deep cobalt blue, Great Dark Spot, bright cloud streaks ─
-      case 'neptune': {
-        const nGrad = ctx.createLinearGradient(0, 0, 0, h);
-        nGrad.addColorStop(0, '#1a237e'); nGrad.addColorStop(0.5, '#283593');
-        nGrad.addColorStop(1, '#0d47a1');
-        ctx.fillStyle = nGrad; ctx.globalAlpha = 1; ctx.fillRect(0, 0, w, h);
-        // Great Dark Spot (like Jupiter's GRS but darker)
-        ctx.globalAlpha = 0.7;
-        const gds = ctx.createRadialGradient(w*0.42, h*0.44, 5, w*0.42, h*0.44, 70);
-        gds.addColorStop(0, '#0a0a3a'); gds.addColorStop(0.7, '#1a1a6e'); gds.addColorStop(1, 'transparent');
-        ctx.fillStyle = gds;
-        ctx.beginPath(); ctx.ellipse(w*0.42, h*0.44, 80, 50, -0.15, 0, Math.PI*2); ctx.fill();
-        // Bright white cirrus cloud streaks
-        ctx.fillStyle = '#e3f2fd'; ctx.globalAlpha = 0.55;
-        for (let i = 0; i < 8; i++) {
-          const y = h*(0.2 + i*0.08);
-          ctx.beginPath(); ctx.ellipse(w*(0.3+rng(i*7)*0.4), y, 80+rng(i*3)*60, 6, 0.1, 0, Math.PI*2); ctx.fill();
-        }
-        break;
-      }
-
-      // ── PLUTO — pale tan/rust patchwork, heart-shaped nitrogen plains ─────
-      case 'pluto': {
-        // Tombaugh Regio (the heart)
-        ctx.fillStyle = '#f5e6d0'; ctx.globalAlpha = 0.85;
-        ctx.beginPath(); ctx.ellipse(w*0.55, h*0.52, 130, 90, 0.3, 0, Math.PI*2); ctx.fill();
-        // Dark reddish terrain (Cthulhu Macula)
-        ctx.fillStyle = '#5c3317'; ctx.globalAlpha = 0.6;
-        ctx.beginPath(); ctx.ellipse(w*0.25, h*0.55, 150, 55, 0.1, 0, Math.PI*2); ctx.fill();
-        // Cratered highlands
-        for (let i = 0; i < 30; i++) {
-          const cx = rng(i*11)*w; const cy = rng(i*17)*h;
-          const r  = 4 + rng(i*7)*12;
-          ctx.fillStyle = '#8b7355'; ctx.globalAlpha = 0.3;
-          ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
-        }
-        break;
-      }
-
-      // ── MOON — grey with dark maria seas, craters, brighter highlands ─────
-      case 'moon': {
-        // Dark mare basins (Sea of Tranquility, Sea of Crisis, etc.)
-        ctx.fillStyle = '#2a2a3a'; ctx.globalAlpha = 0.55;
-        const marea = [{x:0.28,y:0.45,rx:130,ry:90},{x:0.55,y:0.38,rx:110,ry:75},
-                       {x:0.72,y:0.58,rx:85,ry:60},{x:0.15,y:0.62,rx:70,ry:50}];
-        marea.forEach(m => {
-          ctx.beginPath(); ctx.ellipse(w*m.x, h*m.y, m.rx, m.ry, rng(m.x)*0.4, 0, Math.PI*2); ctx.fill();
+        fillPixels((x,y) => {
+          const base = fbm(x*8+2, y*8+1, 5, 0.5);
+          const v = Math.round(140 + base*60);
+          return [v, v-5, v-10, 255];
         });
         // Craters
-        for (let i = 0; i < 60; i++) {
-          const cx = rng(i*11)*w; const cy = rng(i*17)*h;
-          const r  = 3 + rng(i*7)*16;
-          ctx.fillStyle = '#1a1a2e'; ctx.globalAlpha = 0.45;
-          ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
-          ctx.strokeStyle = '#d4d4d4'; ctx.lineWidth = 1.2; ctx.globalAlpha = 0.4; ctx.stroke();
-        }
-        // Bright ray system (like Tycho)
-        ctx.strokeStyle = '#e8e8e8'; ctx.globalAlpha = 0.2; ctx.lineWidth = 1;
-        for (let a = 0; a < Math.PI*2; a += Math.PI/8) {
-          ctx.beginPath(); ctx.moveTo(w*0.7, h*0.7);
-          ctx.lineTo(w*0.7 + Math.cos(a)*200, h*0.7 + Math.sin(a)*200); ctx.stroke();
+        ctx.globalAlpha = 1;
+        for (let i=0;i<90;i++){
+          const cx=(hash(i*7,1)*w)|0, cy=(hash(i*11,2)*h)|0;
+          const r=4+hash(i*3,5)*20;
+          const dark = `rgba(90,88,85,0.55)`;
+          const rim  = `rgba(210,208,200,0.5)`;
+          ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+          ctx.fillStyle=dark; ctx.fill();
+          ctx.strokeStyle=rim; ctx.lineWidth=1.2; ctx.stroke();
         }
         break;
       }
 
-      // ── IO — yellow sulphur world, red/black calderas ─────────────────────
+      // â”€â”€ VENUS â”€ golden/cream swirling cloud bands â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      case 'venus': {
+        fillPixels((x,y) => {
+          const swirl = fbm(x*4+Math.sin(y*Math.PI*3)*0.3, y*5, 5, 0.5);
+          const band  = 0.5+0.5*Math.sin(y*Math.PI*10 + swirl*4);
+          const c     = lerpRGB([195,145,60],[240,215,140], swirl*0.6+band*0.4);
+          return c.concat(255);
+        });
+        break;
+      }
+
+      // â”€â”€ EARTH (day) â”€ blue ocean, green/brown continents, white clouds â”€â”€â”€
+      // â”€â”€ EARTH (night) â”€ black with city lights â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      case 'earth': {
+        if (mode === 'night') {
+          fillPixels((x,y) => {
+            const n = fbm(x*12+1, y*12+2, 4, 0.5);
+            if (n > 0.54) {
+              const bright = (n-0.54)*5;
+              return [200+bright*55, 190+bright*40, 100+bright*30, 255];
+            }
+            return [4,8,18,255];
+          });
+        } else {
+          fillPixels((x,y) => {
+            const land = fbm(x*5+0.3, y*5+0.7, 6, 0.52);
+            const cloud= fbm(x*7+2.1, y*6+1.3, 4, 0.5);
+            if (cloud > 0.60) return [230,235,240,255];   // cloud
+            if (land > 0.50)  {
+              const topo = fbm(x*10, y*10, 3, 0.5);
+              const c = lerpRGB([90,120,55],[160,130,80], topo);
+              return c.concat(255);                        // land
+            }
+            const depth = fbm(x*6+4, y*6+3, 3, 0.5)*0.3;
+            return lerpRGB([20,70,160],[40,120,200], land/0.5+depth).concat(255); // ocean
+          });
+        }
+        break;
+      }
+
+      // â”€â”€ MOON â”€ grey with dark circular maria, craters â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      case 'moon': {
+        fillPixels((x,y) => {
+          const base = fbm(x*7+1, y*7+2, 5, 0.5);
+          const v = Math.round(120 + base*70);
+          return [v,v,v,255];
+        });
+        // Dark maria (seas)
+        const maria=[{x:0.28,y:0.43,rx:135,ry:80},{x:0.55,y:0.40,rx:105,ry:70},
+                     {x:0.75,y:0.55,rx:80,ry:55},{x:0.14,y:0.60,rx:65,ry:45}];
+        maria.forEach(m=>{
+          const g=ctx.createRadialGradient(w*m.x,h*m.y,5,w*m.x,h*m.y,m.rx);
+          g.addColorStop(0,'rgba(60,60,65,0.75)'); g.addColorStop(1,'transparent');
+          ctx.fillStyle=g; ctx.beginPath();
+          ctx.ellipse(w*m.x,h*m.y,m.rx,m.ry,0,0,Math.PI*2); ctx.fill();
+        });
+        for(let i=0;i<70;i++){
+          const cx=(hash(i*7,3)*w)|0, cy=(hash(i*11,5)*h)|0, r=3+hash(i*5,1)*18;
+          ctx.fillStyle='rgba(55,53,52,0.5)'; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+          ctx.strokeStyle='rgba(210,208,200,0.45)'; ctx.lineWidth=1; ctx.stroke();
+        }
+        break;
+      }
+
+      // â”€â”€ MARS â”€ red-brown terrain, volcanic plains, polar caps â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      case 'mars': {
+        fillPixels((x,y) => {
+          const base = fbm(x*6+1, y*6+2, 5, 0.52);
+          const dark = fbm(x*3+4, y*3+3, 3, 0.5);
+          if (dark > 0.58) return lerpRGB([100,35,15],[130,55,25], base).concat(255);
+          return lerpRGB([170,75,45],[210,110,70], base).concat(255);
+        });
+        // Polar ice caps
+        ctx.fillStyle='rgba(240,240,250,0.85)';
+        ctx.beginPath(); ctx.ellipse(w*.5,12,w*.18,22,0,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(w*.5,h-12,w*.13,16,0,0,Math.PI*2); ctx.fill();
+        break;
+      }
+
+      // â”€â”€ JUPITER â”€ tan/pink/brown horizontal bands + Great Red Spot â”€â”€â”€â”€â”€â”€â”€
+      case 'jupiter': {
+        const jPalette=[
+          [205,175,125],[165,120,80],[220,185,140],[130,85,55],
+          [215,170,120],[175,115,65],[195,155,110],[145,90,60]
+        ];
+        fillPixels((x,y) => {
+          const wave = fbm(x*3+1, y*0.5, 3, 0.5)*0.06;
+          const band = (y + wave) * 8 % 1;
+          const idx  = Math.floor((y+wave)*8) % jPalette.length;
+          const turb = fbm(x*6+y*2, y*4, 4, 0.5)*0.15;
+          const c    = lerpRGB(jPalette[idx], jPalette[(idx+1)%jPalette.length], turb);
+          return c.concat(255);
+        });
+        // Great Red Spot
+        const g=ctx.createRadialGradient(w*.62,h*.62,5,w*.62,h*.62,68);
+        g.addColorStop(0,'rgba(180,50,30,0.9)'); g.addColorStop(0.7,'rgba(145,40,22,0.8)'); g.addColorStop(1,'transparent');
+        ctx.fillStyle=g; ctx.beginPath(); ctx.ellipse(w*.62,h*.62,72,44,-0.1,0,Math.PI*2); ctx.fill();
+        break;
+      }
+
+      // â”€â”€ SATURN â”€ golden/cream bands, lighter and more uniform than Jupiter
+      case 'saturn': {
+        const sPalette=[
+          [225,200,145],[195,165,105],[235,215,165],[180,150,95],
+          [220,195,140],[200,170,110]
+        ];
+        fillPixels((x,y) => {
+          const wave = fbm(x*2+2, y*0.3, 3, 0.5)*0.04;
+          const idx  = Math.floor((y+wave)*6) % sPalette.length;
+          const turb = fbm(x*4+2, y*3+1, 3, 0.45)*0.12;
+          const c    = lerpRGB(sPalette[idx], sPalette[(idx+1)%sPalette.length], turb);
+          return c.concat(255);
+        });
+        break;
+      }
+
+      // â”€â”€ URANUS â”€ uniform pale teal-cyan, nearly featureless â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      case 'uranus': {
+        fillPixels((x,y) => {
+          const n = fbm(x*3, y*2, 3, 0.4)*0.12;
+          const pole=Math.abs(y-0.5)*2;
+          return lerpRGB([100,210,205],[60,175,190], n+pole*0.15).concat(255);
+        });
+        break;
+      }
+
+      // â”€â”€ NEPTUNE â”€ deep royal blue, horizontal white cloud streaks â”€â”€â”€â”€â”€â”€â”€â”€
+      case 'neptune': {
+        fillPixels((x,y) => {
+          const band = fbm(x*2+1, y*1.5, 3, 0.5)*0.08;
+          const c    = lerpRGB([20,60,185],[30,90,210], 0.5+0.5*Math.sin((y+band)*Math.PI*8));
+          return c.concat(255);
+        });
+        // Great Dark Spot
+        const gds=ctx.createRadialGradient(w*.42,h*.44,5,w*.42,h*.44,72);
+        gds.addColorStop(0,'rgba(5,10,60,0.8)'); gds.addColorStop(1,'transparent');
+        ctx.fillStyle=gds; ctx.beginPath(); ctx.ellipse(w*.42,h*.44,80,50,-0.15,0,Math.PI*2); ctx.fill();
+        // Cloud streaks
+        ctx.fillStyle='rgba(200,225,255,0.55)';
+        for(let i=0;i<8;i++){
+          const y2=h*(0.18+i*0.085);
+          ctx.beginPath(); ctx.ellipse(w*(0.3+hash(i,3)*0.3),y2,70+hash(i*2,5)*60,6,0,0,Math.PI*2); ctx.fill();
+        }
+        break;
+      }
+
+      // â”€â”€ PLUTO â”€ brown-grey mottled, Tombaugh heart â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      case 'pluto': {
+        fillPixels((x,y) => {
+          const base = fbm(x*7+1, y*7+2, 5, 0.5);
+          const dark = fbm(x*4+3, y*4+1, 3, 0.5);
+          if (dark > 0.60) return lerpRGB([80,55,40],[110,80,60], base).concat(255);
+          return lerpRGB([130,110,90],[165,140,115], base).concat(255);
+        });
+        // Tombaugh Regio (the heart â€” white nitrogen plains)
+        const hg=ctx.createRadialGradient(w*.55,h*.52,5,w*.55,h*.52,130);
+        hg.addColorStop(0,'rgba(235,228,215,0.95)'); hg.addColorStop(0.7,'rgba(215,205,190,0.7)'); hg.addColorStop(1,'transparent');
+        ctx.fillStyle=hg; ctx.beginPath(); ctx.ellipse(w*.55,h*.52,125,88,0.3,0,Math.PI*2); ctx.fill();
+        break;
+      }
+
+      // â”€â”€ IO â”€ bright yellow sulphur, black caldera spots, red rings â”€â”€â”€â”€â”€â”€â”€â”€
       case 'io': {
-        // Sulphur dioxide frost patches
-        ctx.fillStyle = '#fef08a'; ctx.globalAlpha = 0.4;
-        for (let i = 0; i < 18; i++) {
-          ctx.beginPath(); ctx.ellipse(rng(i*7)*w, rng(i*13)*h, 30+rng(i*3)*50, 20+rng(i*5)*30, rng(i), 0, Math.PI*2); ctx.fill();
-        }
-        // Red sulphur volcanic rings (Pele, Loki)
-        ctx.fillStyle = '#dc2626'; ctx.globalAlpha = 0.65;
-        for (let i = 0; i < 14; i++) {
-          const cx = rng(i*11)*w; const cy = rng(i*17)*h;
-          const r = 15 + rng(i*7)*28;
-          ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
-        }
-        // Black caldera vents
-        ctx.fillStyle = '#111827'; ctx.globalAlpha = 0.9;
-        for (let i = 0; i < 40; i++) {
-          ctx.beginPath(); ctx.arc(rng(i*3)*w, rng(i*5)*h, 3+rng(i*7)*8, 0, Math.PI*2); ctx.fill();
-        }
+        fillPixels((x,y) => {
+          const base = fbm(x*6+1, y*6+2, 4, 0.5);
+          const spot = fbm(x*9+5, y*9+4, 3, 0.5);
+          if (spot > 0.68) return [20,16,10,255];           // caldera black
+          if (spot > 0.62) return [160,50,15,255];           // volcanic red
+          return lerpRGB([215,185,60],[245,225,120], base).concat(255); // sulphur yellow
+        });
         break;
       }
 
-      // ── EUROPA — icy white, criss-cross reddish lineae ───────────────────
+      // â”€â”€ EUROPA â”€ white-blue ice, red-brown crack lineae â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       case 'europa': {
-        // Bright ice base
-        ctx.fillStyle = '#e8f4f8'; ctx.globalAlpha = 0.6; ctx.fillRect(0, 0, w, h);
-        // Reddish-brown tectonic cracks (lineae)
-        ctx.globalAlpha = 0.6;
-        for (let i = 0; i < 28; i++) {
+        fillPixels((x,y) => {
+          const base = fbm(x*5+1, y*5+1, 4, 0.48);
+          return lerpRGB([195,215,230],[230,240,248], base).concat(255);
+        });
+        // Crack network
+        ctx.globalAlpha=1;
+        for(let i=0;i<32;i++){
           ctx.beginPath();
-          ctx.moveTo(rng(i*7)*w, rng(i*3)*h);
-          ctx.bezierCurveTo(rng(i*11)*w, rng(i*13)*h, rng(i*17)*w, rng(i*19)*h, rng(i*23)*w, rng(i*29)*h);
-          ctx.lineWidth = 1.5 + rng(i*5)*3.5;
-          ctx.strokeStyle = rng(i) > 0.4 ? '#8b3a0f' : '#c05020';
+          ctx.moveTo(hash(i*7,1)*w, hash(i*3,2)*h);
+          ctx.bezierCurveTo(hash(i*11,3)*w,hash(i*5,4)*h, hash(i*13,5)*w,hash(i*7,6)*h, hash(i*17,7)*w,hash(i*9,8)*h);
+          ctx.lineWidth=1.5+hash(i*5,9)*3;
+          ctx.strokeStyle=`rgba(${130+hash(i,10)*40|0},${60+hash(i,11)*20|0},${20+hash(i,12)*15|0},0.65)`;
           ctx.stroke();
         }
-        // Chaotic terrain patches
-        ctx.fillStyle = '#c8a87a'; ctx.globalAlpha = 0.2;
-        for (let i = 0; i < 5; i++) {
-          ctx.beginPath(); ctx.ellipse(rng(i*7)*w, rng(i*11)*h, 40+rng(i)*50, 30+rng(i*3)*30, rng(i*5), 0, Math.PI*2); ctx.fill();
-        }
         break;
       }
 
-      // ── GANYMEDE — dark polygons + bright grooved terrain ────────────────
+      // â”€â”€ GANYMEDE â”€ grey, dark patches, lighter grooved terrain â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       case 'ganymede': {
-        // Ancient dark cratered terrain (Regio)
-        ctx.fillStyle = '#2c3e50'; ctx.globalAlpha = 0.55;
-        for (let i = 0; i < 16; i++) {
-          ctx.fillRect(rng(i*7)*w*0.9, rng(i*11)*h*0.9, 80+rng(i*3)*50, 60+rng(i*5)*40);
-        }
-        // Bright grooved terrain (Sulci)
-        ctx.strokeStyle = '#bdc3c7'; ctx.globalAlpha = 0.38; ctx.lineWidth = 2.5;
-        for (let y = 15; y < h; y += 18) {
-          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y + rng(y)*14-7); ctx.stroke();
-        }
-        // Craters
-        for (let i = 0; i < 25; i++) {
-          const cx = rng(i*13)*w; const cy = rng(i*17)*h;
-          ctx.fillStyle = '#1a252f'; ctx.globalAlpha = 0.4;
-          ctx.beginPath(); ctx.arc(cx, cy, 4+rng(i*7)*10, 0, Math.PI*2); ctx.fill();
+        fillPixels((x,y) => {
+          const base = fbm(x*6+2, y*6+1, 5, 0.5);
+          const dark = fbm(x*3+5, y*3+4, 3, 0.5);
+          if (dark > 0.57) { const v=60+base*35|0; return [v,v,v,255]; }
+          const v=105+base*50|0; return [v,v,v+5,255];
+        });
+        // Grooved terrain bands
+        ctx.strokeStyle='rgba(175,175,180,0.35)'; ctx.lineWidth=2;
+        for(let y=15;y<h;y+=20){
+          ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y+hash(y,3)*12-6); ctx.stroke();
         }
         break;
       }
 
-      // ── CALLISTO — most heavily cratered body in the solar system ────────
+      // â”€â”€ CALLISTO â”€ very dark, saturated craters â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       case 'callisto': {
-        ctx.fillStyle = '#1c2833'; ctx.globalAlpha = 0.7; ctx.fillRect(0, 0, w, h);
-        // Saturated craters everywhere
-        for (let i = 0; i < 90; i++) {
-          const cx = rng(i*7)*w; const cy = rng(i*11)*h;
-          const r  = 3 + rng(i*3)*18;
-          ctx.fillStyle = '#17202a'; ctx.globalAlpha = 0.55;
-          ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
-          ctx.strokeStyle = '#aab7c4'; ctx.lineWidth = 1; ctx.globalAlpha = 0.35; ctx.stroke();
-        }
-        // Valhalla multi-ring impact basin
-        ctx.globalAlpha = 0.3;
-        for (let r = 30; r < 200; r += 30) {
-          ctx.strokeStyle = '#d5d8dc'; ctx.lineWidth = 1.5;
-          ctx.beginPath(); ctx.arc(w*0.6, h*0.38, r, 0, Math.PI*2); ctx.stroke();
+        fillPixels((x,y) => {
+          const base = fbm(x*8+3, y*8+2, 5, 0.5);
+          const v=40+base*45|0; return [v,v-2,v-4,255];
+        });
+        for(let i=0;i<100;i++){
+          const cx=hash(i*7,1)*w, cy=hash(i*11,2)*h, r=3+hash(i*3,5)*18;
+          ctx.fillStyle='rgba(22,20,18,0.6)'; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+          ctx.strokeStyle='rgba(130,125,120,0.38)'; ctx.lineWidth=1; ctx.stroke();
         }
         break;
       }
 
-      // ── TITAN — orange nitrogen-methane haze, dark dunes, polar lakes ─────
-      case 'titan': {
-        // Dense orange haze overlay
-        ctx.fillStyle = '#e67e00'; ctx.globalAlpha = 0.4; ctx.fillRect(0, 0, w, h);
-        // Dark equatorial sand seas
-        ctx.fillStyle = '#5d3a1a'; ctx.globalAlpha = 0.5;
-        for (let i = 0; i < 6; i++) {
-          ctx.beginPath(); ctx.ellipse(w*(0.1+i*0.16), h*0.52, 100, 38, 0.05, 0, Math.PI*2); ctx.fill();
-        }
-        // North polar liquid hydrocarbon lakes (dark)
-        ctx.fillStyle = '#0d0d0d'; ctx.globalAlpha = 0.65;
-        for (let i = 0; i < 5; i++) {
-          ctx.beginPath(); ctx.ellipse(rng(i*7)*w*0.6+w*0.1, rng(i*11)*h*0.28+h*0.05, 35+rng(i*3)*40, 18+rng(i*5)*20, rng(i), 0, Math.PI*2); ctx.fill();
-        }
-        break;
-      }
-
-      // ── ENCELADUS — brilliant white ice, blue south-polar tiger stripes ───
+      // â”€â”€ ENCELADUS â”€ brilliant white ice, blue tiger stripes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       case 'enceladus': {
-        ctx.fillStyle = '#f0f8ff'; ctx.globalAlpha = 0.5; ctx.fillRect(0, 0, w, h);
-        // South polar tiger stripe fractures
-        ctx.strokeStyle = '#0077b6'; ctx.globalAlpha = 0.75; ctx.lineWidth = 4;
-        for (let i = 0; i < 5; i++) {
-          const sx = w*(0.32 + i*0.07);
-          ctx.beginPath(); ctx.moveTo(sx, h*0.72); ctx.lineTo(sx+25, h*0.96); ctx.stroke();
+        fillPixels((x,y) => {
+          const n = fbm(x*8, y*8, 4, 0.45)*0.12;
+          const v = 220+n*35|0;
+          return [v,v,v+15,255];
+        });
+        // Tiger stripes at south pole
+        ctx.strokeStyle='rgba(0,120,195,0.8)'; ctx.lineWidth=4;
+        for(let i=0;i<5;i++){
+          const sx=w*(0.30+i*0.08);
+          ctx.beginPath(); ctx.moveTo(sx,h*0.70); ctx.quadraticCurveTo(sx+15,h*0.83,sx+28,h*0.97); ctx.stroke();
         }
-        // Cryovolcanic plume glow at south pole
-        const pGrad = ctx.createRadialGradient(w*0.5, h, 5, w*0.5, h, 120);
-        pGrad.addColorStop(0, 'rgba(100,200,255,0.5)'); pGrad.addColorStop(1, 'transparent');
-        ctx.fillStyle = pGrad; ctx.globalAlpha = 0.5;
-        ctx.beginPath(); ctx.arc(w*0.5, h, 120, 0, Math.PI*2); ctx.fill();
+        // Plume glow
+        const pg=ctx.createRadialGradient(w*.5,h,5,w*.5,h,130);
+        pg.addColorStop(0,'rgba(80,180,255,0.45)'); pg.addColorStop(1,'transparent');
+        ctx.fillStyle=pg; ctx.beginPath(); ctx.arc(w*.5,h,130,0,Math.PI*2); ctx.fill();
         break;
       }
 
-      // ── GENERIC EXOPLANET — type-based visuals ────────────────────────────
+      // â”€â”€ TITAN â”€ uniform amber/orange photochemical haze â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      case 'titan': {
+        fillPixels((x,y) => {
+          const haze = fbm(x*4+1, y*3+2, 4, 0.5);
+          const band = 0.5+0.3*Math.sin(y*Math.PI*6);
+          return lerpRGB([185,105,15],[220,155,40], haze*0.6+band*0.4).concat(255);
+        });
+        break;
+      }
+
+      // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ EXOPLANETS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+      // TRAPPIST-1 e â”€ purple-brown land, dark teal seas, pink clouds â”€â”€â”€â”€â”€â”€â”€â”€
+      case 'trappist_1_e': {
+        fillPixels((x,y) => {
+          const land  = fbm(x*5+0.5, y*5+0.8, 6, 0.52);
+          const cloud = fbm(x*7+2.0, y*6+1.5, 4, 0.5);
+          if (cloud > 0.62) return [210,175,185,255];           // pink-tinged cloud
+          if (land  > 0.50) return lerpRGB([95,55,70],[140,90,100], fbm(x*10,y*10,3,.5)).concat(255); // purple-brown land
+          return lerpRGB([20,65,75],[35,90,100], land/0.5).concat(255); // dark teal sea
+        });
+        break;
+      }
+
+      // TRAPPIST-1 f â”€ colder, icier sibling of 1e â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      case 'trappist_1_f': {
+        fillPixels((x,y) => {
+          const land  = fbm(x*5+1.2, y*5+0.3, 6, 0.52);
+          const cloud = fbm(x*6+3.1, y*6+2.2, 4, 0.5);
+          const pole  = Math.abs(y-0.5)*2;
+          if (pole > 0.75 || cloud > 0.64) return [215,220,230,255]; // ice/cloud
+          if (land > 0.52) return lerpRGB([80,50,65],[115,75,85], fbm(x*9,y*9,3,.5)).concat(255);
+          return lerpRGB([15,55,70],[28,75,90], land/0.52).concat(255);
+        });
+        break;
+      }
+
+      // Proxima Cen b â”€ tidally locked: bright hot side, dark icy cold side â”€
+      case 'proxima_cen_b': {
+        fillPixels((x,y) => {
+          // Tidally locked: centre x=0.5 is the substellar point
+          const dist = Math.abs(x - 0.5)*2;  // 0=hot, 1=cold
+          const land = fbm(x*5+0.7, y*5+1.1, 5, 0.5);
+          if (dist < 0.25) {
+            // Hot bright day side
+            return lerpRGB([220,190,130],[255,230,180], land).concat(255);
+          } else if (dist > 0.75) {
+            // Frozen night side
+            return lerpRGB([30,35,55],[55,65,90], land).concat(255);
+          }
+          // Terminator â€” transition zone
+          const t = (dist-0.25)/0.5;
+          const hot=[180,155,100], cold=[40,50,70];
+          return lerpRGB(hot,cold,t).concat(255);
+        });
+        break;
+      }
+
+      // Kepler-186 f â”€ maroon/orange land, indigo seas, big ice caps â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      case 'kepler_186_f': {
+        fillPixels((x,y) => {
+          const land  = fbm(x*5+0.4, y*5+0.9, 6, 0.52);
+          const pole  = Math.abs(y-0.5)*2;
+          const cloud = fbm(x*6+1.5, y*6+2.8, 4, 0.5);
+          if (pole > 0.70) return [215,218,228,255];                    // big ice caps
+          if (cloud > 0.62) return [200,195,210,255];                   // cloud
+          if (land > 0.48) return lerpRGB([140,65,30],[175,100,55], fbm(x*10,y*10,3,.5)).concat(255); // maroon/orange land
+          return lerpRGB([35,30,105],[55,45,140], land/0.48).concat(255); // indigo sea
+        });
+        break;
+      }
+
+      // Kepler-452 b â”€ old drying super-Earth: golden/olive land, turquoise seas
+      case 'kepler_452_b': {
+        fillPixels((x,y) => {
+          const land  = fbm(x*4+1.1, y*4+0.5, 6, 0.52);
+          const cloud = fbm(x*5+3.0, y*5+1.4, 4, 0.5);
+          if (cloud > 0.63) return [225,220,185,255];                   // cloud/haze
+          if (land > 0.45) return lerpRGB([155,135,60],[185,160,90], fbm(x*9,y*9,3,.5)).concat(255); // golden/olive land+desert
+          return lerpRGB([35,125,130],[55,155,155], land/0.45).concat(255); // turquoise sea
+        });
+        break;
+      }
+
+      // Kepler-22 b â”€ global ocean world: teal-green sea, tiny islands â”€â”€â”€â”€â”€â”€
+      case 'kepler_22_b': {
+        fillPixels((x,y) => {
+          const ocean = fbm(x*5+2.2, y*5+0.6, 6, 0.52);
+          const cloud = fbm(x*8+0.5, y*7+3.1, 4, 0.5);
+          if (cloud > 0.64) return [235,240,245,255];                   // swirling cloud
+          if (ocean > 0.68) return lerpRGB([65,115,80],[90,145,105], fbm(x*12,y*12,3,.5)).concat(255); // tiny island
+          return lerpRGB([18,95,100],[30,130,130], ocean/0.68).concat(255); // teal-green ocean
+        });
+        break;
+      }
+
+      // WASP-76 b â”€ tidally locked ultra-hot Jupiter, iron rain on night side
+      case 'wasp_76_b': {
+        fillPixels((x,y) => {
+          const dist = Math.abs(x-0.5)*2;
+          const n    = fbm(x*5+1, y*5+1, 4, 0.5)*0.2;
+          const band = 0.5+0.3*Math.sin(y*Math.PI*10+n*5);
+          if (dist < 0.3) {
+            return lerpRGB([230,155,30],[255,210,80], band*0.6+n).concat(255); // blazing day side
+          } else if (dist > 0.7) {
+            return lerpRGB([25,10,5],[60,25,10], band*0.4+n).concat(255);      // dark iron-rain night
+          }
+          const t=(dist-0.3)/0.4;
+          return lerpRGB([200,100,20],[35,15,8],t).concat(255);
+        });
+        break;
+      }
+
+      // WASP-12 b â”€ very hot, bloated, deep red-orange gas giant â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      case 'wasp_12_b': {
+        fillPixels((x,y) => {
+          const n    = fbm(x*4+2, y*4+1, 4, 0.5);
+          const band = 0.5+0.4*Math.sin(y*Math.PI*8+n*3);
+          return lerpRGB([120,30,5],[195,80,20], n*0.5+band*0.5).concat(255);
+        });
+        break;
+      }
+
+      // 55 Cnc e â”€ lava world: dark surface with glowing orange fissures â”€â”€â”€â”€â”€
+      case '55_cnc_e': {
+        fillPixels((x,y) => {
+          const lava = fbm(x*10+0.5, y*10+0.5, 5, 0.55);
+          const fiss = fbm(x*15+2, y*15+3, 4, 0.6);
+          if (fiss > 0.62) return lerpRGB([210,110,10],[255,160,20], (fiss-0.62)/0.38).concat(255); // glowing fissure
+          return lerpRGB([20,8,4],[50,20,10], lava).concat(255); // dark crust
+        });
+        break;
+      }
+
+      // HD 189733 b â”€ deep cobalt-blue banded gas giant, azure clouds â”€â”€â”€â”€â”€â”€â”€â”€
+      case 'hd_189733_b': {
+        fillPixels((x,y) => {
+          const n    = fbm(x*4+1, y*3, 4, 0.5);
+          const band = 0.5+0.45*Math.sin(y*Math.PI*12+n*3);
+          return lerpRGB([15,45,170],[25,80,220], n*0.4+band*0.6).concat(255);
+        });
+        // Bright cloud streaks
+        ctx.fillStyle='rgba(170,200,255,0.5)';
+        for(let i=0;i<10;i++){
+          ctx.beginPath(); ctx.ellipse(w*(hash(i*7,3)*.6+.2),h*(hash(i*5,4)*.8+.1),55+hash(i,5)*50,7,0,0,Math.PI*2); ctx.fill();
+        }
+        break;
+      }
+
+      // HD 209458 b â”€ blue-purple "Osiris", evaporating atmosphere â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      case 'hd_209458_b': {
+        fillPixels((x,y) => {
+          const n    = fbm(x*4+3, y*3+2, 4, 0.5);
+          const band = 0.5+0.35*Math.sin(y*Math.PI*9+n*2);
+          // Purple-blue blend
+          const c    = lerpRGB([60,20,130],[90,50,190], n*0.5+band*0.5);
+          return c.concat(255);
+        });
+        break;
+      }
+
+      // TOI-700 d â”€ cloud-wrapped, hazy blue ocean, tan land showing through â”€
+      case 'toi_700_d': {
+        fillPixels((x,y) => {
+          const land  = fbm(x*4+0.8, y*4+1.2, 5, 0.52);
+          const cloud = fbm(x*6+1.8, y*5+3.0, 4, 0.5);
+          if (cloud > 0.58) return [185,195,210,255];                    // thick cloud haze
+          if (land > 0.52) return lerpRGB([150,120,75],[180,150,100], fbm(x*8,y*8,3,.5)).concat(255); // tan land
+          return lerpRGB([35,80,130],[50,110,165], land/0.52).concat(255); // muted blue ocean
+        });
+        break;
+      }
+
+      // â”€â”€ Default / unknown world â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       default: {
-        const id = planet.id || '';
-        // Hot Jupiters (WASP-76b, 55 Cnc e) — lava/iron rain, deep red-orange
-        if (id.includes('wasp') || id.includes('55_cnc') || id.includes('55cnc')) {
-          ctx.fillStyle = '#7f1d1d'; ctx.globalAlpha = 0.6; ctx.fillRect(0, 0, w, h);
-          for (let i = 0; i < 40; i++) {
-            const cx = rng(i*7)*w; const cy = rng(i*11)*h;
-            ctx.fillStyle = '#f97316'; ctx.globalAlpha = 0.3+rng(i*3)*0.4;
-            ctx.beginPath(); ctx.arc(cx, cy, 8+rng(i*5)*25, 0, Math.PI*2); ctx.fill();
-          }
-        }
-        // Ocean/habitable exoplanets (TRAPPIST, Proxima, Kepler)
-        else if (id.includes('trappist') || id.includes('proxima') || id.includes('kepler')) {
-          ctx.fillStyle = '#1e3a5f'; ctx.globalAlpha = 0.6; ctx.fillRect(0, 0, w, h);
-          ctx.fillStyle = '#2e7d32'; ctx.globalAlpha = 0.45;
-          for (let i = 0; i < 10; i++) {
-            ctx.beginPath(); ctx.ellipse(rng(i*7)*w, 80+rng(i*11)*(h-160), 70+rng(i*3)*60, 35+rng(i*5)*35, rng(i), 0, Math.PI*2); ctx.fill();
-          }
-          ctx.fillStyle = '#b3e5fc'; ctx.globalAlpha = 0.25;
-          for (let i = 0; i < 5; i++) {
-            ctx.beginPath(); ctx.ellipse(rng(i*13)*w, rng(i*17)*h, 80+rng(i)*50, 12, rng(i*3)*0.5, 0, Math.PI*2); ctx.fill();
-          }
-        }
-        // Default exotic alien world — swirling gas with planet's unique color
-        else {
-          for (let i = 0; i < 20; i++) {
-            const y = (h/20)*i;
-            ctx.fillStyle = i%2===0 ? primary : secondary;
-            ctx.globalAlpha = 0.3 + rng(i*7)*0.25;
-            ctx.fillRect(0, y, w, h/20 * (0.8+rng(i*3)*0.4));
-          }
-          // Alien storm oval
-          ctx.globalAlpha = 0.6;
-          const stormGrad = ctx.createRadialGradient(w*0.55, h*0.5, 5, w*0.55, h*0.5, 60);
-          stormGrad.addColorStop(0, accent || '#ffffff');
-          stormGrad.addColorStop(1, 'transparent');
-          ctx.fillStyle = stormGrad;
-          ctx.beginPath(); ctx.ellipse(w*0.55, h*0.5, 70, 42, 0, 0, Math.PI*2); ctx.fill();
-        }
+        const primary   = planet.color || '#3a7bd5';
+        const secondary = planet.secondaryColor || '#1a3a6a';
+        const parseHex = h => { const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16); return [r,g,b]; };
+        const p1 = parseHex(primary.length===7?primary:'#3a7bd5');
+        const p2 = parseHex(secondary.length===7?secondary:'#1a3a6a');
+        fillPixels((x,y) => {
+          const n = fbm(x*5+1, y*5+1, 5, 0.5);
+          const band = 0.5+0.4*Math.sin(y*Math.PI*8+n*3);
+          return lerpRGB(p2, p1, n*0.5+band*0.5).concat(255);
+        });
         break;
       }
     }
