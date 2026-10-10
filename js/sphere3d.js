@@ -241,20 +241,26 @@ const Sphere3DViewer = (() => {
     gl.uniform1f(uLightAngleLoc, lightAngle);
     gl.uniform1f(uRotationLoc, rotation);
 
-    // Extract atmosphere glow color
-    let atmos = [0.4, 0.6, 1.0];
-    if (currentPlanet && currentPlanet.palette && currentPlanet.palette.primary) {
-      // Basic hex to rgb conversion
-      const hex = currentPlanet.palette.primary.replace('#', '');
-      if (hex.length === 6) {
+    // Extract atmosphere glow color: airless rocky worlds (Moon, Mercury, Callisto, Pluto) get very subtle or no glow
+    let atmos = [0.0, 0.0, 0.0];
+    const airless = ['moon', 'mercury', 'callisto', 'ganymede', 'pluto'];
+    const pId = (currentPlanet && currentPlanet.id) ? currentPlanet.id.toLowerCase() : '';
+
+    if (!airless.includes(pId)) {
+      const hexColor = (currentPlanet && (currentPlanet.color || (currentPlanet.palette && currentPlanet.palette.primary))) || '#38bdf8';
+      const cleanHex = hexColor.replace('#', '');
+      if (cleanHex.length === 6) {
         atmos = [
-          parseInt(hex.slice(0, 2), 16) / 255,
-          parseInt(hex.slice(2, 4), 16) / 255,
-          parseInt(hex.slice(4, 6), 16) / 255
+          parseInt(cleanHex.slice(0, 2), 16) / 255.0,
+          parseInt(cleanHex.slice(2, 4), 16) / 255.0,
+          parseInt(cleanHex.slice(4, 6), 16) / 255.0
         ];
+      } else {
+        atmos = [0.2, 0.4, 0.7];
       }
     }
     gl.uniform3f(uAtmosphereColorLoc, atmos[0], atmos[1], atmos[2]);
+
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, textureHandle);

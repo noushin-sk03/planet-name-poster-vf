@@ -162,20 +162,33 @@ const TextureManager = (() => {
       // â”€â”€ MERCURY â”€ light grey, heavily cratered â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       case 'mercury': {
         fillPixels((x,y) => {
-          const base = fbm(x*8+2, y*8+1, 5, 0.5);
-          const v = Math.round(140 + base*60);
-          return [v, v-5, v-10, 255];
+          const base = fbm(x*8+2, y*8+1, 4, 0.5);
+          const fine = fbm(x*16+5, y*16+7, 3, 0.4) * 20;
+          const v = Math.round(115 + base*45 + fine);
+          return [v, v-4, v-8, 255];
         });
-        // Craters
-        ctx.globalAlpha = 1;
-        for (let i=0;i<90;i++){
-          const cx=(hash(i*7,1)*w)|0, cy=(hash(i*11,2)*h)|0;
-          const r=4+hash(i*3,5)*20;
-          const dark = `rgba(90,88,85,0.55)`;
-          const rim  = `rgba(210,208,200,0.5)`;
-          ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
-          ctx.fillStyle=dark; ctx.fill();
-          ctx.strokeStyle=rim; ctx.lineWidth=1.2; ctx.stroke();
+        // Realistic subtle craters with lighting relief
+        for (let i = 0; i < 45; i++) {
+          const cx = (hash(i * 9.1, 1.3) * w) | 0;
+          const cy = (hash(i * 13.7, 2.7) * h) | 0;
+          const latFactor = Math.cos((cy / h - 0.5) * Math.PI);
+          const rx = (3 + hash(i * 4.3, 5.1) * 10) * Math.max(0.4, latFactor);
+          const ry = 3 + hash(i * 4.3, 5.1) * 10;
+          
+          const craterGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, ry);
+          craterGrad.addColorStop(0, 'rgba(45, 42, 40, 0.45)');
+          craterGrad.addColorStop(0.7, 'rgba(65, 62, 60, 0.22)');
+          craterGrad.addColorStop(1, 'rgba(100, 95, 90, 0)');
+          ctx.fillStyle = craterGrad;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.strokeStyle = 'rgba(215, 210, 200, 0.30)';
+          ctx.lineWidth = 0.9;
+          ctx.beginPath();
+          ctx.arc(cx, cy, ry, 0.8 * Math.PI, 1.8 * Math.PI);
+          ctx.stroke();
         }
         break;
       }
@@ -223,23 +236,50 @@ const TextureManager = (() => {
       // â”€â”€ MOON â”€ grey with dark circular maria, craters â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       case 'moon': {
         fillPixels((x,y) => {
-          const base = fbm(x*7+1, y*7+2, 5, 0.5);
-          const v = Math.round(120 + base*70);
+          const base = fbm(x*7+1, y*7+2, 4, 0.5);
+          const fine = fbm(x*14+3, y*14+4, 3, 0.4) * 20;
+          const v = Math.round(110 + base*50 + fine);
           return [v,v,v,255];
         });
-        // Dark maria (seas)
-        const maria=[{x:0.28,y:0.43,rx:135,ry:80},{x:0.55,y:0.40,rx:105,ry:70},
-                     {x:0.75,y:0.55,rx:80,ry:55},{x:0.14,y:0.60,rx:65,ry:45}];
-        maria.forEach(m=>{
-          const g=ctx.createRadialGradient(w*m.x,h*m.y,5,w*m.x,h*m.y,m.rx);
-          g.addColorStop(0,'rgba(60,60,65,0.75)'); g.addColorStop(1,'transparent');
-          ctx.fillStyle=g; ctx.beginPath();
-          ctx.ellipse(w*m.x,h*m.y,m.rx,m.ry,0,0,Math.PI*2); ctx.fill();
+        // Dark lunar maria (soft basalt plains)
+        const maria = [
+          {x:0.30, y:0.42, rx:70, ry:45},
+          {x:0.52, y:0.38, rx:60, ry:40},
+          {x:0.68, y:0.52, rx:50, ry:32},
+          {x:0.20, y:0.58, rx:38, ry:28}
+        ];
+        maria.forEach(m => {
+          const g = ctx.createRadialGradient(w*m.x, h*m.y, 2, w*m.x, h*m.y, m.rx);
+          g.addColorStop(0, 'rgba(45,45,48, 0.60)');
+          g.addColorStop(0.7, 'rgba(60,60,64, 0.35)');
+          g.addColorStop(1, 'transparent');
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.ellipse(w*m.x, h*m.y, m.rx, m.ry, 0, 0, Math.PI*2);
+          ctx.fill();
         });
-        for(let i=0;i<70;i++){
-          const cx=(hash(i*7,3)*w)|0, cy=(hash(i*11,5)*h)|0, r=3+hash(i*5,1)*18;
-          ctx.fillStyle='rgba(55,53,52,0.5)'; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
-          ctx.strokeStyle='rgba(210,208,200,0.45)'; ctx.lineWidth=1; ctx.stroke();
+        // Realistic subtle craters
+        for(let i=0; i<40; i++){
+          const cx = (hash(i*8.3, 3.1) * w) | 0;
+          const cy = (hash(i*12.7, 5.7) * h) | 0;
+          const latFactor = Math.cos((cy / h - 0.5) * Math.PI);
+          const rx = (3 + hash(i*4.7, 1.9) * 10) * Math.max(0.4, latFactor);
+          const ry = 3 + hash(i*4.7, 1.9) * 10;
+          
+          const cGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, ry);
+          cGrad.addColorStop(0, 'rgba(40,38,36, 0.45)');
+          cGrad.addColorStop(0.8, 'rgba(58,55,53, 0.20)');
+          cGrad.addColorStop(1, 'transparent');
+          ctx.fillStyle = cGrad;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI*2);
+          ctx.fill();
+          
+          ctx.strokeStyle = 'rgba(215,212,205, 0.25)';
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.arc(cx, cy, ry, 0.7 * Math.PI, 1.7 * Math.PI);
+          ctx.stroke();
         }
         break;
       }
@@ -391,13 +431,32 @@ const TextureManager = (() => {
       // â”€â”€ CALLISTO â”€ very dark, saturated craters â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       case 'callisto': {
         fillPixels((x,y) => {
-          const base = fbm(x*8+3, y*8+2, 5, 0.5);
-          const v=40+base*45|0; return [v,v-2,v-4,255];
+          const base = fbm(x*8+3, y*8+2, 4, 0.5);
+          const fine = fbm(x*16+7, y*16+9, 3, 0.4) * 20;
+          const v = Math.round(55 + base*40 + fine);
+          return [v, v-2, v-4, 255];
         });
-        for(let i=0;i<100;i++){
-          const cx=hash(i*7,1)*w, cy=hash(i*11,2)*h, r=3+hash(i*3,5)*18;
-          ctx.fillStyle='rgba(22,20,18,0.6)'; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
-          ctx.strokeStyle='rgba(130,125,120,0.38)'; ctx.lineWidth=1; ctx.stroke();
+        for(let i=0; i<50; i++){
+          const cx = (hash(i*7.1, 1.3) * w) | 0;
+          const cy = (hash(i*11.3, 2.9) * h) | 0;
+          const latFactor = Math.cos((cy / h - 0.5) * Math.PI);
+          const rx = (2 + hash(i*3.7, 5.3) * 9) * Math.max(0.4, latFactor);
+          const ry = 2 + hash(i*3.7, 5.3) * 9;
+
+          const cGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, ry);
+          cGrad.addColorStop(0, 'rgba(25, 23, 22, 0.55)');
+          cGrad.addColorStop(0.7, 'rgba(45, 42, 40, 0.30)');
+          cGrad.addColorStop(1, 'transparent');
+          ctx.fillStyle = cGrad;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.strokeStyle = 'rgba(195, 205, 215, 0.30)';
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.arc(cx, cy, ry, 0, Math.PI * 2);
+          ctx.stroke();
         }
         break;
       }

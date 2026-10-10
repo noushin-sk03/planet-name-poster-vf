@@ -1967,38 +1967,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Start with restored or default world
   selectWorld(state.worldId || 'earth', { source: 'init' });
   updateAstronautScroller(state.worldId || 'earth');
-
-  // ── Idle-time texture pre-warming ──────────────────────────────────────────
-  // Generate textures for the most-visited planets in the background during
-  // browser idle time so the first click on each planet is instant.
-  // Uses requestIdleCallback so it NEVER blocks the UI or animation loop.
-  const PREWARM_IDS = ['earth','mars','jupiter','saturn','moon','venus','neptune','uranus'];
-  const prewarmQueue = [...PREWARM_IDS];
-  const prewarmNext = (deadline) => {
-    while (prewarmQueue.length > 0 && (deadline.timeRemaining() > 4 || deadline.didTimeout)) {
-      const id = prewarmQueue.shift();
-      const world = getAllWorlds().find(w => w.id === id);
-      if (world) {
-        TextureManager.generateProceduralTexture(world, 'day');
-        TextureManager.generateProceduralTexture(world, 'night');
-      }
-    }
-    if (prewarmQueue.length > 0) {
-      requestIdleCallback(prewarmNext, { timeout: 2000 });
-    }
-  };
-  // requestIdleCallback not available in all browsers — fall back to setTimeout
-  if (typeof requestIdleCallback === 'function') {
-    requestIdleCallback(prewarmNext, { timeout: 1500 });
-  } else {
-    setTimeout(() => {
-      PREWARM_IDS.forEach(id => {
-        const world = getAllWorlds().find(w => w.id === id);
-        if (world) {
-          TextureManager.generateProceduralTexture(world, 'day');
-          TextureManager.generateProceduralTexture(world, 'night');
-        }
-      });
-    }, 2000);
-  }
 });
+
