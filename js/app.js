@@ -861,14 +861,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ---------------------------------------------------------------------------
   function syncAstronautToScroll() {
     if (!astronautGuideThumb || !astroTrackRail || !planetMenuList) return;
+    const activeBtn = planetMenuList.querySelector(`.planet-btn.active`);
+    const railRect = astroTrackRail.getBoundingClientRect();
+    const thumbH = 36;
+    const maxTop = Math.max(0, (railRect.height || 200) - thumbH);
+
+    if (activeBtn && railRect.height > 0) {
+      const btnRect = activeBtn.getBoundingClientRect();
+      // Center astronaut thumb relative to the active planet button
+      const targetCenterY = (btnRect.top + btnRect.height * 0.5) - railRect.top;
+      const targetTop = Math.max(0, Math.min(maxTop, Math.round(targetCenterY - thumbH * 0.5)));
+      astronautGuideThumb.style.top = `${targetTop}px`;
+    } else {
+      const maxScroll = planetMenuList.scrollHeight - planetMenuList.clientHeight;
+      const progress = maxScroll > 0 ? (planetMenuList.scrollTop / maxScroll) : 0;
+      const topPx = Math.max(0, Math.min(maxTop, Math.round(progress * maxTop)));
+      astronautGuideThumb.style.top = `${topPx}px`;
+    }
+
     const maxScroll = planetMenuList.scrollHeight - planetMenuList.clientHeight;
     const progress = maxScroll > 0 ? (planetMenuList.scrollTop / maxScroll) : 0;
-    const railHeight = astroTrackRail.clientHeight || 200;
-    const thumbHeight = 36;
-    const availableTravel = Math.max(0, railHeight - thumbHeight);
-    const topPx = Math.max(0, Math.min(availableTravel, Math.round(progress * availableTravel)));
-
-    astronautGuideThumb.style.top = `${topPx}px`;
     if (planetDrawer) {
       planetDrawer.style.setProperty('--milkyway-depth', progress.toFixed(3));
     }
@@ -880,7 +892,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (activeBtn) {
       activeBtn.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
+    // Update astronaut position immediately, then again once smooth scroll finishes
     syncAstronautToScroll();
+    requestAnimationFrame(syncAstronautToScroll);
+    setTimeout(syncAstronautToScroll, 200);
   }
 
   // ---------------------------------------------------------------------------
@@ -1451,9 +1466,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (astroUpBtn) {
       astroUpBtn.addEventListener('click', () => {
-        if (planetMenuList) {
-          planetMenuList.scrollBy({ top: -56, behavior: 'smooth' });
-        }
         const activeList = getActiveWorldsList();
         const currentIdx = activeList.findIndex((w) => w.id === state.worldId);
         if (currentIdx > 0) {
@@ -1464,9 +1476,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (astroDownBtn) {
       astroDownBtn.addEventListener('click', () => {
-        if (planetMenuList) {
-          planetMenuList.scrollBy({ top: 56, behavior: 'smooth' });
-        }
         const activeList = getActiveWorldsList();
         const currentIdx = activeList.findIndex((w) => w.id === state.worldId);
         if (currentIdx >= 0 && currentIdx < activeList.length - 1) {
