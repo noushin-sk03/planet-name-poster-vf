@@ -4,8 +4,6 @@ Ever wondered what your name looks like on Mars? Or how old you'd be on Jupiter?
 
 Pick any planet (or moon, or exoplanet), type your name, and it instantly generates a beautiful space poster with your name written across the world you chose. You can also spin a 3D globe, download your poster, or even check your weight and age on another planet. It's free, it works in your browser, and no app download is needed.
 
-**Made by NSK with AI 🤍**
-
 ---
 
 ## What can you do with it?
@@ -61,24 +59,11 @@ Every number — gravity, temperature, day length, orbital period, distance — 
 
 ---
 
-## Running it yourself
-
-This is a plain HTML/CSS/JavaScript project. No frameworks, no build steps, no installs.
-
-**Quick start:**
-```bash
-python -m http.server 8080
-```
-Then open `http://localhost:8080` in your browser.
-
-Or just double-click `index.html` directly.
-
----
-
 ## A note on the 3D globe
 
 The 3D planet globe isn't a pre-made 3D model — it's drawn in real time using a WebGL shader that traces rays of light mathematically. This means it works on any browser that supports WebGL, with no heavy files to download.
 
 ---
+Website link: https://planet-name-poster-vf.netlify.app/
 
 *-Made by NSK with AI*
