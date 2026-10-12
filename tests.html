@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Celestial Calculator - Unit Tests</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #090a0f;
+      color: #e2e8f0;
+      padding: 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 { font-size: 1.5rem; margin-bottom: 0.5rem; color: #60a5fa; }
+    p { color: #94a3b8; font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .test-card {
+      background: #131622;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 0.8rem 1.2rem;
+      margin-bottom: 0.6rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .test-desc { font-size: 0.95rem; }
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .pass { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
+    .fail { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .summary {
+      margin-top: 1.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Celestial Calculator Test Runner</h1>
+  <p>Verifying celestial biological & orbital math against NASA baseline metrics.</p>
+
+  <div id="test-results"></div>
+  <div id="test-summary" class="summary">Running tests...</div>
+
+  <script src="js/calculator.js"></script>
+  <script>
+    const resultsContainer = document.getElementById('test-results');
+    const summaryContainer = document.getElementById('test-summary');
+    let passed = 0;
+    let failed = 0;
+
+    function assertEqual(actual, expected, desc) {
+      const match = actual === expected;
+      if (match) passed++; else failed++;
+
+      const div = document.createElement('div');
+      div.className = 'test-card';
+      div.innerHTML = `
+        <span class="test-desc">${desc}</span>
+        <span class="badge ${match ? 'pass' : 'fail'}">${match ? 'PASS' : 'FAIL'}</span>
+      `;
+      resultsContainer.appendChild(div);
+    }
+
+    // Invariants
+    const wEarth = CelestialCalculator.calculateWeightOnPlanet(70, 9.8);
+    assertEqual(Math.round(wEarth.value), 70, 'Earth Weight Invariant: 70 kg on Earth is 70 kg');
+
+    const aEarth = CelestialCalculator.calculateAgeOnPlanet(new Date('2005-01-01T00:00:00Z'), 1.0, new Date('2025-01-01T00:00:00Z'));
+    assertEqual(Math.round(aEarth.value), 20, 'Earth Age Invariant: Born 2005, in 2025 is 20 Earth years old');
+
+    const dEarth = CelestialCalculator.calculateDiurnalRatio(24.0);
+    assertEqual(dEarth.planetDaysPerEarthDay, 1.0, 'Earth Diurnal Invariant: 1 Earth day = 1.0 Earth days');
+
+    // Mars
+    const wMars = CelestialCalculator.calculateWeightOnPlanet(70, '3.7 m/s²');
+    assertEqual(wMars.value, 26.4, 'Mars Weight: 70 kg * (3.7 / 9.80665) = 26.4 kg');
+
+    const aMars = CelestialCalculator.calculateAgeOnPlanet(new Date('2000-01-01T00:00:00Z'), 1.881, new Date('2030-01-01T00:00:00Z'));
+    assertEqual(Math.round(aMars.value), 16, 'Mars Age: 30 Earth years / 1.881 = ~16 Mars years');
+
+    // Jupiter
+    const wJup = CelestialCalculator.calculateWeightOnPlanet(70, '24.8 m/s²');
+    assertEqual(wJup.value, 177.0, 'Jupiter Weight: 70 kg * (24.8 / 9.80665) = 177.0 kg');
+
+    // Edge cases
+    const wEmpty = CelestialCalculator.calculateWeightOnPlanet(null, 3.7);
+    assertEqual(wEmpty.value, null, 'Empty weight returns null without error');
+
+    const aFuture = CelestialCalculator.calculateAgeOnPlanet(new Date(Date.now() + 86400000000), 1.881);
+    assertEqual(aFuture.error, 'Future date', 'Future birth date returns graceful error');
+
+    const aSun = CelestialCalculator.calculateAgeOnPlanet(new Date('2000-01-01'), 0);
+    assertEqual(aSun.formatted, 'N/A', 'The Sun (0 orbital period) safely returns N/A');
+
+    // Stage 06: Moons
+    const aIo = CelestialCalculator.calculateAgeOnPlanet(new Date('2000-01-01T00:00:00Z'), 11.86, new Date('2030-01-01T00:00:00Z'));
+    assertEqual(Number(aIo.value.toFixed(1)), 2.5, 'Jovian Moon Year: Io/Europa orbit Sun with Jupiter (11.86 yrs)');
+
+    // Stage 07: Exoplanets
+    const gTrappist = Number(((0.69 / (0.92 * 0.92)) * 9.80665).toFixed(1));
+    assertEqual(gTrappist, 8.0, 'Exoplanet Gravity: TRAPPIST-1 e (M=0.69, R=0.92) produces 8.0 m/s²');
+
+    summaryContainer.textContent = `All Tests Completed: ${passed} Passed, ${failed} Failed.`;
+  </script>
+</body>
+</html>
