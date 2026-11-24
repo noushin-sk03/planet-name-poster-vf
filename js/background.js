@@ -2,18 +2,18 @@
  * background.js - High-Fidelity Procedural Solar System Canvas Engine
  * -------------------------------------------------------------------
  * Design & Visual Features:
- * 1. Procedural Deep-Space Starfield with Galactic Parallax Drift:
+ * 1. Procedcs:
+ *    - 8 planetary tilted elliptical tracks with astronomical foreshortening.
+ *    - Glowing neon cyan illumination on the active planet's orbit track.
+ *    - Full Orbit-Line Hit-Testing: Clicking or hovering anywhere along an orbit line selects the planet!
+ * 4. Animated Asteroid Belt & Stray ural Deep-Space Starfield with Galactic Parallax Drift:
  *    - Stars drift continuously to simulate the Solar System's ~230 km/s voyage through the Milky Way.
  *    - 3-layer parallax twinkling stars with realistic stellar color temperatures.
  *    - Soft atmospheric cosmic nebulae clouds for deep cinematic contrast.
  * 2. Luminous Central Star (The Sun):
  *    - Multi-layered pulsating plasma corona and solar flare breathing.
  *    - Clickable & selectable celestial body.
- * 3. 3D Perspective Orbital Mechanics:
- *    - 8 planetary tilted elliptical tracks with astronomical foreshortening.
- *    - Glowing neon cyan illumination on the active planet's orbit track.
- *    - Full Orbit-Line Hit-Testing: Clicking or hovering anywhere along an orbit line selects the planet!
- * 4. Animated Asteroid Belt & Stray Asteroids:
+ * 3. 3D Perspective Orbital MechaniAsteroids:
  *    - 220 orbiting asteroids between Mars and Jupiter with authentic rock palettes.
  *    - Stray tumbling asteroids (Ceres and Vesta) drifting along the belt.
  * 5. Earth & Moon System:
@@ -1694,28 +1694,28 @@ const SolarBackground = (() => {
     ctx.restore();
 
     // 4. Extrasolar System Top Banner
-    ctx.save();
-    const bannerW = Math.min(width - 60, 480);
-    const bannerH = 28;
-    const bx = sunCenterX - bannerW * 0.5;
-    const by = 26;
-    ctx.fillStyle = 'rgba(8, 12, 26, 0.88)';
-    ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
-    ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    if (ctx.roundRect) {
-      ctx.roundRect(bx, by, bannerW, bannerH, 6);
-    } else {
-      ctx.rect(bx, by, bannerW, bannerH);
-    }
-    ctx.fill();
-    ctx.stroke();
+    // ctx.save();
+    // const bannerW = Math.min(width - 60, 480);
+    // const bannerH = 28;
+    // const bx = sunCenterX - bannerW * 0.5;
+    // const by = 26;
+    // ctx.fillStyle = 'rgba(8, 12, 26, 0.88)';
+    // ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+    // ctx.lineWidth = 1.2;
+    // ctx.beginPath();
+    // if (ctx.roundRect) {
+    //   ctx.roundRect(bx, by, bannerW, bannerH, 6);
+    // } else {
+    //   ctx.rect(bx, by, bannerW, bannerH);
+    // }
+    // ctx.fill();
+    // ctx.stroke();
 
-    ctx.font = '600 10.5px "Space Grotesk", sans-serif';
-    ctx.fillStyle = '#38bdf8';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(`🌌 EXTRASOLAR SYSTEM • HOST STAR: ${currentExoPlanet.hostname.toUpperCase()} • ARTIST'S IMPRESSION`, sunCenterX, by + bannerH * 0.5);
+    // ctx.font = '600 10.5px "Space Grotesk", sans-serif';
+    // ctx.fillStyle = '#38bdf8';
+    // ctx.textAlign = 'center';
+    // ctx.textBaseline = 'middle';
+    // ctx.fillText(`🌌 EXTRASOLAR SYSTEM • HOST STAR: ${currentExoPlanet.hostname.toUpperCase()} • ARTIST'S IMPRESSION`, sunCenterX, by + bannerH * 0.5);
     ctx.restore();
   }
 
